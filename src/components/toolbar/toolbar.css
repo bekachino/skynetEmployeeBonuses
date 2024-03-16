@@ -1,0 +1,16 @@
+.toolbar {
+  max-width: 1400px;
+  padding: 16px 40px;
+  border-radius: 20px;
+  background-color: #A2B0C0;
+  margin: 0 100px;
+}
+
+@media (max-width: 992px) {
+  .toolbar {
+    margin: 0;
+    padding: 16px 25px;
+    border-top-right-radius: 0;
+    border-top-left-radius: 0;
+  }
+}
