@@ -1,23 +1,23 @@
-import logo from './logo.svg';
+import {Navigate, Route, Routes} from "react-router-dom";
+import {useAppSelector} from "./app/hooks";
+import SignUp from "./containers/signUp/SignUp";
+import SignIn from "./containers/signIn/SignIn";
+import Bonuses from "./containers/bonuses/Bonuses";
 import './App.css';
 
-function App() {
+const App = () => {
+  const userToken = useAppSelector((state) => state.userState.user);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Routes>
+        <Route path='*' element={userToken ?
+          <Navigate to="/sign-in" replace/> : <Navigate to="/sign-in" replace/>}/>
+        <Route path='sign-up' element={<SignUp/>}/>
+        <Route path='sign-in' element={<SignIn/>}/>
+        <Route path='bonuses' element={<Bonuses/>}/>
+        {/*<Route path='show-data' element={<ShowData/>}/>*/}
+      </Routes>
     </div>
   );
 }
