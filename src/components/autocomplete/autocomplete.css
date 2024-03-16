@@ -1,0 +1,143 @@
+.autocomplete {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 240px;
+}
+
+.autocomplete-main-placeholder {
+  font-weight: 600;
+  color: white;
+  margin-right: auto;
+  margin-bottom: 6px;
+}
+
+.autocomplete-input-box {
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 40px;
+  border-radius: 10px;
+  background-color: white;
+}
+
+.autocomplete-input {
+  width: 100%;
+  height: 100%;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  color: #1B1B1B;
+  background-color: white;
+  box-sizing: border-box;
+  font-size: 16px;
+  border: 0;
+  outline: 0;
+  padding: 0 4px 0 14px;
+}
+
+.autocomplete-input::placeholder {
+  color: rgba(27, 27, 27, 0.6);
+}
+
+.autocomplete-icon {
+  position: relative;
+  display: flex;
+  width: 40px;
+  height: 40px;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  transition: 0.2s;
+}
+
+.autocomplete-icon::before {
+  position: absolute;
+  content: '';
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("../../assets/autocomplete-arrow.svg");
+  background-size: 16px;
+  background-position: center;
+  background-repeat: no-repeat;
+  transition: 0.2s;
+}
+
+.autocomplete-toggler:checked ~ .autocomplete-icon {
+  background-color: #E7F0FA;
+}
+
+.autocomplete-toggler:checked ~ .autocomplete-icon::before {
+  transform: rotateX(180deg);
+}
+
+.autocomplete-toggler:checked ~ .autocomplete-panel {
+  opacity: 1;
+  z-index: 1;
+  max-height: 300px;
+}
+
+.autocomplete-toggler {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+}
+
+.autocomplete-panel {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  top: 105%;
+  width: 100%;
+  opacity: 0;
+  max-height: 0;
+  box-sizing: border-box;
+  padding: 8px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px 0 #61616180;
+  overflow-y: auto;
+  z-index: -1;
+}
+
+.autocomplete-option,
+.autocomplete-option-not-found {
+  display: flex;
+  align-items: center;
+  height: 25px;
+  border-radius: 5px;
+  font-weight: 500;
+  text-align: left;
+  color: #1B1B1B;
+  padding: 3px 10px;
+}
+
+.autocomplete-option-not-found {
+  color: rgba(27, 27, 27, 0.6);
+}
+
+.autocomplete-option:hover {
+  background-color: #29384A;
+  color: white;
+}
+
+@media (max-width: 724px) {
+  .autocomplete {
+    width: 220px;
+  }
+
+  .autocomplete-input-box {
+    font-size: 14px;
+    height: 36px;
+  }
+
+  .autocomplete-icon {
+    width: 36px;
+    height: 36px;
+  }
+}

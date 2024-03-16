@@ -1,7 +1,10 @@
 import React, {useState} from 'react';
 import Toolbar from "../../components/toolbar/Toolbar";
-import './bonuses.css';
 import DatePicker from "../../components/datePicker/DatePicker";
+import './bonuses.css';
+import Autocomplete from "../../components/autocomplete/Autocomplete";
+
+const districts = ['Ак-Ордо', 'Рухий-Мурас', 'Учкун', 'Аламедин-1'];
 
 const Bonuses = () => {
   const [state, setState] = useState({
@@ -20,7 +23,10 @@ const Bonuses = () => {
   return (
     <>
       <Toolbar>
-        <DatePicker value={state.date} changeHandler={changeHandler} />
+        <div className="toolbar-form">
+          <DatePicker value={state.date} changeHandler={changeHandler}/>
+          <Autocomplete value={state.district} changeHandler={changeHandler} options={districts}/>
+        </div>
       </Toolbar>
     </>
   );

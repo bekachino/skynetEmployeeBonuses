@@ -1,3 +1,10 @@
-body {
-  background-color: #E8E8E8;
+.toolbar-form {
+  display: flex;
+  gap: 90px;
+}
+
+@media (max-width: 724px) {
+  .toolbar-form {
+    gap: 40px;
+  }
 }
