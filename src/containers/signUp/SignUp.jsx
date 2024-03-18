@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import mainLogo from '../../assets/skynet-logo.png';
 import './signUp.css';
-import {Link, useNavigate} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import {useAppDispatch, useAppSelector} from "../../app/hooks";
 
 const SignUp = () => {
