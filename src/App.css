@@ -1,3 +1,9 @@
 .App {
   text-align: center;
 }
+
+@media (min-width: 880px) {
+  html {
+    width: 100% !important;
+  }
+}

@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  width: 240px;
+  min-width: 240px;
 }
 
 .date-picker-input {
@@ -187,30 +187,30 @@
   color: white;
 }
 
-@media (max-width: 724px) {
-  .date-picker {
-    width: 220px;
-  }
+/*@media (max-width: 724px) {*/
+/*  .date-picker {*/
+/*    min-width: 200px;*/
+/*  }*/
 
-  .date-picker-input {
-    font-size: 14px;
-    height: 36px;
-  }
+/*  .date-picker-input {*/
+/*    font-size: 12px;*/
+/*    height: 32px;*/
+/*  }*/
 
-  .date-picker-icon {
-    width: 36px;
-    height: 36px;
-  }
+/*  .date-picker-icon {*/
+/*    width: 26px;*/
+/*    height: 32px;*/
+/*  }*/
 
-  .date-picker-month-day {
-    width: 26px;
-    height: 26px;
-  }
+/*  .date-picker-month-day {*/
+/*    width: 26px;*/
+/*    height: 26px;*/
+/*  }*/
 
-  .date-picker-week-names {
-    font-size: 11px;
-  }
-}
+/*  .date-picker-week-names {*/
+/*    font-size: 11px;*/
+/*  }*/
+/*}*/
 
 @keyframes dayPickerPanelOpen {
   0% {

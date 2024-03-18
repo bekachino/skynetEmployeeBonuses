@@ -1,10 +1,6 @@
 .toolbar-form {
   display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
   gap: 90px;
-}
-
-@media (max-width: 724px) {
-  .toolbar-form {
-    gap: 40px;
-  }
 }

@@ -94,6 +94,7 @@ const DatePicker = ({value, changeHandler}) => {
                           value: new Date(day)
                         }
                       });
+                      setPanelOpen(false);
                     }}
                   >
                     {day.format('D')}
