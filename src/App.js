@@ -12,7 +12,11 @@ const App = () => {
 
   useEffect(() => {
     document.body.style.backgroundColor =
-    location.pathname === '/sign-in' || location.pathname === '/sign-up' ? '#29384A' : '#E8E8E8';
+      location.pathname === '/sign-in' || location.pathname === '/sign-up' ? '#29384A' : '#E8E8E8';
+
+    if (document.querySelector('.toolbar')) {
+      document.documentElement.style.width = '175vh';
+    }
   }, [location.pathname]);
 
   return (
@@ -23,7 +27,6 @@ const App = () => {
         <Route path='sign-up' element={<SignUp/>}/>
         <Route path='sign-in' element={<SignIn/>}/>
         <Route path='bonuses' element={<Bonuses/>}/>
-        {/*<Route path='show-data' element={<ShowData/>}/>*/}
       </Routes>
     </div>
   );
