@@ -2,14 +2,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  min-width: 240px;
-}
-
-.autocomplete-main-placeholder {
-  font-weight: 600;
-  color: white;
-  margin-right: auto;
-  margin-bottom: 6px;
+  width: 240px;
 }
 
 .autocomplete-input-box {

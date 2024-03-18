@@ -4,7 +4,8 @@
   background-color: #FFFFFF;
   font-weight: 600;
   font-size: 18px;
-  width: 240px;
+  max-width: 240px;
+  min-width: 200px;
   height: 40px;
   border-radius: 10px;
   box-shadow: 0 2px 10px 0 #61616180;

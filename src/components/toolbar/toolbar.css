@@ -1,9 +1,11 @@
 .toolbar {
-  max-width: 1400px;
-  padding: 16px 40px;
+  display: flex;
+  flex-wrap: wrap;
+  padding: 30px 40px;
   border-radius: 20px;
   background-color: #A2B0C0;
-  margin: 0 100px;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 @media (max-width: 1120px) {

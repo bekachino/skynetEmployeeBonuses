@@ -1,6 +1,130 @@
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px 30px;
+  align-items: center;
+}
+
 .toolbar-form {
   display: flex;
   justify-content: flex-end;
   align-items: flex-end;
   gap: 90px;
+  margin-left: auto;
+}
+
+.bonuses-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-sizing: border-box;
+  overflow: auto;
+  padding: 10px 0;
+}
+
+.bonuses-paper {
+  padding: 15px 30px 20px;
+  background-color: #FFFFFF;
+  border-radius: 10px;
+  box-sizing: border-box;
+}
+
+.bonuses-paper-title {
+  font-size: 24px;
+  color: #29384A;
+  font-weight: 700;
+  margin: 0 0 15px;
+}
+
+.bonuses-table {
+  display: flex;
+  flex-direction: column;
+}
+
+.bonuses-table-title-row {
+  display: flex;
+}
+
+.bonuses-table-value-row {
+  display: flex;
+}
+
+.table-col-title,
+.bonuses-table-title-row span {
+  width: 50%;
+  background-color: #29384A;
+  padding: 7px 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.table-col-value,
+.bonuses-table-value-row span {
+  width: 50%;
+  background-color: #E7F0FA;
+  padding: 7px 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #29384A;
+}
+
+.bonuses-table-1 {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.table-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex-grow: 1;
+}
+
+.table-col-title,
+.table-col-value {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  border-radius: 10px;
+  flex-grow: 1;
+}
+
+.table-col-value-red {
+  align-items: center;
+  background-color: #D1585B;
+  color: #FFFFFF;
+  font-size: 24px;
+}
+
+.table-col-value-minus {
+  color: #D1585B;
+}
+
+.br-r-10 {
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+.br-l-10 {
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+
+.br-r-0 {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.br-l-0 {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+@media (max-width: 910px) {
+  .toolbar-form {
+    gap: 78px;
+  }
 }

@@ -47,7 +47,6 @@ const DatePicker = ({value, changeHandler}) => {
 
   return (
     <div className='date-picker'>
-      <span className="date-picker-main-placeholder">Дата</span>
       <div className='date-picker-input' onClick={e => e.stopPropagation()}>
         {
           value ?

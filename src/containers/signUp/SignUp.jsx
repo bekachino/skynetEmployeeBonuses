@@ -35,6 +35,7 @@ const SignUp = () => {
         <input name='sirName' value={state.sirName} type="text" placeholder="Фамилия" onChange={onChange} required/>
         <input name='department' value={state.department} type="text" placeholder="Отдел" onChange={onChange} required/>
         <button type="submit" className="form-submit-btn">Отправить</button>
+        <span className="form-container-helper">Войти в аккаунт</span>
       </form>
     </div>
   );

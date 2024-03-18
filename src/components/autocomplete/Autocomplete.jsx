@@ -27,7 +27,6 @@ const Autocomplete = ({value, changeHandler, options}) => {
 
   return (
     <div className="autocomplete">
-      <span className="autocomplete-main-placeholder">Квадрат</span>
       <div className="autocomplete-input-box" onClick={e => e.stopPropagation()}>
         <input
           type="text" className="autocomplete-input" value={value}

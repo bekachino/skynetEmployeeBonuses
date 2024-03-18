@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  min-width: 240px;
+  width: 240px;
 }
 
 .date-picker-input {
@@ -19,13 +19,6 @@
 .date-picker-placeholder,
 .date-picker-value {
   padding: 10px 0 10px 14px;
-}
-
-.date-picker-main-placeholder {
-  font-weight: 600;
-  color: white;
-  margin-right: auto;
-  margin-bottom: 6px;
 }
 
 .date-picker-placeholder {
