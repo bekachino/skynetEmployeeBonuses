@@ -1,3 +1,7 @@
+h1, h2 {
+  margin: 0;
+}
+
 .toolbar {
   display: flex;
   justify-content: space-between;
@@ -99,6 +103,25 @@
   font-size: 24px;
 }
 
+.table-col-value-yellow {
+  align-items: center;
+  background-color: #FBDF35;
+  color: #29384A;
+}
+
+.border-red {
+  border: 3px solid #D1585B;
+  color: #29384A;
+  border-radius: 10px;
+}
+
+.border-yellow {
+  align-items: center;
+  background-color: transparent;
+  color: #FFFFFF;
+  border: 3px solid #FBDF35;
+  border-radius: 10px;
+}
 .table-col-value-minus {
   color: #D1585B;
 }
