@@ -34,6 +34,9 @@ h1, h2 {
 }
 
 .bonuses-paper-title {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   font-size: 24px;
   color: #29384A;
   font-weight: 700;
@@ -124,6 +127,37 @@ h1, h2 {
 }
 .table-col-value-minus {
   color: #D1585B;
+}
+
+.table-col-value-plus {
+  color: #60d158;
+}
+
+.currentPercentage-decrease,
+.currentPercentage-increase {
+  height: 50%;
+  font-size: 14px;
+  line-height: 12px;
+  cursor: pointer;
+  padding: 1px 3px;
+  text-align: center;
+}
+
+.currentPercentage-decrease:hover,
+.currentPercentage-increase:hover {
+  background-color: #E7F0FA;
+}
+
+.editable-input {
+  margin: 0 5px 0 10px;
+  width: 40px;
+  font-size: 18px;
+  border: 0;
+  background-color: #f6faff;
+  outline: none;
+  padding: 2px 4px 0 4px;
+  border-radius: 6px;
+  font-weight: 600;
 }
 
 .br-r-10 {

@@ -15,7 +15,7 @@ const App = () => {
       location.pathname === '/sign-in' || location.pathname === '/sign-up' ? '#29384A' : '#E8E8E8';
 
     if (document.querySelector('.toolbar')) {
-      document.documentElement.style.width = '176vh';
+      document.documentElement.style.width = '1440px';
     }
   }, [location.pathname]);
 

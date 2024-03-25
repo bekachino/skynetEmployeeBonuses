@@ -12,8 +12,16 @@ const Bonuses = () => {
   const [state, setState] = useState({
     date: '',
     district: '',
+    actives: 3000,
+    nonActives: 450,
+    bonusPerAbonent: 150,
   });
   const [formLoading, setFormLoading] = useState(false);
+  const [currentPercentage, setCurrentPercentage] = useState(90);
+  const activesPercentage = (state.actives / (state.actives + state.nonActives) * 100).toFixed(2) || 0;
+  const abonentsPlusMinusPercentage = (activesPercentage - currentPercentage).toFixed(2) || 0;
+  const abonentsPlusMinusNumber = (state.actives / (activesPercentage / currentPercentage))
+    .toFixed(0) - state.actives;
 
   const changeHandler = (e) => {
     const {name, value} = e.target;
@@ -68,35 +76,73 @@ const Bonuses = () => {
           </div>
         </div>
         <div className="bonuses-paper" style={{minWidth: '1440px'}}>
-          <h1 className="bonuses-paper-title">1. Премия за план 90% Активных абонентов</h1>
+          <h1 className="bonuses-paper-title">
+            1. Премия за план
+            <div style={{margin: '0 2px 0 7px', display: 'flex', flexDirection: 'column'}}>
+              <span
+                className="currentPercentage-increase"
+                onClick={() => (currentPercentage < 100) && setCurrentPercentage(currentPercentage + 1)}
+              >&#x25B2;</span>
+              <span
+                className="currentPercentage-decrease"
+                onClick={() => (currentPercentage > 0) && setCurrentPercentage(currentPercentage - 1)}
+              >&#x25BC;</span>
+            </div>
+            {' ' + currentPercentage}%
+            {' '}Активных абонентов
+          </h1>
           <div className="bonuses-table bonuses-table-1">
             <div className="table-col">
               <span className="table-col-title">ААБ</span>
-              <span className="table-col-value">3000</span>
+              <span className="table-col-value">{state.actives}</span>
             </div>
             <div className="table-col">
               <span className="table-col-title">НАБ</span>
-              <span className="table-col-value">450</span>
+              <span className="table-col-value">{state.nonActives}</span>
             </div>
             <div className="table-col">
               <span className="table-col-title">ОАБ</span>
-              <span className="table-col-value">3450</span>
+              <span className="table-col-value">{state.actives + state.nonActives}</span>
             </div>
             <div className="table-col">
               <span className="table-col-title">ААБ/ОАБ %</span>
-              <span className="table-col-value">86,96%</span>
+              <span className="table-col-value">
+                {activesPercentage}%
+              </span>
             </div>
             <div className="table-col">
               <span className="table-col-title">отклонение %</span>
-              <span className="table-col-value table-col-value-minus">-3,04%</span>
+              <span className={
+                `table-col-value
+                ${abonentsPlusMinusPercentage >= 0 ? 'table-col-value-plus' : 'table-col-value-minus'}`}
+              >
+                {abonentsPlusMinusPercentage}%
+              </span>
             </div>
             <div className="table-col">
               <span className="table-col-title">отклонение, кол-во</span>
-              <span className="table-col-value table-col-value-minus">-105,00</span>
+              <span className={
+                `table-col-value
+                ${abonentsPlusMinusNumber <= 0 ? 'table-col-value-plus' : 'table-col-value-minus'}`}
+              >
+                {abonentsPlusMinusNumber < 0 ? '+' : abonentsPlusMinusNumber > 0 ? '-' : ''}
+                {Number(
+                  abonentsPlusMinusNumber > 0 ? abonentsPlusMinusNumber :
+                    `${abonentsPlusMinusNumber}`.slice(1, `${abonentsPlusMinusNumber}`.length)
+                )}
+              </span>
             </div>
             <div className="table-col">
-              <span className="table-col-title table-col-value-yellow">Премия</span>
-              <span className="table-col-value">0</span>
+              <span className="table-col-title table-col-value-yellow">
+                Премия
+                <input
+                  className="editable-input" type="text"
+                  name="bonusPerAbonent"
+                  value={state.bonusPerAbonent}
+                  onChange={changeHandler}/>
+                <span style={{textDecoration: 'underline'}}>c</span>
+              </span>
+              <span className="table-col-value">{abonentsPlusMinusNumber * state.bonusPerAbonent}</span>
             </div>
           </div>
         </div>
@@ -162,7 +208,8 @@ const Bonuses = () => {
             className="border-yellow"
             style={{
               width: '780px', margin: '8px 0 0 auto',
-              display: 'flex', justifyContent: 'space-between', alignItems: 'stretch'
+              display: 'flex', justifyContent: 'space-between', alignItems: 'stretch',
+              backgroundColor: 'rgb(240, 240, 240)'
             }}>
             <div
               style={{
