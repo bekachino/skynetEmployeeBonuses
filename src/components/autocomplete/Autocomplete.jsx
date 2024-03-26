@@ -1,4 +1,4 @@
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import './autocomplete.css';
 import {useAppDispatch, useAppSelector} from "../../app/hooks";
 import {setPopupId} from "../../features/usersSlice";
@@ -35,7 +35,7 @@ const Autocomplete = ({value, changeHandler, options, i}) => {
       <div className="autocomplete-input-box" onClick={e => e.stopPropagation()}>
         <input
           type="text" className="autocomplete-input" value={value}
-          onChange={changeHandler}
+          onChange={e => changeHandler({target: {name: "district", value: e.target.value}})}
           name="district"
           autoComplete='off'
           ref={inputRef}

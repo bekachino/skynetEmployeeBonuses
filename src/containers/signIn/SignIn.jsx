@@ -1,8 +1,9 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import mainLogo from '../../assets/skynet-logo.png';
 import {useNavigate} from "react-router-dom";
 import {useAppDispatch, useAppSelector} from "../../app/hooks";
 import '../signUp/signUp.css';
+import {signIn} from "../../features/userThunk";
 
 const SignIn = () => {
   const [state, setState] = useState({
@@ -21,18 +22,22 @@ const SignIn = () => {
     }));
   };
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
-    // navigate('');
+    await dispatch(signIn(state));
   };
+
+  useEffect(() => {
+    if (user) navigate('/bonuses')
+  }, [navigate, user]);
 
   return (
     <div className="form-container">
       <img src={mainLogo} alt="Skynet"/>
       <form onSubmit={onSubmit}>
-        <input name='login' value={state.login} type="text" placeholder="Имя" onChange={onChange} required/>
+        <input name='login' value={state.login} type="text" placeholder="Логин" onChange={onChange} required/>
         <input
-          name='password' value={state.password} type="password" placeholder="Фамилия"
+          name='password' value={state.password} type="password" placeholder="Пароль"
           onChange={onChange} required
         />
         <button type="submit" className="form-submit-btn">Войти</button>

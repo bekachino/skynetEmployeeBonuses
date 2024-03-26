@@ -83,8 +83,8 @@ const DatePicker = ({value, changeHandler, i}) => {
                 return (
                   <div
                     className={`date-picker-month-day ${day.format('MMMM') !== currentMonthName ?
-                      'date-picker-not-current-month' : ''} ${day.isSame(moment(), 'day') ?
-                      'date-picker-current-day' : ''} ${day.isAfter(moment(), 'day') ?
+                      'date-picker-not-current-month' : ''} ${day.isSame(value, 'day') ?
+                      'date-picker-current-day' : ''} ${day.isAfter(moment(), 'day') || day.isSame(moment(), 'day') ?
                       'date-picker-day-in-future' : ''} ${isWeekend ? 'day-picker-day-weekend' : ''}`}
                     key={index}
                     onClick={() => {

@@ -145,13 +145,19 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 30px;
-  height: 30px;
+  width: 29px;
+  height: 29px;
   text-align: center;
   color: #29384A;
   cursor: pointer;
   font-weight: 500;
   margin: 0 auto;
+  border: 1px dashed transparent;
+  border-radius: 5px;
+}
+
+.date-picker-month-day:hover {
+  border: 1px dashed #29384A;
 }
 
 .date-picker-month-day:before {

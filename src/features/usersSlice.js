@@ -46,7 +46,7 @@ const UsersSlice = createSlice({
     });
     builder.addCase(signIn.fulfilled, (state, {payload: res}) => {
       state.signInLoading = false;
-      state.user = res?.token || '';
+      state.user = res?.token || '' || res;
       state.authorizationMessage = res.message;
     });
     builder.addCase(signIn.rejected, (state, {payload: error}) => {
