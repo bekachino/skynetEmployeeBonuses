@@ -1,9 +1,9 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef} from 'react';
 import './autocomplete.css';
 import {useAppDispatch, useAppSelector} from "../../app/hooks";
 import {setPopupId} from "../../features/usersSlice";
 
-const Autocomplete = ({value, changeHandler, options, i}) => {
+const Autocomplete = ({value, changeHandler, options, i, onClick}) => {
   const inputRef = useRef();
   const dispatch = useAppDispatch();
   const popupId = useAppSelector((state) => state.userState.popupId);
@@ -20,6 +20,7 @@ const Autocomplete = ({value, changeHandler, options, i}) => {
     ));
 
   const onCheckboxClick = () => {
+    onClick();
     dispatch(setPopupId(`autocomplete${i || ''}`));
     inputRef.current.focus();
   };

@@ -14,15 +14,20 @@ const Bonuses = () => {
   const dispatch = useAppDispatch();
   const user = useAppSelector(state => state.userState.user);
   const [districts, setDistricts] = useState([]);
+  const [nonActives, setNonActives] = useState([]);
+  const [showNonActives, setShowNonActives] = useState(false);
+  const [formLoading, setFormLoading] = useState(false);
+  const [nonActivesLoading, setNonActivesLoading] = useState(false);
   const [state, setState] = useState({
     date: '',
     district: {id: -1, squares: ''},
   });
   const [data, setData] = useState({
-    actives: 0,
-    nonActives: 450,
+    actives: -1,
+    nonActives: -1,
     bonusPerActiveAbonent: 150,
     currentPercentage: 90,
+    additionalEarningPercentage: 7,
     bonusPerConnectedAbonent980: 0,
     bonusPerConnectedAbonent1200: 0,
     connectedAbonents980: 50,
@@ -33,7 +38,6 @@ const Bonuses = () => {
     locations: [],
     user_list: [],
   });
-  const [formLoading, setFormLoading] = useState(false);
   const activesPercentage = Number((data.actives / (data.actives + data.nonActives) * 100).toFixed(2)) || 0;
   const abonentsPlusMinusPercentage = Number((activesPercentage - data.currentPercentage).toFixed(2)) || 0;
   const abonentsPlusMinusNumber = Math.floor((abonentsPlusMinusPercentage / 100) * (data.actives + data.nonActives));
@@ -55,12 +59,13 @@ const Bonuses = () => {
     (data.connectedAbonents980 + data.connectedAbonents1200)
     * data.bonusPerConnectedAbonent +
     data.actives * data.bonusPerActiveAbonent2;
+  const abonentAmountToReturn = Math.ceil(q * 0.03 * 150 + w + e + q * (1 - data.additionalEarningPercentage / 100) * data.bonusPerReturnedAbonent2 - r);
 
   const changeHandler = (e) => {
     const {name, value} = e.target;
     if (
       [
-        'bonusPerActiveAbonent', 'currentPercentage', 'bonusPerConnectedAbonent980',
+        'bonusPerActiveAbonent', 'currentPercentage', 'additionalEarningPercentage', 'bonusPerConnectedAbonent980',
         'bonusPerConnectedAbonent1200', 'bonusPerConnectedAbonent', 'bonusPerActiveAbonent2',
         'bonusPerReturnedAbonent2'
       ].includes(name)
@@ -77,25 +82,8 @@ const Bonuses = () => {
     }
   };
 
-  const formatNumber = (number) => {
-    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
-  };
-
-  const abonentAmountToReturn = Math.ceil(q * 0.03 * 150 + w + e + q * 0.93 * data.bonusPerReturnedAbonent2 - r);
-
   const getDistrictByName = (name) => {
     return districts.filter(district => district.squares === name)[0] || {id: -1, squares: name};
-  };
-
-  const getSquires = async () => {
-    try {
-      const req = await axiosApi.get('http://planup.skynet.kg:8000/planup/all_squares/');
-      const res = await req.data;
-      setDistricts(res.data);
-    }
-    catch (e) {
-      console.log(e);
-    }
   };
 
   const formatDate = (date) => {
@@ -108,15 +96,61 @@ const Bonuses = () => {
     return `${year}-${month}-${day}`;
   }
 
+  const formatNumber = (number) => {
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+  };
+
+  const getSquires = async () => {
+    try {
+      const req = await axiosApi('http://planup.skynet.kg:8000/planup/all_squares/');
+      const res = await req.data;
+      setDistricts(res.data);
+    }
+    catch (e) {
+      console.log(e);
+    }
+  };
+
+  const getNonActives = async () => {
+    setNonActivesLoading(true);
+    try {
+      const formData = new FormData();
+      const keys = Object.keys(state);
+
+      keys.forEach((key) => {
+        const value = state[key];
+
+        if (value) {
+          if (key === 'date') {
+            formData.append('date_filter', formatDate(state.date));
+          } else if (key === 'district') {
+            formData.append('squares_id', state.district.id);
+          }
+        }
+      });
+      const req = await axiosApi.post(
+        'http://planup.skynet.kg:8000/planup/noactive_squares/', formData);
+      const res = await req.data;
+      setNonActives(res.data);
+      setNonActivesLoading(false);
+    }
+    catch (e) {
+      console.log(e);
+    }
+  }
+
   useEffect(() => {
     void getSquires();
     if (!user) navigate('/sign-in');
+
+    document.addEventListener('click', () => setShowNonActives(false));
   }, [navigate, user]);
 
   const onSubmit = async (e) => {
     e.preventDefault();
     setFormLoading(true);
     try {
+      void getNonActives();
       const formData = new FormData();
       const keys = Object.keys(state);
 
@@ -136,8 +170,8 @@ const Bonuses = () => {
       const res = await req.data;
       setData(prevState => ({
         ...prevState,
-        actives: res.count['Актив'],
-        nonActives: res.count['Неактив'],
+        actives: res.count['Актив'] || -1,
+        nonActives: res.count['Неактив'] || -1,
         locations: res.locations,
         user_list: res.user_list,
       }));
@@ -158,13 +192,19 @@ const Bonuses = () => {
             value={state.district.squares}
             changeHandler={changeHandler}
             options={[...districts?.map(district => district.squares) || []]}
-            i={''}/>
-          <Button type="submit" disabled={!state.date || state.district.id < 0} onClick={onSubmit} loading={formLoading}/>
+            i={''}
+            onClick={() => setState(prevState => ({
+              ...prevState,
+              district: {id: -1, squares: ''},
+            }))}
+          />
+          <Button type="submit" disabled={!state.date || state.district.id < 0} onClick={onSubmit}
+                  loading={formLoading}/>
         </form>
       </Toolbar>
       <div className="bonuses-container">
         {
-          !data.actives ?
+          data.actives < 0 ?
             <h3 className="bonuses-paper" style={{padding: '20px 0'}}>
               Нет данных
             </h3> :
@@ -196,11 +236,11 @@ const Bonuses = () => {
                 <h1 className="bonuses-paper-title">
                   1. Премия за план
                   <div style={{margin: '0 2px 0 7px', display: 'flex', flexDirection: 'column'}}>
-              <span
-                className="currentPercentage-increase"
-                onClick={() => (data.currentPercentage < 100) &&
-                  changeHandler({target: {name: 'currentPercentage', value: data.currentPercentage + 1}})}
-              >&#x25B2;</span>
+                    <span
+                      className="currentPercentage-increase"
+                      onClick={() => (data.currentPercentage < 100) &&
+                        changeHandler({target: {name: 'currentPercentage', value: data.currentPercentage + 1}})}
+                    >&#x25B2;</span>
                     <span
                       className="currentPercentage-decrease"
                       onClick={() => (data.currentPercentage > 0) &&
@@ -216,7 +256,40 @@ const Bonuses = () => {
                     <span className="table-col-value">{data.actives}</span>
                   </div>
                   <div className="table-col">
-                    <span className="table-col-title">НАБ</span>
+                    <span
+                      className="table-col-title" style={{cursor: 'pointer', position: 'relative'}}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowNonActives(true);
+                      }}>
+                      НАБ
+                      {
+                        showNonActives &&
+                        <div className="bonuses-paper non-actives-list">
+                          <div className="non-actives-list-inner">
+                            {
+                              nonActivesLoading ? <span className="non-actives-list-loader"/> :
+                                nonActives.map((nonActive, i) => (
+                                  <div className="bonuses-paper non-actives-list-item" key={i}>
+                                    <div className="non-actives-list-item-ls-abon">
+                                      <span>ls_abon:</span>
+                                      <span>{nonActive.ls_abon}</span>
+                                    </div>
+                                    <div className="non-actives-list-item-address">
+                                      <span>Адрес:</span>
+                                      <span>{nonActive.address}</span>
+                                    </div>
+                                    <div className="non-actives-list-item-balance">
+                                      <span>Баланс:</span>
+                                      <span>{nonActive.balance}</span>
+                                    </div>
+                                  </div>
+                                ))
+                            }
+                          </div>
+                        </div>
+                      }
+                    </span>
                     <span className="table-col-value">{data.nonActives}</span>
                   </div>
                   <div className="table-col">
@@ -393,12 +466,36 @@ const Bonuses = () => {
                 Для этого надо вернуть всего абонентов из неактивки:
               </span>
                     <h2 style={{marginTop: 'auto', color: '#D1585B'}}>
-                      {Math.ceil((data.actives + data.nonActives) * 0.93 - data.actives)}
+                      {Math.floor(data.nonActives / data.additionalEarningPercentage)}
                     </h2>
                   </div>
                   <div className="border-red">
-                    <h2 className="table-col-value-red" style={{padding: '11px 20px', fontSize: '18px'}}>
-                      Вы можете ЗАРАБОТАТЬ ДОПОЛНИТЕЛЬНО если неактивку сократить до 7%
+                    <h2 className="table-col-value-red"
+                        style={{padding: '11px 20px', fontSize: '18px', display: 'flex'}}>
+                      Вы можете ЗАРАБОТАТЬ ДОПОЛНИТЕЛЬНО если неактивку сократить до
+                      <div style={{margin: '0 2px 0 7px', display: 'flex', flexDirection: 'column', width: '16px'}}>
+                        <span
+                          className="additionalEarningPercentage-increase"
+                          onClick={() => (data.currentPercentage < 100) &&
+                            changeHandler({
+                              target: {
+                                name: 'additionalEarningPercentage',
+                                value: data.additionalEarningPercentage + 1
+                              }
+                            })}
+                        >&#x25B2;</span>
+                        <span
+                          className="additionalEarningPercentage-decrease"
+                          onClick={() => (data.currentPercentage > 0) &&
+                            changeHandler({
+                              target: {
+                                name: 'additionalEarningPercentage',
+                                value: data.additionalEarningPercentage - 1
+                              }
+                            })}
+                        >&#x25BC;</span>
+                      </div>
+                      {' ' + data.additionalEarningPercentage}%
                       <input
                         className="editable-input" type="text"
                         name="bonusPerReturnedAbonent2"

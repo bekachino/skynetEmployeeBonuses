@@ -134,7 +134,9 @@ h1, h2 {
 }
 
 .currentPercentage-decrease,
-.currentPercentage-increase {
+.currentPercentage-increase,
+.additionalEarningPercentage-decrease,
+.additionalEarningPercentage-increase {
   height: 50%;
   font-size: 14px;
   line-height: 12px;
@@ -148,6 +150,11 @@ h1, h2 {
   background-color: #E7F0FA;
 }
 
+.additionalEarningPercentage-decrease:hover,
+.additionalEarningPercentage-increase:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
 .editable-input {
   margin: 0 5px 0 10px;
   width: 40px;
@@ -159,6 +166,79 @@ h1, h2 {
   border-radius: 6px;
   font-weight: 600;
   text-align: center;
+}
+
+.non-actives-list-loader {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  margin: 0 auto;
+}
+
+.non-actives-list-loader::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 25px;
+  height: 25px;
+  transform: translate(-50%, -50%) rotate(0);
+  border-radius: 50%;
+  border: 5px solid #29384a;
+  border-right: 5px solid transparent;
+  animation: loaderSpin 0.8s infinite linear;
+}
+
+.non-actives-list {
+  position: absolute;
+  top: -150px;
+  left: 100%;
+  box-shadow: 0 2px 10px 0 #61616180;
+  cursor: auto;
+  padding: 6px;
+}
+
+.non-actives-list-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  top: 0;
+  left: 100%;
+  min-width: 600px;
+  max-height: 600px;
+  overflow-y: auto;
+  border-radius: 5px;
+}
+
+.non-actives-list-item {
+  position: relative;
+  display: flex;
+  gap: 12px;
+  background-color: #e7f0fa;
+  padding: 4px 8px;
+  color: black;
+  font-size: 16px;
+}
+
+.non-actives-list-item-ls-abon,
+.non-actives-list-item-address,
+.non-actives-list-item-balance {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+  user-select: none;
+}
+
+.non-actives-list-item-balance {
+  min-width: 15%;
+  margin-left: auto;
+}
+
+.non-actives-list-item-ls-abon span:nth-child(2),
+.non-actives-list-item-address span:nth-child(2),
+.non-actives-list-item-balance span:nth-child(2) {
+  font-weight: 400;
 }
 
 .br-r-10 {
@@ -184,5 +264,14 @@ h1, h2 {
 @media (max-width: 910px) {
   .toolbar-form {
     gap: 78px;
+  }
+}
+
+@keyframes loaderSpin {
+  0% {
+    transform: translate(-50%, -50%) rotate(0);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg);
   }
 }

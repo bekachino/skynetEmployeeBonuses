@@ -8,6 +8,7 @@
   background-color: #A2B0C0;
   box-sizing: border-box;
   width: 100%;
+  z-index: 1;
 }
 
 @media (max-width: 1120px) {
