@@ -1,12 +1,13 @@
 import {createSlice} from "@reduxjs/toolkit";
 import {signIn, signUp} from "./userThunk";
 
-const initialState= {
+const initialState = {
   user: "",
   signInLoading: false,
   signUpLoading: false,
   authorizationError: "",
   authorizationMessage: "",
+  popupId: "",
 };
 
 const UsersSlice = createSlice({
@@ -16,6 +17,9 @@ const UsersSlice = createSlice({
     logout: (state) => {
       state.user = '';
     },
+    setPopupId: (state, action) => {
+      state.popupId = action.payload;
+    }
   },
   extraReducers: (builder) => {
     builder.addCase(signUp.pending, (state) => {
@@ -53,4 +57,4 @@ const UsersSlice = createSlice({
 });
 
 export const userReducer = UsersSlice.reducer;
-export const {logout} = UsersSlice.actions;
+export const {logout, setPopupId} = UsersSlice.actions;

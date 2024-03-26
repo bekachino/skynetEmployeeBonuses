@@ -47,19 +47,8 @@
   opacity: 0;
 }
 
-.date-picker-toggler:checked ~ .date-picker-panel {
-  opacity: 1;
-  transform: translateY(0);
-  z-index: 1;
-  height: unset;
-  animation: 0.2s dayPickerPanelOpen;
-}
-
-.date-picker-toggler:checked + .date-picker-icon {
-  background-color: #E7F0FA;
-}
-
-.date-picker-panel {
+.date-picker-panel,
+.date-picker-panel-open {
   position: absolute;
   display: flex;
   flex-direction: column;
@@ -76,6 +65,18 @@
   transform: translateY(-10px);
   overflow: hidden;
   z-index: -1;
+}
+
+.date-picker-panel-open {
+  opacity: 1;
+  transform: translateY(0);
+  z-index: 1;
+  height: unset;
+  animation: 0.2s dayPickerPanelOpen;
+}
+
+.date-picker-panel-open ~ .date-picker-icon {
+  background-color: #E7F0FA;
 }
 
 .date-picker-current-position {

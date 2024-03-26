@@ -1,29 +1,34 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef} from 'react';
 import './autocomplete.css';
+import {useAppDispatch, useAppSelector} from "../../app/hooks";
+import {setPopupId} from "../../features/usersSlice";
 
-const Autocomplete = ({value, changeHandler, options}) => {
+const Autocomplete = ({value, changeHandler, options, i}) => {
   const inputRef = useRef();
-  const [panelOpen, setPanelOpen] = useState(false);
+  const dispatch = useAppDispatch();
+  const popupId = useAppSelector((state) => state.userState.popupId);
   const dists = options.filter(district => district.toLowerCase().includes(value.toLowerCase()))
     .map((district, i) => (
       <span
         className="autocomplete-option"
         onClick={() => {
           changeHandler({target: {name: 'district', value: district}});
-          setPanelOpen(false);
+          dispatch(setPopupId(''));
         }}
         key={i}
       >{district}</span>
     ));
 
-  const onCheckboxClick = (value) => {
-    setPanelOpen(value);
-    value && inputRef.current.focus();
+  const onCheckboxClick = () => {
+    dispatch(setPopupId(`autocomplete${i || ''}`));
+    inputRef.current.focus();
   };
 
   useEffect(() => {
-    document.body.addEventListener('click', () => setPanelOpen(false));
-  }, []);
+    document.body.addEventListener('click', () => {
+      dispatch(setPopupId(''));
+    });
+  }, [dispatch, popupId]);
 
   return (
     <div className="autocomplete">
@@ -36,12 +41,12 @@ const Autocomplete = ({value, changeHandler, options}) => {
           ref={inputRef}
           placeholder="Выберите квадрат"
         />
-        <input
-          className="autocomplete-toggler" type="checkbox" checked={panelOpen}
-          onChange={() => onCheckboxClick(true)}
+        <span
+          className="autocomplete-toggler"
+          onClick={onCheckboxClick}
         />
         <span className="autocomplete-icon"/>
-        <div className="autocomplete-panel">
+        <div className={`autocomplete-panel${popupId === `autocomplete${i || ''}` ? '-open' : ''}`}>
           {
             dists.length ? dists : <span className="autocomplete-option-not-found">Не найдено</span>
           }

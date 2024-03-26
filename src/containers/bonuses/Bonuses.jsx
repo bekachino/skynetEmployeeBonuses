@@ -85,8 +85,8 @@ const Bonuses = () => {
       <Toolbar>
         <Logout/>
         <form className="toolbar-form" onSubmit={onSubmit}>
-          <DatePicker value={state.date} changeHandler={changeHandler}/>
-          <Autocomplete value={state.district} changeHandler={changeHandler} options={districts}/>
+          <DatePicker value={state.date} changeHandler={changeHandler} i={''}/>
+          <Autocomplete value={state.district} changeHandler={changeHandler} options={districts} i={''}/>
           <Button type="submit" disabled={!state.date || !state.district} onClick={onSubmit} loading={formLoading}/>
         </form>
       </Toolbar>
