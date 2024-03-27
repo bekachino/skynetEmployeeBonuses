@@ -125,6 +125,7 @@ h1, h2 {
   border: 3px solid #FBDF35;
   border-radius: 10px;
 }
+
 .table-col-value-minus {
   color: #D1585B;
 }
@@ -148,11 +149,13 @@ h1, h2 {
 .currentPercentage-decrease:hover,
 .currentPercentage-increase:hover {
   background-color: #E7F0FA;
+  user-select: none;
 }
 
 .additionalEarningPercentage-decrease:hover,
 .additionalEarningPercentage-increase:hover {
   background-color: rgba(255, 255, 255, 0.25);
+  user-select: none;
 }
 
 .editable-input {
@@ -204,7 +207,7 @@ h1, h2 {
   gap: 5px;
   top: 0;
   left: 100%;
-  min-width: 600px;
+  min-width: 700px;
   max-height: 600px;
   overflow-y: auto;
   border-radius: 5px;
@@ -222,7 +225,8 @@ h1, h2 {
 
 .non-actives-list-item-ls-abon,
 .non-actives-list-item-address,
-.non-actives-list-item-balance {
+.non-actives-list-item-balance,
+.non-actives-list-item-ip-address {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -230,14 +234,19 @@ h1, h2 {
   user-select: none;
 }
 
+.non-actives-list-item-ip-address {
+  min-width: 125px;
+}
+
 .non-actives-list-item-balance {
-  min-width: 15%;
+  min-width: 90px;
   margin-left: auto;
 }
 
 .non-actives-list-item-ls-abon span:nth-child(2),
 .non-actives-list-item-address span:nth-child(2),
-.non-actives-list-item-balance span:nth-child(2) {
+.non-actives-list-item-balance span:nth-child(2),
+.non-actives-list-item-ip-address span:nth-child(2) {
   font-weight: 400;
 }
 

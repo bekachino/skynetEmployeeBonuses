@@ -30,8 +30,9 @@ const Bonuses = () => {
     additionalEarningPercentage: 7,
     bonusPerConnectedAbonent980: 0,
     bonusPerConnectedAbonent1200: 0,
-    connectedAbonents980: 50,
-    connectedAbonents1200: 30,
+    connectedAbonents980: 0,
+    connectedAbonents1200: 0,
+    connectedAbonentsAmount: 0,
     bonusPerConnectedAbonent: 1000,
     bonusPerActiveAbonent2: 25,
     bonusPerReturnedAbonent2: 25,
@@ -54,11 +55,8 @@ const Bonuses = () => {
     * data.bonusPerConnectedAbonent +
     data.actives * data.bonusPerActiveAbonent2;
   const bonusForCurrentMonth = (abonentsPlusMinusNumber * data.bonusPerActiveAbonent > 0 ?
-      abonentsPlusMinusNumber * data.bonusPerActiveAbonent : 0) +
-    connected980Bonuses + connected1200Bonuses +
-    (data.connectedAbonents980 + data.connectedAbonents1200)
-    * data.bonusPerConnectedAbonent +
-    data.actives * data.bonusPerActiveAbonent2;
+      abonentsPlusMinusNumber * data.bonusPerActiveAbonent : 0) + w +
+    (data.connectedAbonentsAmount * data.bonusPerConnectedAbonent) + (data.actives * data.bonusPerActiveAbonent2);
   const abonentAmountToReturn = Math.ceil(q * 0.03 * 150 + w + e + q * (1 - data.additionalEarningPercentage / 100) * data.bonusPerReturnedAbonent2 - r);
 
   const changeHandler = (e) => {
@@ -100,7 +98,7 @@ const Bonuses = () => {
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
   };
 
-  const getSquires = async () => {
+  const fetchSquires = async () => {
     try {
       const req = await axiosApi('http://planup.skynet.kg:8000/planup/all_squares/');
       const res = await req.data;
@@ -111,23 +109,14 @@ const Bonuses = () => {
     }
   };
 
-  const getNonActives = async () => {
+  const fetchNonActives = async () => {
     setNonActivesLoading(true);
     try {
       const formData = new FormData();
-      const keys = Object.keys(state);
 
-      keys.forEach((key) => {
-        const value = state[key];
+      formData.append('date_filter', formatDate(state.date));
+      formData.append('squares_id', state.district.id);
 
-        if (value) {
-          if (key === 'date') {
-            formData.append('date_filter', formatDate(state.date));
-          } else if (key === 'district') {
-            formData.append('squares_id', state.district.id);
-          }
-        }
-      });
       const req = await axiosApi.post(
         'http://planup.skynet.kg:8000/planup/noactive_squares/', formData);
       const res = await req.data;
@@ -139,8 +128,27 @@ const Bonuses = () => {
     }
   }
 
+  const fetchConnectedAbonents = async () => {
+    try {
+      const formData = new FormData();
+
+      formData.append('date_filter', formatDate(state.date));
+      formData.append('squares_id', state.district.id);
+      const req = await axiosApi.post(
+        'http://planup.skynet.kg:8000/planup/planup_squares/', formData);
+      const res = await req.data;
+      setData(prevState => ({
+        ...prevState,
+        connectedAbonentsAmount: res.connection_count || 0,
+      }));
+    }
+    catch (e) {
+      console.log(e);
+    }
+  };
+
   useEffect(() => {
-    void getSquires();
+    void fetchSquires();
     if (!user) navigate('/sign-in');
 
     document.addEventListener('click', () => setShowNonActives(false));
@@ -150,21 +158,13 @@ const Bonuses = () => {
     e.preventDefault();
     setFormLoading(true);
     try {
-      void getNonActives();
+      await fetchNonActives();
+      await fetchConnectedAbonents();
       const formData = new FormData();
-      const keys = Object.keys(state);
 
-      keys.forEach((key) => {
-        const value = state[key];
+      formData.append('date_filter', formatDate(state.date));
+      formData.append('squares_id', state.district.id);
 
-        if (value) {
-          if (key === 'date') {
-            formData.append('date_filter', formatDate(state.date));
-          } else if (key === 'district') {
-            formData.append('squares_id', state.district.id);
-          }
-        }
-      });
       const req = await axiosApi.post(
         'http://planup.skynet.kg:8000/planup/filtered_squares/', formData);
       const res = await req.data;
@@ -281,7 +281,14 @@ const Bonuses = () => {
                                     </div>
                                     <div className="non-actives-list-item-balance">
                                       <span>Баланс:</span>
-                                      <span>{nonActive.balance}</span>
+                                      <span>
+                                        {nonActive.balance}
+                                        {' '}<span style={{fontWeight: 600, textDecoration: 'underline'}}>c</span>
+                                      </span>
+                                    </div>
+                                    <div className="non-actives-list-item-ip-address">
+                                      <span>IP Адрес:</span>
+                                      <span>{nonActive.ip_address}</span>
                                     </div>
                                   </div>
                                 ))
@@ -395,7 +402,7 @@ const Bonuses = () => {
                   <div className="table-col" style={{width: '66%'}}>
                     <span className="table-col-title">Кол-во подключенных абонентов</span>
                     <span className="table-col-value">
-                {data.connectedAbonents980 + data.connectedAbonents1200}
+                {data.connectedAbonentsAmount}
               </span>
                   </div>
                   <div className="table-col">
@@ -410,8 +417,7 @@ const Bonuses = () => {
               </span>
                     <span className="table-col-value">
                 {formatNumber(
-                  (data.connectedAbonents980 + data.connectedAbonents1200)
-                  * data.bonusPerConnectedAbonent
+                  data.connectedAbonentsAmount * data.bonusPerConnectedAbonent
                 )}
               </span>
                   </div>
@@ -421,7 +427,7 @@ const Bonuses = () => {
                 <h1 className="bonuses-paper-title">4. Премия за Активных абонентов</h1>
                 <div className="bonuses-table bonuses-table-1">
                   <div className="table-col" style={{width: '66%'}}>
-                    <span className="table-col-title">4. Премия за Активных абонентов</span>
+                    <span className="table-col-title">Кол-во активных абонентов</span>
                     <span className="table-col-value">{data.actives}</span>
                   </div>
                   <div className="table-col">
@@ -466,7 +472,8 @@ const Bonuses = () => {
                 Для этого надо вернуть всего абонентов из неактивки:
               </span>
                     <h2 style={{marginTop: 'auto', color: '#D1585B'}}>
-                      {Math.floor(data.nonActives / data.additionalEarningPercentage)}
+                      {Math.floor(data.nonActives / data.additionalEarningPercentage) === Infinity ?
+                        0 : Math.floor(data.nonActives / data.additionalEarningPercentage)}
                     </h2>
                   </div>
                   <div className="border-red">
@@ -476,7 +483,7 @@ const Bonuses = () => {
                       <div style={{margin: '0 2px 0 7px', display: 'flex', flexDirection: 'column', width: '16px'}}>
                         <span
                           className="additionalEarningPercentage-increase"
-                          onClick={() => (data.currentPercentage < 100) &&
+                          onClick={() => (data.additionalEarningPercentage < 100) &&
                             changeHandler({
                               target: {
                                 name: 'additionalEarningPercentage',
@@ -486,7 +493,7 @@ const Bonuses = () => {
                         >&#x25B2;</span>
                         <span
                           className="additionalEarningPercentage-decrease"
-                          onClick={() => (data.currentPercentage > 0) &&
+                          onClick={() => (data.additionalEarningPercentage > 0) &&
                             changeHandler({
                               target: {
                                 name: 'additionalEarningPercentage',
