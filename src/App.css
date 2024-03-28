@@ -1,5 +1,6 @@
 html {
   width: 1440px!important;
+  margin: 0 auto;
 }
 
 html, body, #root, .App {

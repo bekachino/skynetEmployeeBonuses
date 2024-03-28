@@ -151,9 +151,14 @@ const Bonuses = () => {
   useEffect(() => {
     void fetchSquires();
     if (!user) navigate('/sign-in');
+    if (toobarOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
 
     document.addEventListener('click', () => setShowNonActives(false));
-  }, [navigate, user]);
+  }, [navigate, toobarOpen, user]);
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -219,19 +224,25 @@ const Bonuses = () => {
                       <span className="br-l-10">ФИО</span>
                       <span className="br-r-10">Должность</span>
                     </div>
-                    {data.user_list.map((user, i) => (
-                      <div className="bonuses-table-value-row" style={{gap: '4px'}} key={i}>
-                        <span className="br-l-10">{user}</span>
-                        <span className="br-r-10">СИ</span>
+                    {data.user_list.length ?
+                      data.user_list.map((user, i) => (
+                        <div className="bonuses-table-value-row" style={{gap: '4px'}} key={i}>
+                          <span className="br-l-10">{user}</span>
+                          <span className="br-r-10">СИ</span>
+                        </div>
+                      )) :
+                      <div className="bonuses-table-value-row" style={{gap: '4px'}}>
+                        <span className="br-l-10">-</span>
+                        <span className="br-r-10">-</span>
                       </div>
-                    ))}
+                    }
                   </div>
                 </div>
                 <div className="bonuses-paper location-block">
                   <h1 className="bonuses-paper-title">Локация</h1>
                   <span
                     style={{fontSize: '18px', fontWeight: '600'}}
-                  >{data.locations.join(', ')}</span>
+                  >{data.locations.length ? data.locations.join(', ') : '-'}</span>
                 </div>
               </div>
               <div className="bonuses-paper" style={{width: '100%'}}>
@@ -343,10 +354,11 @@ const Bonuses = () => {
                   onChange={changeHandler}/>
                 <span style={{textDecoration: 'underline'}}>c</span>
               </span>
-                    <span className="table-col-value">
+                    <span className="table-col-value total-bonus">
                 {
                   abonentsPlusMinusNumber * data.bonusPerActiveAbonent > 0 ?
-                    formatNumber(abonentsPlusMinusNumber * data.bonusPerActiveAbonent) : 0}
+                    formatNumber(abonentsPlusMinusNumber * data.bonusPerActiveAbonent) : 0
+                }
               </span>
                   </div>
                 </div>
@@ -359,42 +371,42 @@ const Bonuses = () => {
                     <span className="table-col-value">0</span>
                   </div>
                   <div className="table-col">
-              <span className="table-col-title">
-                Сумма
-                <input
-                  className="editable-input" type="text"
-                  name="bonusPerConnectedAbonent980"
-                  value={data.bonusPerConnectedAbonent980}
-                  onChange={changeHandler}/>
-                <span style={{textDecoration: 'underline'}}>c</span>
-              </span>
+                    <span className="table-col-title">
+                      Сумма
+                      <input
+                        className="editable-input" type="text"
+                        name="bonusPerConnectedAbonent980"
+                        value={data.bonusPerConnectedAbonent980}
+                        onChange={changeHandler}/>
+                      <span style={{textDecoration: 'underline'}}>c</span>
+                    </span>
                     <span className="table-col-value">
-                {/*{formatNumber(connected980Bonuses)}*/}0
-              </span>
+                      {/*{formatNumber(connected980Bonuses)}*/}0
+                    </span>
                   </div>
                   <div className="table-col">
                     <span className="table-col-title">Кол-во заявок ТП 1200</span>
                     <span className="table-col-value">0</span>
                   </div>
                   <div className="table-col">
-              <span className="table-col-title">
-                Сумма
-                <input
-                  className="editable-input" type="text"
-                  name="bonusPerConnectedAbonent1200"
-                  value={data.bonusPerConnectedAbonent1200}
-                  onChange={changeHandler}/>
-                <span style={{textDecoration: 'underline'}}>c</span>
-              </span>
+                    <span className="table-col-title">
+                      Сумма
+                      <input
+                        className="editable-input" type="text"
+                        name="bonusPerConnectedAbonent1200"
+                        value={data.bonusPerConnectedAbonent1200}
+                        onChange={changeHandler}/>
+                      <span style={{textDecoration: 'underline'}}>c</span>
+                    </span>
                     <span className="table-col-value">
-                {/*{formatNumber(connected1200Bonuses)}*/}0
-              </span>
+                      {/*{formatNumber(connected1200Bonuses)}*/}0
+                    </span>
                   </div>
                   <div className="table-col">
                     <span className="table-col-title table-col-value-yellow">Премия</span>
-                    <span className="table-col-value">
-                {/*{formatNumber(w)}*/}0
-              </span>
+                    <span className="table-col-value total-bonus">
+                      {/*{formatNumber(w)}*/}0
+                    </span>
                   </div>
                 </div>
               </div>
@@ -408,20 +420,20 @@ const Bonuses = () => {
               </span>
                   </div>
                   <div className="table-col">
-              <span className="table-col-title table-col-value-yellow">
-                Премия
-                <input
-                  className="editable-input" type="text"
-                  name="bonusPerConnectedAbonent"
-                  value={data.bonusPerConnectedAbonent}
-                  onChange={changeHandler}/>
-                <span style={{textDecoration: 'underline'}}>c</span>
-              </span>
-                    <span className="table-col-value">
-                {formatNumber(
-                  data.connectedAbonentsAmount * data.bonusPerConnectedAbonent
-                )}
-              </span>
+                    <span className="table-col-title table-col-value-yellow">
+                      Премия
+                      <input
+                        className="editable-input" type="text"
+                        name="bonusPerConnectedAbonent"
+                        value={data.bonusPerConnectedAbonent}
+                        onChange={changeHandler}/>
+                      <span style={{textDecoration: 'underline'}}>c</span>
+                    </span>
+                    <span className="table-col-value total-bonus">
+                      {formatNumber(
+                        data.connectedAbonentsAmount * data.bonusPerConnectedAbonent
+                      )}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -433,18 +445,18 @@ const Bonuses = () => {
                     <span className="table-col-value">{data.actives}</span>
                   </div>
                   <div className="table-col">
-              <span className="table-col-title table-col-value-yellow">
-                Премия
-                <input
-                  className="editable-input" type="text"
-                  name="bonusPerActiveAbonent2"
-                  value={data.bonusPerActiveAbonent2}
-                  onChange={changeHandler}/>
-                <span style={{textDecoration: 'underline'}}>c</span>
-              </span>
-                    <span className="table-col-value">
-                {formatNumber(data.actives * data.bonusPerActiveAbonent2)}
-              </span>
+                    <span className="table-col-title table-col-value-yellow">
+                      Премия
+                      <input
+                        className="editable-input" type="text"
+                        name="bonusPerActiveAbonent2"
+                        value={data.bonusPerActiveAbonent2}
+                        onChange={changeHandler}/>
+                      <span style={{textDecoration: 'underline'}}>c</span>
+                    </span>
+                    <span className="table-col-value total-bonus">
+                      {formatNumber(data.actives * data.bonusPerActiveAbonent2)}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -453,7 +465,7 @@ const Bonuses = () => {
                   <h2 className="table-col-value-yellow" style={{padding: '11px 50px'}}>
                     ИТОГО ПРЕМИЯ за текущий месяц на бригаду
                   </h2>
-                  <h1 style={{color: '#29384A', padding: '9px'}}>
+                  <h1 style={{color: '#29384A', padding: '9px', fontWeight: 800}}>
                     {formatNumber(bonusForCurrentMonth)} сом
                   </h1>
                 </div>
@@ -470,9 +482,9 @@ const Bonuses = () => {
                       display: 'flex', flexDirection: 'column'
                     }}
                   >
-              <span style={{color: '#29384A', fontSize: '18px', fontWeight: '600'}}>
-                Для этого надо вернуть всего абонентов из неактивки:
-              </span>
+                    <span style={{color: '#29384A', fontSize: '18px', fontWeight: '600'}}>
+                      Для этого надо вернуть всего абонентов из неактивки:
+                    </span>
                     <h2 style={{marginTop: 'auto', color: '#D1585B'}}>
                       {Math.floor(data.nonActives / data.additionalEarningPercentage) === Infinity ?
                         0 : Math.floor(data.nonActives / data.additionalEarningPercentage)}
@@ -512,7 +524,7 @@ const Bonuses = () => {
                         onChange={changeHandler}/>
                       <span style={{textDecoration: 'underline'}}>c</span>
                     </h2>
-                    <h1 style={{color: '#29384A', padding: '9px'}}>
+                    <h1 style={{color: '#29384A', padding: '9px', fontWeight: 800}}>
                       {abonentAmountToReturn > 0 ? `+ ${formatNumber(abonentAmountToReturn)}` : 0} сом
                     </h1>
                   </div>

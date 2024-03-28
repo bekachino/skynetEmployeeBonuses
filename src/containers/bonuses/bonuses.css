@@ -121,7 +121,7 @@ h1, h2 {
 .border-red {
   border: 3px solid #D1585B;
   color: #29384A;
-  border-radius: 10px;
+  border-radius: 6px;
 }
 
 .border-yellow {
@@ -256,6 +256,14 @@ h1, h2 {
   font-weight: 400;
 }
 
+.total-bonus {
+  font-weight: 800;
+}
+
+.can-earn-more-block {
+  width: 780px;
+}
+
 .br-r-10 {
   border-top-right-radius: 10px;
   border-bottom-right-radius: 10px;
@@ -284,7 +292,7 @@ h1, h2 {
 
 @media (max-width: 768px) {
   .toolbar-inner {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     width: 0;
@@ -353,8 +361,7 @@ h1, h2 {
   }
 
   .non-actives-list-item-balance {
-    min-width: unset;
-    margin-left: 70px;
+    min-width: 70px;
   }
 
   .bonuses-table-title-row span,
@@ -407,6 +414,7 @@ h1, h2 {
 
   .can-earn-more-block {
     flex-direction: column-reverse;
+    width: unset;
   }
 
   .total-bonuses {

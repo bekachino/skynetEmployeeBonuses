@@ -79,7 +79,6 @@
   opacity: 0;
   max-height: 0;
   box-sizing: border-box;
-  padding: 8px;
   background-color: white;
   border-radius: 10px;
   box-shadow: 0 2px 10px 0 #61616180;
@@ -99,6 +98,7 @@
   opacity: 1;
   z-index: 1;
   max-height: 300px;
+  padding: 8px;
 }
 
 .autocomplete-option {
