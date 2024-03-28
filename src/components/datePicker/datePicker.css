@@ -54,7 +54,7 @@
   flex-direction: column;
   align-items: stretch;
   top: 105%;
-  width: 100%;
+  width: 240px;
   opacity: 0;
   height: 0;
   box-sizing: border-box;
@@ -187,31 +187,6 @@
   color: white;
 }
 
-/*@media (max-width: 724px) {*/
-/*  .date-picker {*/
-/*    min-width: 200px;*/
-/*  }*/
-
-/*  .date-picker-input {*/
-/*    font-size: 12px;*/
-/*    height: 32px;*/
-/*  }*/
-
-/*  .date-picker-icon {*/
-/*    width: 26px;*/
-/*    height: 32px;*/
-/*  }*/
-
-/*  .date-picker-month-day {*/
-/*    width: 26px;*/
-/*    height: 26px;*/
-/*  }*/
-
-/*  .date-picker-week-names {*/
-/*    font-size: 11px;*/
-/*  }*/
-/*}*/
-
 @keyframes dayPickerPanelOpen {
   0% {
     height: unset;
@@ -222,5 +197,20 @@
     height: unset;
     transform: translateY(0);
     opacity: 1;
+  }
+}
+
+@media (max-width: 476px) {
+  @keyframes dayPickerPanelOpen {
+    0% {
+      height: unset;
+      transform: translate(-50%, -10px);
+      opacity: 0;
+    }
+    100% {
+      height: unset;
+      transform: translate(-50%, 0);
+      opacity: 1;
+    }
   }
 }

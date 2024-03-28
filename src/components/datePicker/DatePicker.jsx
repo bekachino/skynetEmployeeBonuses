@@ -95,6 +95,7 @@ const DatePicker = ({value, changeHandler, i}) => {
                           value: new Date(day)
                         }
                       });
+                      dispatch(setPopupId(''));
                     }}
                   >
                     {day.format('D')}

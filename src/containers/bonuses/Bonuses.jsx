@@ -17,6 +17,7 @@ const Bonuses = () => {
   const [nonActives, setNonActives] = useState([]);
   const [showNonActives, setShowNonActives] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
+  const [toobarOpen, setToolbarOpen] = useState(false);
   const [nonActivesLoading, setNonActivesLoading] = useState(false);
   const [state, setState] = useState({
     date: '',
@@ -176,6 +177,7 @@ const Bonuses = () => {
         user_list: res.user_list,
       }));
       setFormLoading(false);
+      setToolbarOpen(false);
     }
     catch (e) {
       console.log(e);
@@ -184,7 +186,7 @@ const Bonuses = () => {
 
   return (
     <>
-      <Toolbar>
+      <Toolbar open={toobarOpen} onClick={() => setToolbarOpen(!toobarOpen)}>
         <Logout/>
         <form className="toolbar-form" onSubmit={onSubmit}>
           <DatePicker value={state.date} changeHandler={changeHandler} i={''}/>
@@ -209,8 +211,8 @@ const Bonuses = () => {
               Нет данных
             </h3> :
             <>
-              <div style={{display: 'flex', gap: '20px'}}>
-                <div className="bonuses-paper" style={{minWidth: '832px'}}>
+              <div style={{display: 'flex', gap: '20px', flexWrap: 'wrap'}}>
+                <div className="bonuses-paper service-group-block">
                   <h1 className="bonuses-paper-title">Сервисная группа</h1>
                   <div className="bonuses-table" style={{gap: '4px'}}>
                     <div className="bonuses-table-title-row" style={{gap: '4px'}}>
@@ -225,16 +227,17 @@ const Bonuses = () => {
                     ))}
                   </div>
                 </div>
-                <div className="bonuses-paper" style={{flexGrow: '1', minWidth: '548px'}}>
+                <div className="bonuses-paper location-block">
                   <h1 className="bonuses-paper-title">Локация</h1>
                   <span
                     style={{fontSize: '18px', fontWeight: '600'}}
                   >{data.locations.join(', ')}</span>
                 </div>
               </div>
-              <div className="bonuses-paper" style={{minWidth: '1440px'}}>
+              <div className="bonuses-paper" style={{width: '100%'}}>
                 <h1 className="bonuses-paper-title">
                   1. Премия за план
+                  Активных абонентов
                   <div style={{margin: '0 2px 0 7px', display: 'flex', flexDirection: 'column'}}>
                     <span
                       className="currentPercentage-increase"
@@ -248,7 +251,6 @@ const Bonuses = () => {
                     >&#x25BC;</span>
                   </div>
                   {' ' + data.currentPercentage}%
-                  {' '}Активных абонентов
                 </h1>
                 <div className="bonuses-table bonuses-table-1">
                   <div className="table-col">
@@ -349,7 +351,7 @@ const Bonuses = () => {
                   </div>
                 </div>
               </div>
-              <div className="bonuses-paper" style={{minWidth: '1440px'}}>
+              <div className="bonuses-paper" style={{width: '100%'}}>
                 <h1 className="bonuses-paper-title">2. Премия за подключенные заявки (продажи)</h1>
                 <div className="bonuses-table bonuses-table-1">
                   <div className="table-col">
@@ -396,7 +398,7 @@ const Bonuses = () => {
                   </div>
                 </div>
               </div>
-              <div className="bonuses-paper" style={{minWidth: '1440px'}}>
+              <div className="bonuses-paper" style={{width: '100%'}}>
                 <h1 className="bonuses-paper-title">3. Премия за подключение абонента</h1>
                 <div className="bonuses-table bonuses-table-1">
                   <div className="table-col" style={{width: '66%'}}>
@@ -423,7 +425,7 @@ const Bonuses = () => {
                   </div>
                 </div>
               </div>
-              <div className="bonuses-paper" style={{minWidth: '1440px'}}>
+              <div className="bonuses-paper" style={{width: '100%'}}>
                 <h1 className="bonuses-paper-title">4. Премия за Активных абонентов</h1>
                 <div className="bonuses-table bonuses-table-1">
                   <div className="table-col" style={{width: '66%'}}>
@@ -446,8 +448,8 @@ const Bonuses = () => {
                   </div>
                 </div>
               </div>
-              <div className="bonuses-paper" style={{minWidth: '1440px'}}>
-                <div className="border-yellow" style={{width: '450px', marginLeft: 'auto'}}>
+              <div className="bonuses-paper" style={{width: '100%'}}>
+                <div className="border-yellow total-bonuses" style={{width: '450px', marginLeft: 'auto'}}>
                   <h2 className="table-col-value-yellow" style={{padding: '11px 50px'}}>
                     ИТОГО ПРЕМИЯ за текущий месяц на бригаду
                   </h2>
@@ -456,9 +458,9 @@ const Bonuses = () => {
                   </h1>
                 </div>
                 <div
-                  className="border-yellow"
+                  className="border-yellow can-earn-more-block"
                   style={{
-                    width: '780px', margin: '8px 0 0 auto',
+                    margin: '8px 0 0 auto',
                     display: 'flex', justifyContent: 'space-between', alignItems: 'stretch',
                     backgroundColor: 'rgb(240, 240, 240)'
                   }}>
