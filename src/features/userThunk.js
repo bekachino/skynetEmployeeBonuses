@@ -16,8 +16,15 @@ export const signUp = createAsyncThunk("user/signUp", async (userData, {rejectWi
 });
 
 export const signIn = createAsyncThunk("user/signIn", async (userData, {rejectWithValue}) => {
-  if (userData.login === 'admin' && userData.password === 'skynet') {
-    return 'token';
+  if (
+    (userData.login === 'admin' && userData.password === 'skynet') ||
+    (userData.login === 'osh' && userData.password === 'oshskynet02') ||
+    (userData.login === 'djalalabad' && userData.password === 'djskynet03') ||
+    (userData.login === 'talas' && userData.password === 'talasskynet07') ||
+    (userData.login === 'ik' && userData.password === 'ikskynet09') ||
+    (userData.login === 'naryn' && userData.password === 'narynskynet05')
+  ) {
+    return userData.login;
   } else return '';
   // try {
   //   const response = await axiosApi.post("/login/", userData);
@@ -29,4 +36,17 @@ export const signIn = createAsyncThunk("user/signIn", async (userData, {rejectWi
   //   }
   //   throw e;
   // }
+});
+
+export const fetchLocations = createAsyncThunk("user/fetchLocations", async (formData, {rejectWithValue}) => {
+  try {
+    const response = await axiosApi("http://planup.skynet.kg:8000/planup/all_squares/", formData);
+    return response.data;
+  }
+  catch (e) {
+    if (isAxiosError(e) && e.response && e.response.status === 400) {
+      return rejectWithValue(e.response.data);
+    }
+    throw e;
+  }
 });

@@ -1,5 +1,5 @@
 import {createSlice} from "@reduxjs/toolkit";
-import {signIn, signUp} from "./userThunk";
+import {fetchLocations, signIn, signUp} from "./userThunk";
 
 const initialState = {
   user: "",
@@ -8,6 +8,7 @@ const initialState = {
   authorizationError: "",
   authorizationMessage: "",
   popupId: "",
+  locations: [],
 };
 
 const UsersSlice = createSlice({
@@ -19,7 +20,10 @@ const UsersSlice = createSlice({
     },
     setPopupId: (state, action) => {
       state.popupId = action.payload;
-    }
+    },
+    setLocations: (state, action) => {
+      state.locations = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(signUp.pending, (state) => {
@@ -53,8 +57,18 @@ const UsersSlice = createSlice({
       state.signInLoading = false;
       state.authorizationError = error?.error || 'Произошла ошибка. Попробуйте позже';
     });
+
+    builder.addCase(fetchLocations.pending, (state) => {
+      state.locations = [];
+    });
+    builder.addCase(fetchLocations.fulfilled, (state, {payload: res}) => {
+      state.locations = res.data;
+    });
+    builder.addCase(fetchLocations.rejected, (state, {payload: error}) => {
+      state.locations = [];
+    });
   },
 });
 
 export const userReducer = UsersSlice.reducer;
-export const {logout, setPopupId} = UsersSlice.actions;
+export const {logout, setPopupId, setLocations} = UsersSlice.actions;
