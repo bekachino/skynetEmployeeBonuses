@@ -82,11 +82,23 @@ h1, h2 {
   color: #29384A;
 }
 
-.bonuses-table-1 {
+.bonuses-table-1,
+.bonuses-table-2,
+.bonuses-table-3,
+.bonuses-table-4 {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   gap: 10px;
+}
+
+.bonuses-table-2 {
+  justify-content: flex-start;
+}
+
+.bonuses-table-2 .table-col {
+  min-width: 170px;
+  max-width: 350px;
 }
 
 .table-col {
@@ -205,6 +217,17 @@ h1, h2 {
   box-shadow: 0 2px 10px 0 #61616180;
   cursor: auto;
   padding: 6px;
+  z-index: 2;
+}
+
+.non-actives-list img {
+  margin: 0 3px 3px auto;
+  padding: 3px;
+  border-radius: 3px;
+}
+
+.non-actives-list img:hover {
+  background-color: rgba(38, 148, 30, 0.28);
 }
 
 .non-actives-list-inner {
@@ -315,7 +338,7 @@ h1, h2 {
   .toolbar-form {
     flex-direction: column;
     align-items: center;
-    margin: 0;
+    margin: auto 0 0;
     width: 100%;
     gap: 30px;
   }
@@ -330,7 +353,7 @@ h1, h2 {
   }
 
   .logout-btn {
-    margin: 150px 0 0;
+    margin: auto 0 50px;
   }
 
   .bonuses-paper {
@@ -390,7 +413,10 @@ h1, h2 {
     font-size: 20px;
   }
 
-  .bonuses-table-1 {
+  .bonuses-table-1,
+  .bonuses-table-2,
+  .bonuses-table-3,
+  .bonuses-table-4 {
     flex-direction: column;
     gap: 4px;
   }

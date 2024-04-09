@@ -5,73 +5,71 @@ import Autocomplete from "../../components/autocomplete/Autocomplete";
 import Button from "../../components/button/Button";
 import Logout from "../../components/logout/Logout";
 import axiosApi from "../../axiosApi";
-import './bonuses.css';
 import {useNavigate} from "react-router-dom";
 import {useAppDispatch, useAppSelector} from "../../app/hooks";
+import {fetchLocations} from "../../features/userThunk";
+import {setLocations} from "../../features/usersSlice";
+import * as XLSX from 'xlsx';
+import excelLogo from '../../assets/excel.png';
+import './bonuses.css';
 
 const Bonuses = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const user = useAppSelector(state => state.userState.user);
-  const [districts, setDistricts] = useState([]);
+  const locations = useAppSelector(state => state.userState.locations);
   const [nonActives, setNonActives] = useState([]);
+  const [connectedSalesData, setConnectedSalesData] = useState([]);
   const [showNonActives, setShowNonActives] = useState(false);
+  const [showConnectedAbonents, setShowConnectedAbonents] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
   const [toobarOpen, setToolbarOpen] = useState(false);
   const [nonActivesLoading, setNonActivesLoading] = useState(false);
+  const [connectedAbonentsListLoading, setConnectedAbonentsListLoading] = useState(false);
   const [state, setState] = useState({
     date: '',
     district: {id: -1, squares: ''},
   });
   const [data, setData] = useState({
-    actives: -1,
-    nonActives: -1,
-    bonusPerActiveAbonent: 150,
-    currentPercentage: 90,
+    aab: -1,
+    nab: -1,
+    oab: -1,
+    bonusPerPlanActiveAbonent: 150,
+    planActiveAbsBonusPercentage: 90,
     additionalEarningPercentage: 7,
-    bonusPerConnectedAbonent980: 0,
-    bonusPerConnectedAbonent1200: 0,
-    connectedAbonents980: 0,
-    connectedAbonents1200: 0,
     connectedAbonentsAmount: 0,
+    bonusPerConnectedReq: 1000,
     bonusPerConnectedAbonent: 1000,
     bonusPerActiveAbonent2: 25,
     bonusPerReturnedAbonent2: 25,
     locations: [],
     user_list: [],
   });
-  const activesPercentage = Number((data.actives / (data.actives + data.nonActives) * 100).toFixed(2)) || 0;
-  const abonentsPlusMinusPercentage = Number((activesPercentage - data.currentPercentage).toFixed(2)) || 0;
-  const abonentsPlusMinusNumber = Math.floor((abonentsPlusMinusPercentage / 100) * (data.actives + data.nonActives));
-  const connected980Bonuses = data.connectedAbonents980 * data.bonusPerConnectedAbonent980;
-  const connected1200Bonuses = data.connectedAbonents1200 * data.bonusPerConnectedAbonent1200;
 
-  const q = data.actives + data.nonActives;
-  const w = connected980Bonuses + connected1200Bonuses;
-  const e = (data.connectedAbonents980 + data.connectedAbonents1200) * data.bonusPerConnectedAbonent;
-  const r = (abonentsPlusMinusNumber * data.bonusPerActiveAbonent > 0 ?
-      abonentsPlusMinusNumber * data.bonusPerActiveAbonent : 0) +
-    connected980Bonuses + connected1200Bonuses +
-    (data.connectedAbonents980 + data.connectedAbonents1200)
-    * data.bonusPerConnectedAbonent +
-    data.actives * data.bonusPerActiveAbonent2;
-  const bonusForCurrentMonth = (abonentsPlusMinusNumber * data.bonusPerActiveAbonent > 0 ?
-      abonentsPlusMinusNumber * data.bonusPerActiveAbonent : 0) + w +
-    (data.connectedAbonentsAmount * data.bonusPerConnectedAbonent) + (data.actives * data.bonusPerActiveAbonent2);
-  const abonentAmountToReturn = Math.ceil(q * 0.03 * 150 + w + e + q * (1 - data.additionalEarningPercentage / 100) * data.bonusPerReturnedAbonent2 - r);
+  const aabPercentage = Number((data.aab / data.oab * 100).toFixed(2));
+  const otkloneniePercentage = Number((aabPercentage - data.planActiveAbsBonusPercentage).toFixed(2));
+  const otklonenieKolvo = Number(((data.oab / 100 * data.planActiveAbsBonusPercentage) / 100 * otkloneniePercentage).toFixed());
+  const blockOneBonus = Number((otklonenieKolvo > 0 ? otklonenieKolvo * data.bonusPerPlanActiveAbonent : 0).toFixed());
+  const blockTwoBonus = connectedSalesData.reduce((accumulator, currentValue) => {
+    return accumulator + (currentValue.count * currentValue.price);
+  }, 0);
+  const blockThreeBonus = Number((data.connectedAbonentsAmount * data.bonusPerConnectedAbonent).toFixed());
+  const blockFourBonus = Number((data.aab * data.bonusPerActiveAbonent2).toFixed());
+  const additionalBonus = Number((
+    ((100 - data.planActiveAbsBonusPercentage) - data.additionalEarningPercentage) * (data.oab) / 100 * 150
+  ).toFixed());
 
   const changeHandler = (e) => {
     const {name, value} = e.target;
     if (
       [
-        'bonusPerActiveAbonent', 'currentPercentage', 'additionalEarningPercentage', 'bonusPerConnectedAbonent980',
-        'bonusPerConnectedAbonent1200', 'bonusPerConnectedAbonent', 'bonusPerActiveAbonent2',
-        'bonusPerReturnedAbonent2'
+        'bonusPerPlanActiveAbonent', 'planActiveAbsBonusPercentage', 'additionalEarningPercentage', 'bonusPerConnectedReq',
+        'bonusPerConnectedAbonent', 'bonusPerActiveAbonent2', 'bonusPerReturnedAbonent2'
       ].includes(name)
     ) {
       setData(prevState => ({
         ...prevState,
-        [name]: value,
+        [name]: typeof value === 'number' ? value : value.replace(/[^0-9]/g, ''),
       }));
     } else {
       setState(prevState => ({
@@ -82,7 +80,7 @@ const Bonuses = () => {
   };
 
   const getDistrictByName = (name) => {
-    return districts.filter(district => district.squares === name)[0] || {id: -1, squares: name};
+    return locations.filter(district => district.squares === name)[0] || {id: -1, squares: name};
   };
 
   const formatDate = (date) => {
@@ -99,20 +97,9 @@ const Bonuses = () => {
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
   };
 
-  const fetchSquires = async () => {
-    try {
-      const req = await axiosApi('http://planup.skynet.kg:8000/planup/all_squares/');
-      const res = await req.data;
-      setDistricts(res.data);
-    }
-    catch (e) {
-      console.log(e);
-    }
-  };
-
   const fetchNonActives = async () => {
-    setNonActivesLoading(true);
     try {
+      setNonActivesLoading(true);
       const formData = new FormData();
 
       formData.append('date_filter', formatDate(state.date));
@@ -131,17 +118,21 @@ const Bonuses = () => {
 
   const fetchConnectedAbonents = async () => {
     try {
+      setConnectedAbonentsListLoading(true);
       const formData = new FormData();
 
       formData.append('date_filter', formatDate(state.date));
       formData.append('squares_id', state.district.id);
       const req = await axiosApi.post(
-        'http://planup.skynet.kg:8000/planup/planup_squares/', formData);
+        'http://planup.skynet.kg:8000/planup/count_podkl/', formData);
       const res = await req.data;
-      setData(prevState => ({
-        ...prevState,
-        connectedAbonentsAmount: res.connection_count || 0,
+      setConnectedSalesData(res.data.map(tariff => {
+        return {
+          ...tariff,
+          price: 100,
+        }
       }));
+      setConnectedAbonentsListLoading(false);
     }
     catch (e) {
       console.log(e);
@@ -149,16 +140,27 @@ const Bonuses = () => {
   };
 
   useEffect(() => {
-    void fetchSquires();
     if (!user) navigate('/sign-in');
+    dispatch(fetchLocations()).then(res => {
+      if (user === 'naryn') {
+        dispatch(setLocations(res.payload.data.filter(location => ['Ат-Башы', 'Кочкор', 'Нарын'].includes(location.squares))));
+      } else if (user === 'ik') {
+        dispatch(setLocations(res.payload.data.filter(location => ['Кызыл-Суу', 'Ананьева', 'Чолпон-Ата', 'Балыкчы', 'Боконбаево', 'Барскоон']
+          .includes(location.squares))));
+      } else if (user === 'talas') {
+        dispatch(setLocations(res.payload.data.filter(location => ['Талас', 'Талас1'].includes(location.squares))));
+      } else if (user === 'djalalabad') {
+        dispatch(setLocations(res.payload.data.filter(location => ['Базар-Коргон', 'Джалал-Абад'].includes(location.squares))));
+      } else if (user === 'osh') {
+        dispatch(setLocations(res.payload.data.filter(location => ['Ош', 'Араван', 'Кара-Суу'].includes(location.squares))));
+      }
+    }).catch(e => console.log(e));
     if (toobarOpen) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'unset';
     }
-
-    document.addEventListener('click', () => setShowNonActives(false));
-  }, [navigate, toobarOpen, user]);
+  }, [dispatch, navigate, toobarOpen, user]);
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -176,8 +178,9 @@ const Bonuses = () => {
       const res = await req.data;
       setData(prevState => ({
         ...prevState,
-        actives: res.count['Актив'] || -1,
-        nonActives: res.count['Неактив'] || -1,
+        aab: res.count['Актив'] || -1,
+        nab: res.count['Неактив'] || -1,
+        oab: (res.count['Неактив'] || -1) + (res.count['Актив'] || -1),
         locations: res.locations,
         user_list: res.user_list,
       }));
@@ -189,6 +192,22 @@ const Bonuses = () => {
     }
   };
 
+  const handleExcelFileExport = () => {
+    // Create a new workbook and add a worksheet
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.json_to_sheet(nonActives.map(nonActive => {
+      return {
+        ls_abon: nonActive.ls_abon,
+        address: nonActive.address,
+        balance: nonActive.balance,
+      }
+    }));
+    XLSX.utils.book_append_sheet(workbook, worksheet, state.district.squares);
+
+    // Generate an Excel file and trigger download
+    XLSX.writeFile(workbook, `${state.district.squares} - ${formatDate(state.date)}.xlsx`);
+  };
+
   return (
     <>
       <Toolbar open={toobarOpen} onClick={() => setToolbarOpen(!toobarOpen)}>
@@ -198,7 +217,7 @@ const Bonuses = () => {
           <Autocomplete
             value={state.district.squares}
             changeHandler={changeHandler}
-            options={[...districts?.map(district => district.squares) || []]}
+            options={[...locations?.map(district => district.squares) || []]}
             i={''}
             onClick={() => setState(prevState => ({
               ...prevState,
@@ -211,7 +230,7 @@ const Bonuses = () => {
       </Toolbar>
       <div className="bonuses-container">
         {
-          data.actives < 0 ?
+          data.aab < 0 ?
             <h3 className="bonuses-paper" style={{padding: '20px 0'}}>
               Нет данных
             </h3> :
@@ -252,37 +271,47 @@ const Bonuses = () => {
                   <div style={{margin: '0 2px 0 7px', display: 'flex', flexDirection: 'column'}}>
                     <span
                       className="currentPercentage-increase"
-                      onClick={() => (data.currentPercentage < 100) &&
-                        changeHandler({target: {name: 'currentPercentage', value: data.currentPercentage + 1}})}
+                      onClick={() => (data.planActiveAbsBonusPercentage < 100) &&
+                        changeHandler({
+                          target: {
+                            name: 'planActiveAbsBonusPercentage',
+                            value: data.planActiveAbsBonusPercentage + 1
+                          }
+                        })}
                     >&#x25B2;</span>
                     <span
                       className="currentPercentage-decrease"
-                      onClick={() => (data.currentPercentage > 0) &&
-                        changeHandler({target: {name: 'currentPercentage', value: data.currentPercentage - 1}})}
+                      onClick={() => (data.planActiveAbsBonusPercentage > 0) &&
+                        changeHandler({
+                          target: {
+                            name: 'planActiveAbsBonusPercentage',
+                            value: data.planActiveAbsBonusPercentage - 1
+                          }
+                        })}
                     >&#x25BC;</span>
                   </div>
-                  {' ' + data.currentPercentage}%
+                  {' ' + data.planActiveAbsBonusPercentage}%
                 </h1>
                 <div className="bonuses-table bonuses-table-1">
                   <div className="table-col">
                     <span className="table-col-title">ААБ</span>
-                    <span className="table-col-value">{data.actives}</span>
+                    <span className="table-col-value">{data.aab}</span>
                   </div>
                   <div className="table-col">
                     <span
                       className="table-col-title" style={{cursor: 'pointer', position: 'relative'}}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setShowNonActives(true);
-                      }}>
+                      onMouseEnter={() => setShowNonActives(true)}
+                      onMouseLeave={() => setShowNonActives(false)}
+                    >
                       НАБ
                       {
                         showNonActives &&
-                        <div className="bonuses-paper non-actives-list">
+                        <div className="bonuses-paper non-actives-list" style={{display: 'flex', flexDirection: 'column'}}>
+                          <img src={excelLogo} alt="excel logo" width="30px" height="30px" onClick={handleExcelFileExport}/>
                           <div className="non-actives-list-inner">
                             {
                               nonActivesLoading ? <span className="non-actives-list-loader"/> :
-                                nonActives.map((nonActive, i) => (
+                                nonActives.length && nonActives.map((nonActive, i) => (
                                   <div className="bonuses-paper non-actives-list-item" key={i}>
                                     <div className="non-actives-list-item-ls-abon">
                                       <span>ls_abon:</span>
@@ -310,114 +339,124 @@ const Bonuses = () => {
                         </div>
                       }
                     </span>
-                    <span className="table-col-value">{data.nonActives}</span>
+                    <span className="table-col-value">{data.nab}</span>
                   </div>
                   <div className="table-col">
                     <span className="table-col-title">ОАБ</span>
-                    <span className="table-col-value">{data.actives + data.nonActives}</span>
+                    <span className="table-col-value">{data.oab}</span>
                   </div>
                   <div className="table-col">
                     <span className="table-col-title">ААБ/ОАБ %</span>
                     <span className="table-col-value">
-                {activesPercentage}%
-              </span>
+                      {aabPercentage}%
+                    </span>
                   </div>
                   <div className="table-col">
-              <span className="table-col-title">
-                {abonentsPlusMinusPercentage < 0 ? 'отклонение' : 'соответствие'} %
-              </span>
-                    <span className={
-                      `table-col-value
-                ${abonentsPlusMinusPercentage >= 0 ? 'table-col-value-plus' : 'table-col-value-minus'}`}
-                    >
-                {abonentsPlusMinusPercentage}%
-              </span>
+                      <span className="table-col-title">
+                        {otkloneniePercentage < 0 ? 'отклонение' : 'соответствие'} %
+                      </span>
+                    <span
+                      className={`table-col-value ${otkloneniePercentage >= 0 ? 'table-col-value-plus' : 'table-col-value-minus'}`}>
+                        {otkloneniePercentage}%
+                      </span>
                   </div>
                   <div className="table-col">
-              <span className="table-col-title">
-                {abonentsPlusMinusNumber < 0 ? 'отклонение' : 'соответствие'}, кол-во
-              </span>
-                    <span className={
-                      `table-col-value
-                ${abonentsPlusMinusNumber >= 0 ? 'table-col-value-plus' : 'table-col-value-minus'}`}
-                    >
-                {abonentsPlusMinusNumber}
-              </span>
+                      <span className="table-col-title">
+                        {otklonenieKolvo < 0 ? 'отклонение' : 'соответствие'}, кол-во
+                      </span>
+                    <span
+                      className={`table-col-value ${otklonenieKolvo >= 0 ? 'table-col-value-plus' : 'table-col-value-minus'}`}>{otklonenieKolvo}</span>
                   </div>
                   <div className="table-col">
-              <span className="table-col-title table-col-value-yellow">
-                Премия
-                <input
-                  className="editable-input" type="text"
-                  name="bonusPerActiveAbonent"
-                  value={data.bonusPerActiveAbonent}
-                  onChange={changeHandler}/>
-                <span style={{textDecoration: 'underline'}}>c</span>
-              </span>
-                    <span className="table-col-value total-bonus">
-                {
-                  abonentsPlusMinusNumber * data.bonusPerActiveAbonent > 0 ?
-                    formatNumber(abonentsPlusMinusNumber * data.bonusPerActiveAbonent) : 0
-                }
-              </span>
+                     <span className="table-col-title table-col-value-yellow">
+                      Премия
+                      <input
+                        className="editable-input" type="text"
+                        name="bonusPerPlanActiveAbonent"
+                        value={data.bonusPerPlanActiveAbonent}
+                        onChange={changeHandler}/>
+                      <span style={{textDecoration: 'underline'}}>c</span>
+                      </span>
+                    <span className="table-col-value total-bonus">{blockOneBonus}</span>
                   </div>
                 </div>
               </div>
               <div className="bonuses-paper" style={{width: '100%'}}>
                 <h1 className="bonuses-paper-title">2. Премия за подключенные заявки (продажи)</h1>
-                <div className="bonuses-table bonuses-table-1">
-                  <div className="table-col">
-                    <span className="table-col-title">Кол-во заявок ТП 980</span>
-                    <span className="table-col-value">0</span>
-                  </div>
-                  <div className="table-col">
-                    <span className="table-col-title">
-                      Сумма
-                      <input
-                        className="editable-input" type="text"
-                        name="bonusPerConnectedAbonent980"
-                        value={data.bonusPerConnectedAbonent980}
-                        onChange={changeHandler}/>
-                      <span style={{textDecoration: 'underline'}}>c</span>
+                <div className="bonuses-table bonuses-table-2" style={{flexWrap: 'wrap'}}>
+                  <div className="table-col" style={{maxWidth: 'unset', position: 'relative'}}>
+                    <span
+                      className="table-col-title"
+                      onMouseEnter={() => setShowConnectedAbonents(true)}
+                      onMouseLeave={() => setShowConnectedAbonents(false)}
+                      style={{cursor: 'pointer'}}
+                    >
+                      Кол-во заявок
+                      {
+                        showConnectedAbonents && !!connectedSalesData.length &&
+                        <div
+                          className="bonuses-paper non-actives-list"
+                          style={{
+                            top: '0',
+                            left: '0',
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
+                            gridGap: '5px',
+                            minWidth: '350px'
+                          }}
+                        >
+                          {
+                            connectedAbonentsListLoading ? <span className="non-actives-list-loader"/> :
+                              connectedSalesData.map((item, i) => (
+                                <div className="bonuses-paper non-actives-list-item" key={i}
+                                     style={{minWidth: '120px'}}>
+                                  <div className="non-actives-list-item-ls-abon" style={{width: '100%'}}>
+                                    <div style={{display: 'flex', gap: '5px'}}>
+                                      <span>{item.name}:</span>
+                                      <span>{item.count}</span>
+                                    </div>
+                                    <div>
+                                      <input
+                                        className="editable-input" type="text"
+                                        name="bonusPerConnectedReq"
+                                        value={item.price || 0}
+                                        onChange={(e) => {
+                                          const connectedSalesDataCopy = [...connectedSalesData];
+                                          connectedSalesData[i].price = e.target.value.replace(/[^0-9]/g, '');
+                                          setConnectedSalesData(connectedSalesDataCopy);
+                                        }}
+                                        style={{marginLeft: '0'}}
+                                      />
+                                      <span style={{textDecoration: 'underline'}}>c</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))
+                          }
+                        </div>
+                      }
                     </span>
-                    <span className="table-col-value">
-                      {/*{formatNumber(connected980Bonuses)}*/}0
-                    </span>
+                    <span
+                      className="table-col-value">{connectedSalesData.reduce((acc, currentValue) => acc + currentValue.count, 0)}</span>
                   </div>
-                  <div className="table-col">
-                    <span className="table-col-title">Кол-во заявок ТП 1200</span>
-                    <span className="table-col-value">0</span>
-                  </div>
-                  <div className="table-col">
-                    <span className="table-col-title">
-                      Сумма
-                      <input
-                        className="editable-input" type="text"
-                        name="bonusPerConnectedAbonent1200"
-                        value={data.bonusPerConnectedAbonent1200}
-                        onChange={changeHandler}/>
-                      <span style={{textDecoration: 'underline'}}>c</span>
+                  <div className="table-col" style={{maxWidth: 'unset'}}>
+                    <span className="table-col-title table-col-value-yellow">
+                      Премия
                     </span>
-                    <span className="table-col-value">
-                      {/*{formatNumber(connected1200Bonuses)}*/}0
-                    </span>
-                  </div>
-                  <div className="table-col">
-                    <span className="table-col-title table-col-value-yellow">Премия</span>
                     <span className="table-col-value total-bonus">
-                      {/*{formatNumber(w)}*/}0
+                      {blockTwoBonus}
                     </span>
                   </div>
                 </div>
               </div>
               <div className="bonuses-paper" style={{width: '100%'}}>
                 <h1 className="bonuses-paper-title">3. Премия за подключение абонента</h1>
-                <div className="bonuses-table bonuses-table-1">
+                <div className="bonuses-table bonuses-table-3">
                   <div className="table-col" style={{width: '66%'}}>
                     <span className="table-col-title">Кол-во подключенных абонентов</span>
                     <span className="table-col-value">
-                {data.connectedAbonentsAmount}
-              </span>
+                      {data.connectedAbonentsAmount}
+                    </span>
                   </div>
                   <div className="table-col">
                     <span className="table-col-title table-col-value-yellow">
@@ -430,19 +469,17 @@ const Bonuses = () => {
                       <span style={{textDecoration: 'underline'}}>c</span>
                     </span>
                     <span className="table-col-value total-bonus">
-                      {formatNumber(
-                        data.connectedAbonentsAmount * data.bonusPerConnectedAbonent
-                      )}
+                      {formatNumber(blockThreeBonus)}
                     </span>
                   </div>
                 </div>
               </div>
               <div className="bonuses-paper" style={{width: '100%'}}>
                 <h1 className="bonuses-paper-title">4. Премия за Активных абонентов</h1>
-                <div className="bonuses-table bonuses-table-1">
+                <div className="bonuses-table bonuses-table-4">
                   <div className="table-col" style={{width: '66%'}}>
                     <span className="table-col-title">Кол-во активных абонентов</span>
-                    <span className="table-col-value">{data.actives}</span>
+                    <span className="table-col-value">{data.aab}</span>
                   </div>
                   <div className="table-col">
                     <span className="table-col-title table-col-value-yellow">
@@ -455,7 +492,7 @@ const Bonuses = () => {
                       <span style={{textDecoration: 'underline'}}>c</span>
                     </span>
                     <span className="table-col-value total-bonus">
-                      {formatNumber(data.actives * data.bonusPerActiveAbonent2)}
+                      {formatNumber(blockFourBonus)}
                     </span>
                   </div>
                 </div>
@@ -466,7 +503,7 @@ const Bonuses = () => {
                     ИТОГО ПРЕМИЯ за текущий месяц на бригаду
                   </h2>
                   <h1 style={{color: '#29384A', padding: '9px', fontWeight: 800}}>
-                    {formatNumber(bonusForCurrentMonth)} сом
+                    {blockOneBonus + blockTwoBonus + blockThreeBonus + blockFourBonus} сом
                   </h1>
                 </div>
                 <div
@@ -486,8 +523,7 @@ const Bonuses = () => {
                       Для этого надо вернуть всего абонентов из неактивки:
                     </span>
                     <h2 style={{marginTop: 'auto', color: '#D1585B'}}>
-                      {Math.floor(data.nonActives / data.additionalEarningPercentage) === Infinity ?
-                        0 : Math.floor(data.nonActives / data.additionalEarningPercentage)}
+                      {((Math.abs(otkloneniePercentage) + (10 - data.additionalEarningPercentage)) * data.oab / 100).toFixed()}
                     </h2>
                   </div>
                   <div className="border-red">
@@ -517,15 +553,9 @@ const Bonuses = () => {
                         >&#x25BC;</span>
                       </div>
                       {' ' + data.additionalEarningPercentage}%
-                      <input
-                        className="editable-input" type="text"
-                        name="bonusPerReturnedAbonent2"
-                        value={data.bonusPerReturnedAbonent2}
-                        onChange={changeHandler}/>
-                      <span style={{textDecoration: 'underline'}}>c</span>
                     </h2>
                     <h1 style={{color: '#29384A', padding: '9px', fontWeight: 800}}>
-                      {abonentAmountToReturn > 0 ? `+ ${formatNumber(abonentAmountToReturn)}` : 0} сом
+                      {formatNumber(additionalBonus)} сом
                     </h1>
                   </div>
                 </div>
@@ -534,7 +564,8 @@ const Bonuses = () => {
         }
       </div>
     </>
-  );
+  )
+    ;
 };
 
 export default Bonuses;
