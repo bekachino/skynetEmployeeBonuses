@@ -306,8 +306,16 @@ const Bonuses = () => {
                       НАБ
                       {
                         showNonActives &&
-                        <div className="bonuses-paper non-actives-list" style={{display: 'flex', flexDirection: 'column'}}>
-                          <img src={excelLogo} alt="excel logo" width="30px" height="30px" onClick={handleExcelFileExport}/>
+                        <div className="bonuses-paper non-actives-list"
+                             style={{display: 'flex', flexDirection: 'column'}}>
+                          {
+                            user === 'meerim' &&
+                            <div className="export-to-excel">
+                              <img src={excelLogo} alt="excel logo" width="30px" height="30px"
+                                   onClick={handleExcelFileExport}/>
+                              <span>экскорт</span>
+                            </div>
+                          }
                           <div className="non-actives-list-inner">
                             {
                               nonActivesLoading ? <span className="non-actives-list-loader"/> :

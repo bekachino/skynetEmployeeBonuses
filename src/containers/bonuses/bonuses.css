@@ -220,14 +220,21 @@ h1, h2 {
   z-index: 2;
 }
 
-.non-actives-list img {
+.export-to-excel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   margin: 0 3px 3px auto;
   padding: 3px;
   border-radius: 3px;
 }
 
-.non-actives-list img:hover {
+.export-to-excel:hover {
   background-color: rgba(38, 148, 30, 0.28);
+}
+
+.export-to-excel span {
+  line-height: 16px;
 }
 
 .non-actives-list-inner {
