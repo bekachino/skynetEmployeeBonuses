@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import Toolbar from "../../components/toolbar/Toolbar";
 import DatePicker from "../../components/datePicker/DatePicker";
 import Autocomplete from "../../components/autocomplete/Autocomplete";
@@ -15,6 +15,10 @@ import './bonuses.css';
 
 const Bonuses = () => {
   const navigate = useNavigate();
+  const nabContainerRef = useRef();
+  const kolZayContainerRef = useRef();
+  const [nabContainerPosition, setNabContainerPosition] = useState({x: 0, y: 0});
+  const [kolZayContainerPosition, setKolZayContainerPosition] = useState({x: 0, y: 0});
   const dispatch = useAppDispatch();
   const user = useAppSelector(state => state.userState.user);
   const locations = useAppSelector(state => state.userState.locations);
@@ -162,6 +166,21 @@ const Bonuses = () => {
     }
   }, [dispatch, navigate, toobarOpen, user]);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      const pos1 = nabContainerRef.current?.getBoundingClientRect();
+      const pos2 = kolZayContainerRef.current?.getBoundingClientRect();
+      if (pos1 && pos2) {
+        setNabContainerPosition({ x: pos1.left, y: pos1.top });
+        setKolZayContainerPosition({ x: pos2.left, y: pos2.top });
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+
   const onSubmit = async (e) => {
     e.preventDefault();
     setFormLoading(true);
@@ -193,19 +212,26 @@ const Bonuses = () => {
   };
 
   const handleExcelFileExport = () => {
-    // Create a new workbook and add a worksheet
     const workbook = XLSX.utils.book_new();
     const worksheet = XLSX.utils.json_to_sheet(nonActives.map(nonActive => {
       return {
         ls_abon: nonActive.ls_abon,
         address: nonActive.address,
         balance: nonActive.balance,
+        name_abon: nonActive.name_abon,
+        type_abon: nonActive.type_abon,
+        phone_abon: nonActive.phone_abon,
+        last_pay: nonActive.last_pay,
       }
     }));
     XLSX.utils.book_append_sheet(workbook, worksheet, state.district.squares);
 
-    // Generate an Excel file and trigger download
     XLSX.writeFile(workbook, `${state.district.squares} - ${formatDate(state.date)}.xlsx`);
+  };
+
+  const getDataFromDart = (jsonString) => {
+    var data = JSON.parse(jsonString);
+    console.log(data);
   };
 
   return (
@@ -300,32 +326,45 @@ const Bonuses = () => {
                   <div className="table-col">
                     <span
                       className="table-col-title" style={{cursor: 'pointer', position: 'relative'}}
-                      onMouseEnter={() => setShowNonActives(true)}
+                      onMouseEnter={() => {
+                        setKolZayContainerPosition({
+                          x: nabContainerRef.current?.getBoundingClientRect().left || 0,
+                          y: nabContainerRef.current?.getBoundingClientRect().top || 0,
+                        });
+                        setShowNonActives(true);
+                      }}
                       onMouseLeave={() => setShowNonActives(false)}
+                      ref={nabContainerRef}
                     >
                       НАБ
                       {
                         showNonActives &&
-                        <div className="bonuses-paper non-actives-list"
-                             style={{display: 'flex', flexDirection: 'column'}}>
+                        <div
+                          className="bonuses-paper non-actives-list"
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            transform: `translate(${nabContainerPosition.x}px, ${nabContainerPosition.y}px)`,
+                          }}>
                           {
                             user === 'meerim' &&
-                            <div className="export-to-excel">
-                              <img src={excelLogo} alt="excel logo" width="30px" height="30px"
-                                   onClick={handleExcelFileExport}/>
-                              <span>экскорт</span>
+                            <div className="export-to-excel" onClick={handleExcelFileExport}>
+                              <img src={excelLogo} alt="excel logo" width="30px" height="30px"/>
+                              <span style={{color: 'black'}}>экскорт</span>
                             </div>
                           }
                           <div className="non-actives-list-inner">
                             {
                               nonActivesLoading ? <span className="non-actives-list-loader"/> :
                                 nonActives.length && nonActives.map((nonActive, i) => (
-                                  <div className="bonuses-paper non-actives-list-item" key={i}>
+                                  <div className="bonuses-paper non-actives-list-item" key={i}
+                                       style={{minWidth: '1120px'}}>
                                     <div className="non-actives-list-item-ls-abon">
                                       <span>ls_abon:</span>
                                       <span>{nonActive.ls_abon}</span>
                                     </div>
-                                    <div className="non-actives-list-item-address">
+                                    <div className="non-actives-list-item-address"
+                                         style={{minWidth: '250px', maxWidth: '250px'}}>
                                       <span>Адрес:</span>
                                       <span>{nonActive.address}</span>
                                     </div>
@@ -336,9 +375,23 @@ const Bonuses = () => {
                                         {' '}<span style={{fontWeight: 600, textDecoration: 'underline'}}>c</span>
                                       </span>
                                     </div>
-                                    <div className="non-actives-list-item-ip-address">
-                                      <span>IP Адрес:</span>
-                                      <span>{nonActive.ip_address}</span>
+                                    <div className="non-actives-list-item-ip-address"
+                                         style={{minWidth: '250px', maxWidth: '250px'}}>
+                                      <span>Имя абонента:</span>
+                                      <span>{nonActive.name_abon}</span>
+                                    </div>
+                                    <div className="non-actives-list-item-ip-address" style={{minWidth: '150px'}}>
+                                      <span>Физическое лицо:</span>
+                                      <span>{nonActive.type_abon}</span>
+                                    </div>
+                                    <div className="non-actives-list-item-ip-address"
+                                         style={{minWidth: '140px', maxWidth: '150px'}}>
+                                      <span>Номер телефона:</span>
+                                      <span>{nonActive.phone_abon}</span>
+                                    </div>
+                                    <div className="non-actives-list-item-ip-address" style={{minWidth: '140px'}}>
+                                      <span>Последний платёж:</span>
+                                      <span>{nonActive.last_pay}</span>
                                     </div>
                                   </div>
                                 ))
@@ -398,6 +451,7 @@ const Bonuses = () => {
                       onMouseEnter={() => setShowConnectedAbonents(true)}
                       onMouseLeave={() => setShowConnectedAbonents(false)}
                       style={{cursor: 'pointer'}}
+                      ref={kolZayContainerRef}
                     >
                       Кол-во заявок
                       {
@@ -410,14 +464,15 @@ const Bonuses = () => {
                             display: 'grid',
                             gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
                             gridGap: '5px',
-                            minWidth: '350px'
+                            minWidth: '350px',
+                            transform: `translate(${kolZayContainerPosition.x}px, ${kolZayContainerPosition.y}px)`,
                           }}
                         >
                           {
                             connectedAbonentsListLoading ? <span className="non-actives-list-loader"/> :
                               connectedSalesData.map((item, i) => (
                                 <div className="bonuses-paper non-actives-list-item" key={i}
-                                     style={{minWidth: '120px'}}>
+                                     style={{minWidth: '120px', width: 'unset'}}>
                                   <div className="non-actives-list-item-ls-abon" style={{width: '100%'}}>
                                     <div style={{display: 'flex', gap: '5px'}}>
                                       <span>{item.name}:</span>
