@@ -5,7 +5,7 @@ import Autocomplete from "../../components/autocomplete/Autocomplete";
 import Button from "../../components/button/Button";
 import Logout from "../../components/logout/Logout";
 import axiosApi from "../../axiosApi";
-import {useNavigate} from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 import {useAppDispatch, useAppSelector} from "../../app/hooks";
 import {fetchLocations} from "../../features/userThunk";
 import {setLocations} from "../../features/usersSlice";
@@ -14,8 +14,11 @@ import excelLogo from '../../assets/excel.png';
 import './bonuses.css';
 
 const Bonuses = () => {
+  const [interval, setClearInterval] = useState(null);
+  const location = useLocation();
   const navigate = useNavigate();
   const nabContainerRef = useRef();
+  const nabContainerInnerRef = useRef();
   const kolZayContainerRef = useRef();
   const [nabContainerPosition, setNabContainerPosition] = useState({x: 0, y: 0});
   const [kolZayContainerPosition, setKolZayContainerPosition] = useState({x: 0, y: 0});
@@ -32,7 +35,7 @@ const Bonuses = () => {
   const [connectedAbonentsListLoading, setConnectedAbonentsListLoading] = useState(false);
   const [state, setState] = useState({
     date: '',
-    district: {id: -1, squares: ''},
+    district: {id: location.search.slice(1, location.search.length), squares: ''},
   });
   const [data, setData] = useState({
     aab: -1,
@@ -147,8 +150,8 @@ const Bonuses = () => {
     const pos1 = nabContainerRef.current?.getBoundingClientRect();
     const pos2 = kolZayContainerRef.current?.getBoundingClientRect();
     if (pos1 && pos2) {
-      setNabContainerPosition({ x: pos1.left, y: pos1.top });
-      setKolZayContainerPosition({ x: pos2.left, y: pos2.top });
+      setNabContainerPosition({x: pos1.left, y: pos1.top});
+      setKolZayContainerPosition({x: pos2.left, y: pos2.top});
     }
   };
 
@@ -179,7 +182,6 @@ const Bonuses = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -229,18 +231,15 @@ const Bonuses = () => {
     XLSX.writeFile(workbook, `${state.district.squares} - ${formatDate(state.date)}.xlsx`);
   };
 
-  const getDataFromDart = (jsonString) => {
-    var data = JSON.parse(jsonString);
-    console.log(data);
-  };
-
   return (
     <>
       <Toolbar open={toobarOpen} onClick={() => setToolbarOpen(!toobarOpen)}>
-        <Logout/>
+        {
+          window.innerWidth > 768 && <Logout/>
+        }
         <form className="toolbar-form" onSubmit={onSubmit}>
           <DatePicker value={state.date} changeHandler={changeHandler} i={''}/>
-          <Autocomplete
+          {window.innerWidth > 768 && <Autocomplete
             value={state.district.squares}
             changeHandler={changeHandler}
             options={[...locations?.map(district => district.squares) || []]}
@@ -249,8 +248,8 @@ const Bonuses = () => {
               ...prevState,
               district: {id: -1, squares: ''},
             }))}
-          />
-          <Button type="submit" disabled={!state.date || state.district.id < 0} onClick={onSubmit}
+          />}
+          <Button type="submit" disabled={!state.date || (window.innerWidth > 768 && !state.district.squares)} onClick={onSubmit}
                   loading={formLoading}/>
         </form>
       </Toolbar>
@@ -335,9 +334,7 @@ const Bonuses = () => {
                     >
                       НАБ
                       {
-                        showNonActives
-                        // 1 === 1
-                        &&
+                        showNonActives && window.innerWidth > 768 &&
                         <div
                           className="bonuses-paper non-actives-list"
                           style={{
@@ -352,9 +349,29 @@ const Bonuses = () => {
                               <span style={{color: 'black'}}>экспорт</span>
                             </div>
                           }
-                          <div className="non-actives-list-inner-arrow-left" />
-                          <div className="non-actives-list-inner-arrow-right" />
-                          <div className="non-actives-list-inner">
+                          <div
+                            className="non-actives-list-inner-arrow-left"
+                            onMouseOver={() => {
+                              setClearInterval(
+                                setInterval(() => {
+                                  nabContainerInnerRef.current.scrollLeft -= 5;
+                                }, 10)
+                              );
+                            }}
+                            onMouseLeave={() => clearInterval(interval)}
+                          />
+                          <div
+                            className="non-actives-list-inner-arrow-right"
+                            onMouseOver={() => {
+                              setClearInterval(
+                                setInterval(() => {
+                                  nabContainerInnerRef.current.scrollLeft += 5;
+                                }, 10)
+                              );
+                            }}
+                            onMouseLeave={() => clearInterval(interval)}
+                          />
+                          <div className="non-actives-list-inner" ref={nabContainerInnerRef}>
                             {
                               nonActivesLoading ? <span className="non-actives-list-loader"/> :
                                 nonActives.length && nonActives.map((nonActive, i) => (
