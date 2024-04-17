@@ -143,6 +143,15 @@ const Bonuses = () => {
     }
   };
 
+  const handleScroll = () => {
+    const pos1 = nabContainerRef.current?.getBoundingClientRect();
+    const pos2 = kolZayContainerRef.current?.getBoundingClientRect();
+    if (pos1 && pos2) {
+      setNabContainerPosition({ x: pos1.left, y: pos1.top });
+      setKolZayContainerPosition({ x: pos2.left, y: pos2.top });
+    }
+  };
+
   useEffect(() => {
     if (!user) navigate('/sign-in');
     dispatch(fetchLocations()).then(res => {
@@ -167,15 +176,6 @@ const Bonuses = () => {
   }, [dispatch, navigate, toobarOpen, user]);
 
   useEffect(() => {
-    const handleScroll = () => {
-      const pos1 = nabContainerRef.current?.getBoundingClientRect();
-      const pos2 = kolZayContainerRef.current?.getBoundingClientRect();
-      if (pos1 && pos2) {
-        setNabContainerPosition({ x: pos1.left, y: pos1.top });
-        setKolZayContainerPosition({ x: pos2.left, y: pos2.top });
-      }
-    };
-
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -327,10 +327,7 @@ const Bonuses = () => {
                     <span
                       className="table-col-title" style={{cursor: 'pointer', position: 'relative'}}
                       onMouseEnter={() => {
-                        setKolZayContainerPosition({
-                          x: nabContainerRef.current?.getBoundingClientRect().left || 0,
-                          y: nabContainerRef.current?.getBoundingClientRect().top || 0,
-                        });
+                        handleScroll();
                         setShowNonActives(true);
                       }}
                       onMouseLeave={() => setShowNonActives(false)}
@@ -338,7 +335,9 @@ const Bonuses = () => {
                     >
                       НАБ
                       {
-                        showNonActives &&
+                        showNonActives
+                        // 1 === 1
+                        &&
                         <div
                           className="bonuses-paper non-actives-list"
                           style={{
@@ -350,15 +349,17 @@ const Bonuses = () => {
                             user === 'meerim' &&
                             <div className="export-to-excel" onClick={handleExcelFileExport}>
                               <img src={excelLogo} alt="excel logo" width="30px" height="30px"/>
-                              <span style={{color: 'black'}}>экскорт</span>
+                              <span style={{color: 'black'}}>экспорт</span>
                             </div>
                           }
+                          <div className="non-actives-list-inner-arrow-left" />
+                          <div className="non-actives-list-inner-arrow-right" />
                           <div className="non-actives-list-inner">
                             {
                               nonActivesLoading ? <span className="non-actives-list-loader"/> :
                                 nonActives.length && nonActives.map((nonActive, i) => (
                                   <div className="bonuses-paper non-actives-list-item" key={i}
-                                       style={{minWidth: '1120px'}}>
+                                       style={{minWidth: '1195px'}}>
                                     <div className="non-actives-list-item-ls-abon">
                                       <span>ls_abon:</span>
                                       <span>{nonActive.ls_abon}</span>
@@ -448,7 +449,10 @@ const Bonuses = () => {
                   <div className="table-col" style={{maxWidth: 'unset', position: 'relative'}}>
                     <span
                       className="table-col-title"
-                      onMouseEnter={() => setShowConnectedAbonents(true)}
+                      onMouseEnter={() => {
+                        handleScroll();
+                        setShowConnectedAbonents(true);
+                      }}
                       onMouseLeave={() => setShowConnectedAbonents(false)}
                       style={{cursor: 'pointer'}}
                       ref={kolZayContainerRef}
