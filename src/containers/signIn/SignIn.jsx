@@ -28,7 +28,7 @@ const SignIn = () => {
   };
 
   useEffect(() => {
-    if (user) navigate('/bonuses')
+    if (user) navigate('/bonuses/-')
   }, [navigate, user]);
 
   return (

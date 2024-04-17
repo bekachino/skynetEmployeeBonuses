@@ -1,0 +1,30 @@
+.non-active-item {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 5px;
+  padding: 5px;
+  background-color: #E7F0FA;
+  border-radius: 8px;
+  margin: 15px;
+}
+
+.non-active-item-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: nowrap;
+  text-align: left;
+  font-size: 12px;
+  user-select: none;
+}
+
+.non-active-item-row-title {
+  min-width: 100px;
+  width: 100px;
+  font-weight: 700;
+}
+
+.non-active-item-row .autocomplete-input-box,
+.non-active-item-row .autocomplete-icon {
+  height: 30px;
+}

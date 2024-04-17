@@ -86,12 +86,16 @@
   z-index: -1;
 }
 
-.autocomplete-input:focus ~ .autocomplete-icon {
+.autocomplete-panel-open ~ .autocomplete-icon {
   background-color: #E7F0FA;
 }
 
-.autocomplete-input:focus ~ .autocomplete-icon::before {
+.autocomplete-panel-open ~ .autocomplete-icon::before {
   transform: rotateX(180deg);
+}
+
+.autocomplete-panel-open ~ .autocomplete-toggler {
+  z-index: 0;
 }
 
 .autocomplete-panel-open {
@@ -103,6 +107,7 @@
 
 .autocomplete-option {
   cursor: pointer;
+  z-index: 30;
 }
 
 .autocomplete-option,

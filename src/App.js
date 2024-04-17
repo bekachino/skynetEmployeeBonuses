@@ -3,8 +3,9 @@ import {useAppSelector} from "./app/hooks";
 import SignUp from "./containers/signUp/SignUp";
 import SignIn from "./containers/signIn/SignIn";
 import Bonuses from "./containers/bonuses/Bonuses";
-import './App.css';
 import {useEffect} from "react";
+import NonActive from "./containers/nonActives/NonActive";
+import './App.css';
 
 const App = () => {
   const userToken = useAppSelector((state) => state.userState.user);
@@ -23,10 +24,11 @@ const App = () => {
     <div className="App">
       <Routes>
         <Route path='*' element={userToken ?
-          <Navigate to="/sign-in" replace/> : <Navigate to="/sign-in" replace/>}/>
+          <Navigate to="/bonuses/-" replace/> : <Navigate to="/sign-in" replace/>}/>
         <Route path='sign-up' element={<SignUp/>}/>
         <Route path='sign-in' element={<SignIn/>}/>
-        <Route path='bonuses' element={<Bonuses/>}/>
+        <Route path='bonuses/:params' element={<Bonuses/>}/>
+        <Route path='bonuses/non-active' element={<NonActive/>}/>
       </Routes>
     </div>
   );

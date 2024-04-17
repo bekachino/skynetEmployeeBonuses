@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import mainLogo from '../../assets/skynet-logo.png';
 import './signUp.css';
 import {useNavigate} from "react-router-dom";
@@ -21,6 +21,10 @@ const SignUp = () => {
       [name]: value,
     }));
   };
+
+  useEffect(() => {
+    if (user) navigate('/bonuses/-')
+  }, [navigate, user]);
 
   const onSubmit = (e) => {
     e.preventDefault();

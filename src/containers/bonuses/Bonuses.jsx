@@ -5,17 +5,17 @@ import Autocomplete from "../../components/autocomplete/Autocomplete";
 import Button from "../../components/button/Button";
 import Logout from "../../components/logout/Logout";
 import axiosApi from "../../axiosApi";
-import {useLocation, useNavigate} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import {useAppDispatch, useAppSelector} from "../../app/hooks";
 import {fetchLocations} from "../../features/userThunk";
-import {setLocations} from "../../features/usersSlice";
+import {setLocations, setNonActive} from "../../features/usersSlice";
 import * as XLSX from 'xlsx';
 import excelLogo from '../../assets/excel.png';
 import './bonuses.css';
 
 const Bonuses = () => {
   const [interval, setClearInterval] = useState(null);
-  const location = useLocation();
+  const params = useParams();
   const navigate = useNavigate();
   const nabContainerRef = useRef();
   const nabContainerInnerRef = useRef();
@@ -35,7 +35,7 @@ const Bonuses = () => {
   const [connectedAbonentsListLoading, setConnectedAbonentsListLoading] = useState(false);
   const [state, setState] = useState({
     date: '',
-    district: {id: location.search.slice(1, location.search.length), squares: ''},
+    district: {id: params?.params || -1, squares: ''},
   });
   const [data, setData] = useState({
     aab: -1,
@@ -239,18 +239,27 @@ const Bonuses = () => {
         }
         <form className="toolbar-form" onSubmit={onSubmit}>
           <DatePicker value={state.date} changeHandler={changeHandler} i={''}/>
-          {window.innerWidth > 768 && <Autocomplete
-            value={state.district.squares}
-            changeHandler={changeHandler}
-            options={[...locations?.map(district => district.squares) || []]}
-            i={''}
-            onClick={() => setState(prevState => ({
-              ...prevState,
-              district: {id: -1, squares: ''},
-            }))}
-          />}
-          <Button type="submit" disabled={!state.date || (window.innerWidth > 768 && !state.district.squares)} onClick={onSubmit}
-                  loading={formLoading}/>
+          {window.innerWidth > 768 &&
+            <Autocomplete
+              name="district"
+              value={state.district.squares}
+              changeHandler={changeHandler}
+              options={[...locations?.map(district => district.squares) || []]}
+              i={''}
+              onClick={() => setState(prevState => ({
+                ...prevState,
+                district: {id: -1, squares: ''},
+              }))}
+              label="Выберите квадрат"
+            />
+          }
+          <Button
+            type="submit"
+            disabled={!state.date || (window.innerWidth > 768 && !state.district.squares)}
+            onClick={onSubmit}
+            loading={formLoading}
+            label="Поиск"
+          />
         </form>
       </Toolbar>
       <div className="bonuses-container">
@@ -334,7 +343,7 @@ const Bonuses = () => {
                     >
                       НАБ
                       {
-                        showNonActives && window.innerWidth > 768 &&
+                        showNonActives &&
                         <div
                           className="bonuses-paper non-actives-list"
                           style={{
@@ -375,10 +384,19 @@ const Bonuses = () => {
                             {
                               nonActivesLoading ? <span className="non-actives-list-loader"/> :
                                 nonActives.length && nonActives.map((nonActive, i) => (
-                                  <div className="bonuses-paper non-actives-list-item" key={i}
-                                       style={{minWidth: '1195px'}}>
+                                  <div
+                                    className="bonuses-paper non-actives-list-item"
+                                    style={{minWidth: '1195px'}}
+                                    key={i}
+                                    onClick={() => {
+                                      dispatch(setNonActive(nonActive));
+                                      if (window.innerWidth < 768) {
+                                        navigate(`/bonuses/non-active`);
+                                      }
+                                    }}
+                                  >
                                     <div className="non-actives-list-item-ls-abon">
-                                      <span>ls_abon:</span>
+                                      <span>Лицевой счёт:</span>
                                       <span>{nonActive.ls_abon}</span>
                                     </div>
                                     <div className="non-actives-list-item-address"

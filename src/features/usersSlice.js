@@ -9,6 +9,7 @@ const initialState = {
   authorizationMessage: "",
   popupId: "",
   locations: [],
+  nonActive: null,
 };
 
 const UsersSlice = createSlice({
@@ -24,6 +25,9 @@ const UsersSlice = createSlice({
     setLocations: (state, action) => {
       state.locations = action.payload;
     },
+    setNonActive: (state, action) => {
+      state.nonActive = action.payload;
+    }
   },
   extraReducers: (builder) => {
     builder.addCase(signUp.pending, (state) => {
@@ -71,4 +75,4 @@ const UsersSlice = createSlice({
 });
 
 export const userReducer = UsersSlice.reducer;
-export const {logout, setPopupId, setLocations} = UsersSlice.actions;
+export const {logout, setPopupId, setLocations, setNonActive} = UsersSlice.actions;
