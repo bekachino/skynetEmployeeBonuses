@@ -15,7 +15,7 @@ export const signUp = createAsyncThunk("user/signUp", async (userData, {rejectWi
   }
 });
 
-export const signIn = createAsyncThunk("user/signIn", async (userData, {rejectWithValue}) => {
+export const signIn = createAsyncThunk("user/signIn", async (userData) => {
   if (
     (userData.login === 'admin' && userData.password === 'skynet') ||
     (userData.login === 'osh' && userData.password === 'oshskynet02') ||
