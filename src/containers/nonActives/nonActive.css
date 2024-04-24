@@ -14,17 +14,61 @@
   gap: 10px;
   flex-wrap: nowrap;
   text-align: left;
-  font-size: 12px;
   user-select: none;
 }
 
 .non-active-item-row-title {
-  min-width: 100px;
-  width: 100px;
+  min-width: 150px;
+  width: 150px;
   font-weight: 700;
 }
 
 .non-active-item-row .autocomplete-input-box,
 .non-active-item-row .autocomplete-icon {
   height: 30px;
+}
+
+.non-active-item-phone {
+  position: relative;
+}
+
+.non-active-item-phone-modal {
+  position: absolute;
+  display: none;
+  gap: 5px;
+  top: 50%;
+  left: 0;
+  background-color: white;
+  padding: 5px;
+  border-radius: 8px;
+  z-index: 3;
+}
+
+.non-active-item-phone-modal link {
+  box-shadow: 0 2px 5px 0 #61616166;
+}
+
+.non-active-item-phone-toggler {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+}
+
+.non-active-item-phone-toggler:checked ~ .non-active-item-phone-modal {
+  display: flex;
+}
+
+@media (max-width: 768px) {
+  .non-active-item-row {
+    font-size: 12px;
+  }
+
+  .non-active-item-row-title {
+    min-width: 120px;
+    width: 120px;
+  }
 }
