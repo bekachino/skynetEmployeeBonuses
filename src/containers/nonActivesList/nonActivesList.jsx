@@ -62,9 +62,9 @@ const NonActivesList = () => {
       formData.append('squares_id', state.district.id);
 
       const req = await axiosApi.post(
-        'http://planup.skynet.kg:8000/planup/noactive_squares/', formData);
+        'noactive_squares/', formData);
       const req2 = await axiosApi.post(
-        'http://planup.skynet.kg:8000/planup/filtered_squares/', formData);
+        'filtered_squares/', formData);
       const res = await req.data;
       const res2 = await req2.data;
       setNonActives(res.data);

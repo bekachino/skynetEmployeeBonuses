@@ -1,1 +1,1 @@
-export const apiUrl = 'http://10.1.2.138:8001/';
+export const apiUrl = 'http://planup.skynet.kg:8000/planup/';

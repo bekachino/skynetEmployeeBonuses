@@ -49,7 +49,7 @@ const NonActive = () => {
         }
       });
 
-      await axiosApi.post('http://planup.skynet.kg:8000/planup/noactive_planup/', formData);
+      await axiosApi.post('noactive_planup/', formData);
       setFormLoading(false);
       window.history.back();
     }

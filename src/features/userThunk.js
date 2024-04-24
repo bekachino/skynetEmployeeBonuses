@@ -4,7 +4,7 @@ import axiosApi from "../axiosApi";
 
 export const signUp = createAsyncThunk("user/signUp", async (userData, {rejectWithValue}) => {
   try {
-    const response = await axiosApi.post("/register/", userData);
+    const response = await axiosApi.post("register/", userData);
     return response.data;
   }
   catch (e) {
@@ -28,7 +28,7 @@ export const signIn = createAsyncThunk("user/signIn", async (userData, {rejectWi
     return userData.login;
   } else return '';
   // try {
-  //   const response = await axiosApi.post("/login/", userData);
+  //   const response = await axiosApi.post("login/", userData);
   //   return response.data;
   // }
   // catch (e) {
@@ -41,7 +41,7 @@ export const signIn = createAsyncThunk("user/signIn", async (userData, {rejectWi
 
 export const fetchLocations = createAsyncThunk("user/fetchLocations", async (formData, {rejectWithValue}) => {
   try {
-    const response = await axiosApi("http://planup.skynet.kg:8000/planup/all_squares/", formData);
+    const response = await axiosApi("all_squares/", formData);
     return response.data;
   }
   catch (e) {

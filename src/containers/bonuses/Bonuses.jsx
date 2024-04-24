@@ -109,7 +109,7 @@ const Bonuses = () => {
       formData.append('squares_id', state.district.id);
 
       const req = await axiosApi.post(
-        'http://planup.skynet.kg:8000/planup/noactive_squares/', formData);
+        'noactive_squares/', formData);
       const res = await req.data;
       setNonActives(res.data);
       setNonActivesLoading(false);
@@ -127,7 +127,7 @@ const Bonuses = () => {
       formData.append('date_filter', formatDate(new Date(state.date)));
       formData.append('squares_id', state.district.id);
       const req = await axiosApi.post(
-        'http://planup.skynet.kg:8000/planup/count_podkl/', formData);
+        'count_podkl/', formData);
       const res = await req.data;
       setConnectedSalesData(res.data.map(tariff => {
         return {
@@ -202,7 +202,7 @@ const Bonuses = () => {
       formData.append('squares_id', state.district.id);
 
       const req = await axiosApi.post(
-        'http://planup.skynet.kg:8000/planup/filtered_squares/', formData);
+        'filtered_squares/', formData);
       const res = await req.data;
       setData(prevState => ({
         ...prevState,
