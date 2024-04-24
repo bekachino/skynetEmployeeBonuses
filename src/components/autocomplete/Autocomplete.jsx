@@ -7,7 +7,7 @@ const Autocomplete = ({name, value, changeHandler, options, i, onClick, type, la
   const inputRef = useRef();
   const dispatch = useAppDispatch();
   const popupId = useAppSelector((state) => state.userState.popupId);
-  const dists = options.filter(option => option.toLowerCase().includes(value.toLowerCase()))
+  const dists = options.filter(option => option?.trim().toLowerCase().includes(value?.trim().toLowerCase()))
     .map((option, i) => (
       <span
         className="autocomplete-option"

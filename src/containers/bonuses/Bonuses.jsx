@@ -5,7 +5,7 @@ import Autocomplete from "../../components/autocomplete/Autocomplete";
 import Button from "../../components/button/Button";
 import Logout from "../../components/logout/Logout";
 import axiosApi from "../../axiosApi";
-import {useNavigate, useParams} from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 import {useAppDispatch, useAppSelector} from "../../app/hooks";
 import {fetchLocations} from "../../features/userThunk";
 import {setLocations, setNonActive} from "../../features/usersSlice";
@@ -14,15 +14,11 @@ import excelLogo from '../../assets/excel.png';
 import './bonuses.css';
 
 const Bonuses = () => {
-  const [interval, setClearInterval] = useState(null);
-  const params = useParams();
+  const location = useLocation();
   const navigate = useNavigate();
-  const nabContainerRef = useRef();
-  const nabContainerInnerRef = useRef();
-  const kolZayContainerRef = useRef();
-  const [nabContainerPosition, setNabContainerPosition] = useState({x: 0, y: 0});
-  const [kolZayContainerPosition, setKolZayContainerPosition] = useState({x: 0, y: 0});
   const dispatch = useAppDispatch();
+  const kolZayContainerRef = useRef();
+  const [kolZayContainerPosition, setKolZayContainerPosition] = useState({x: 0, y: 0});
   const user = useAppSelector(state => state.userState.user);
   const locations = useAppSelector(state => state.userState.locations);
   const [nonActives, setNonActives] = useState([]);
@@ -34,8 +30,8 @@ const Bonuses = () => {
   const [nonActivesLoading, setNonActivesLoading] = useState(false);
   const [connectedAbonentsListLoading, setConnectedAbonentsListLoading] = useState(false);
   const [state, setState] = useState({
-    date: '',
-    district: {id: params?.params || -1, squares: ''},
+    date: new URLSearchParams(location.search).get('date') || '',
+    district: {id: new URLSearchParams(location.search).get('id') || -1, squares: ''},
   });
   const [data, setData] = useState({
     aab: -1,
@@ -53,17 +49,17 @@ const Bonuses = () => {
     user_list: [],
   });
 
-  const aabPercentage = Number((data.aab / data.oab * 100).toFixed(2));
+  const aabPercentage = Number(((data.aab || 0) / (data.oab || 0) * 100).toFixed(2));
   const otkloneniePercentage = Number((aabPercentage - data.planActiveAbsBonusPercentage).toFixed(2));
-  const otklonenieKolvo = Number(((data.oab / 100 * data.planActiveAbsBonusPercentage) / 100 * otkloneniePercentage).toFixed());
+  const otklonenieKolvo = Number((((data.oab || 0) / 100 * data.planActiveAbsBonusPercentage) / 100 * otkloneniePercentage).toFixed());
   const blockOneBonus = Number((otklonenieKolvo > 0 ? otklonenieKolvo * data.bonusPerPlanActiveAbonent : 0).toFixed());
   const blockTwoBonus = connectedSalesData.reduce((accumulator, currentValue) => {
     return accumulator + (currentValue.count * currentValue.price);
   }, 0);
   const blockThreeBonus = Number((data.connectedAbonentsAmount * data.bonusPerConnectedAbonent).toFixed());
-  const blockFourBonus = Number((data.aab * data.bonusPerActiveAbonent2).toFixed());
+  const blockFourBonus = Number(((data.aab || 0) * data.bonusPerActiveAbonent2).toFixed());
   const additionalBonus = Number((
-    ((100 - data.planActiveAbsBonusPercentage) - data.additionalEarningPercentage) * (data.oab) / 100 * 150
+    ((100 - data.planActiveAbsBonusPercentage) - data.additionalEarningPercentage) * (data.oab || 0) / 100 * 150
   ).toFixed());
 
   const changeHandler = (e) => {
@@ -109,7 +105,7 @@ const Bonuses = () => {
       setNonActivesLoading(true);
       const formData = new FormData();
 
-      formData.append('date_filter', formatDate(state.date));
+      formData.append('date_filter', formatDate(new Date(state.date)));
       formData.append('squares_id', state.district.id);
 
       const req = await axiosApi.post(
@@ -128,7 +124,7 @@ const Bonuses = () => {
       setConnectedAbonentsListLoading(true);
       const formData = new FormData();
 
-      formData.append('date_filter', formatDate(state.date));
+      formData.append('date_filter', formatDate(new Date(state.date)));
       formData.append('squares_id', state.district.id);
       const req = await axiosApi.post(
         'http://planup.skynet.kg:8000/planup/count_podkl/', formData);
@@ -147,16 +143,23 @@ const Bonuses = () => {
   };
 
   const handleScroll = () => {
-    const pos1 = nabContainerRef.current?.getBoundingClientRect();
-    const pos2 = kolZayContainerRef.current?.getBoundingClientRect();
-    if (pos1 && pos2) {
-      setNabContainerPosition({x: pos1.left, y: pos1.top});
-      setKolZayContainerPosition({x: pos2.left, y: pos2.top});
+    const pos = kolZayContainerRef.current?.getBoundingClientRect();
+    if (pos) {
+      setKolZayContainerPosition({x: pos.left, y: pos.top});
     }
   };
 
   useEffect(() => {
-    if (!user) navigate('/sign-in');
+    if (state.date) void onSubmit();
+    // no dependency needed
+  }, []);
+
+  useEffect(() => {
+    if (
+      !user &&
+      (!/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+        !/iPad|Android|tablet|touch/i.test(navigator.userAgent))
+    ) navigate('/sign-in');
     dispatch(fetchLocations()).then(res => {
       if (user === 'naryn') {
         dispatch(setLocations(res.payload.data.filter(location => ['Ат-Башы', 'Кочкор', 'Нарын'].includes(location.squares))));
@@ -179,19 +182,23 @@ const Bonuses = () => {
   }, [dispatch, navigate, toobarOpen, user]);
 
   useEffect(() => {
+    window.addEventListener('click', () => setShowNonActives(false));
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const onSubmit = async (e) => {
-    e.preventDefault();
+    if (e) {
+      e.preventDefault();
+      navigate(`?date=${formatDate(new Date(state.date))}&id=${state.district.id}`);
+    }
     setFormLoading(true);
     try {
       await fetchNonActives();
       await fetchConnectedAbonents();
       const formData = new FormData();
 
-      formData.append('date_filter', formatDate(state.date));
+      formData.append('date_filter', formatDate(new Date(state.date)));
       formData.append('squares_id', state.district.id);
 
       const req = await axiosApi.post(
@@ -235,11 +242,13 @@ const Bonuses = () => {
     <>
       <Toolbar open={toobarOpen} onClick={() => setToolbarOpen(!toobarOpen)}>
         {
-          window.innerWidth > 768 && <Logout/>
+          (!/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) &&
+            !/iPad|Android|tablet|touch/i.test(navigator.userAgent)) && <Logout/>
         }
         <form className="toolbar-form" onSubmit={onSubmit}>
           <DatePicker value={state.date} changeHandler={changeHandler} i={''}/>
-          {window.innerWidth > 768 &&
+          {!/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) &&
+            !/iPad|Android|tablet|touch/i.test(navigator.userAgent) &&
             <Autocomplete
               name="district"
               value={state.district.squares}
@@ -255,7 +264,9 @@ const Bonuses = () => {
           }
           <Button
             type="submit"
-            disabled={!state.date || (window.innerWidth > 768 && !state.district.squares)}
+            disabled={!state.date || (
+              !/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) &&
+              !/iPad|Android|tablet|touch/i.test(navigator.userAgent) && !state.district.squares)}
             onClick={onSubmit}
             loading={formLoading}
             label="Поиск"
@@ -329,118 +340,97 @@ const Bonuses = () => {
                 <div className="bonuses-table bonuses-table-1">
                   <div className="table-col">
                     <span className="table-col-title">ААБ</span>
-                    <span className="table-col-value">{data.aab}</span>
+                    <span className="table-col-value">{data.aab > 0 ? data.aab : '-'}</span>
                   </div>
                   <div className="table-col">
                     <span
                       className="table-col-title" style={{cursor: 'pointer', position: 'relative'}}
-                      onMouseEnter={() => {
-                        handleScroll();
-                        setShowNonActives(true);
+                      onClick={(e) => {
+                        if (data.nab < 0) return;
+                        if (
+                          /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) &&
+                          /iPad|Android|tablet|touch/i.test(navigator.userAgent)
+                        ) {
+                          navigate(`/bonuses/non-actives-list?id=${state.district.id}`);
+                        } else {
+                          e.stopPropagation();
+                          setShowNonActives(true);
+                        }
                       }}
-                      onMouseLeave={() => setShowNonActives(false)}
-                      ref={nabContainerRef}
                     >
                       НАБ
                       {
                         showNonActives &&
                         <div
                           className="bonuses-paper non-actives-list"
-                          style={{
+                          style={{display: 'flex', flexDirection: 'column',}}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <div style={{
+                            padding: '5px',
                             display: 'flex',
-                            flexDirection: 'column',
-                            transform: `translate(${nabContainerPosition.x}px, ${nabContainerPosition.y}px)`,
+                            justifyContent: 'space-between',
+                            marginBottom: '5px'
                           }}>
-                          {
-                            user === 'meerim' &&
-                            <div className="export-to-excel" onClick={handleExcelFileExport}>
-                              <img src={excelLogo} alt="excel logo" width="30px" height="30px"/>
-                              <span style={{color: 'black'}}>экспорт</span>
-                            </div>
-                          }
-                          <div
-                            className="non-actives-list-inner-arrow-left"
-                            onMouseOver={() => {
-                              setClearInterval(
-                                setInterval(() => {
-                                  nabContainerInnerRef.current.scrollLeft -= 5;
-                                }, 10)
-                              );
-                            }}
-                            onMouseLeave={() => clearInterval(interval)}
-                          />
-                          <div
-                            className="non-actives-list-inner-arrow-right"
-                            onMouseOver={() => {
-                              setClearInterval(
-                                setInterval(() => {
-                                  nabContainerInnerRef.current.scrollLeft += 5;
-                                }, 10)
-                              );
-                            }}
-                            onMouseLeave={() => clearInterval(interval)}
-                          />
-                          <div className="non-actives-list-inner" ref={nabContainerInnerRef}>
+                            {
+                              user === 'meerim' &&
+                              <div className="export-to-excel" onClick={handleExcelFileExport}>
+                                <img src={excelLogo} alt="excel logo" width="30px" height="30px"/>
+                                <span style={{color: 'black'}}>экспорт</span>
+                              </div>
+                            }
+                          </div>
+                          <div className="non-actives-list-inner">
                             {
                               nonActivesLoading ? <span className="non-actives-list-loader"/> :
-                                nonActives.length && nonActives.map((nonActive, i) => (
-                                  <div
-                                    className="bonuses-paper non-actives-list-item"
-                                    style={{minWidth: '1195px'}}
-                                    key={i}
-                                    onClick={() => {
-                                      dispatch(setNonActive(nonActive));
-                                      if (window.innerWidth < 768) {
-                                        navigate(`/bonuses/non-active`);
-                                      }
-                                    }}
-                                  >
-                                    <div className="non-actives-list-item-ls-abon">
-                                      <span>Лицевой счёт:</span>
-                                      <span>{nonActive.ls_abon}</span>
+                                nonActives.length ?
+                                  nonActives.map((nonActive, i) => (
+                                    <div
+                                      className={
+                                      "bonuses-paper non-actives-list-item " +
+                                        `${nonActive?.status && nonActive.status === 'Оплатил' ?
+                                          'non-actives-list-item-paid' :
+                                          nonActive?.status && nonActive.status !== 'Оплатил' ?
+                                            'non-actives-list-item-has-status' : ''}`
+                                    }
+                                      key={i}
+                                      onClick={() => {
+                                        if (
+                                          !/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) &&
+                                          !/iPad|Android|tablet|touch/i.test(navigator.userAgent)
+                                        ) {
+                                          dispatch(setNonActive({
+                                            ...nonActive,
+                                            squares_id: locations.filter(location => `${location.id}` === state.district.id)[0]?.squares,
+                                            user_listt: data.user_list,
+                                          }));
+                                          navigate(`/bonuses/non-active`);
+                                        }
+                                      }}
+                                    >
+                                      <div className="non-actives-list-item-ls-abon" style={{minWidth: '120px', maxWidth: '120px'}}>
+                                        <span>Лицевой счёт:</span>
+                                        <span>{nonActive.ls_abon}</span>
+                                      </div>
+                                      <div className="non-actives-list-item-address" style={{flexGrow: 1}}>
+                                        <span>Адрес:</span>
+                                        <span>{nonActive.address}</span>
+                                      </div>
                                     </div>
-                                    <div className="non-actives-list-item-address"
-                                         style={{minWidth: '250px', maxWidth: '250px'}}>
-                                      <span>Адрес:</span>
-                                      <span>{nonActive.address}</span>
-                                    </div>
-                                    <div className="non-actives-list-item-balance">
-                                      <span>Баланс:</span>
-                                      <span>
-                                        {nonActive.balance}
-                                        {' '}<span style={{fontWeight: 600, textDecoration: 'underline'}}>c</span>
-                                      </span>
-                                    </div>
-                                    <div className="non-actives-list-item-ip-address"
-                                         style={{minWidth: '250px', maxWidth: '250px'}}>
-                                      <span>Имя абонента:</span>
-                                      <span>{nonActive.name_abon}</span>
-                                    </div>
-                                    <div className="non-actives-list-item-ip-address" style={{minWidth: '150px'}}>
-                                      <span>Физическое лицо:</span>
-                                      <span>{nonActive.type_abon}</span>
-                                    </div>
-                                    <div className="non-actives-list-item-ip-address"
-                                         style={{minWidth: '140px', maxWidth: '150px'}}>
-                                      <span>Номер телефона:</span>
-                                      <span>{nonActive.phone_abon}</span>
-                                    </div>
-                                    <div className="non-actives-list-item-ip-address" style={{minWidth: '140px'}}>
-                                      <span>Последний платёж:</span>
-                                      <span>{nonActive.last_pay}</span>
-                                    </div>
-                                  </div>
-                                ))
+                                  )) :
+                                  <h3 className="bonuses-paper" style={{color: 'black'}}>
+                                    Нет данных
+                                  </h3>
                             }
                           </div>
                         </div>
                       }
                     </span>
-                    <span className="table-col-value">{data.nab}</span>
+                    <span className="table-col-value">{data.nab > 0 ? data.nab : '-'}</span>
                   </div>
                   <div className="table-col">
                     <span className="table-col-title">ОАБ</span>
-                    <span className="table-col-value">{data.oab}</span>
+                    <span className="table-col-value">{data.oab > 0 ? data.oab : '-'}</span>
                   </div>
                   <div className="table-col">
                     <span className="table-col-title">ААБ/ОАБ %</span>
@@ -498,13 +488,15 @@ const Bonuses = () => {
                         <div
                           className="bonuses-paper non-actives-list"
                           style={{
+                            position: 'fixed',
                             top: '0',
                             left: '0',
                             display: 'grid',
                             gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
                             gridGap: '5px',
-                            minWidth: '350px',
+                            minWidth: '310px',
                             transform: `translate(${kolZayContainerPosition.x}px, ${kolZayContainerPosition.y}px)`,
+                            height: 'unset',
                           }}
                         >
                           {

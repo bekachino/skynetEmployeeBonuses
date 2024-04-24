@@ -14,6 +14,15 @@ html, body, #root, .App {
   margin: 0 auto;
 }
 
+.non-actives-list-item-paid {
+  background-color: #D1585B;
+  color: white;
+}
+
+.non-actives-list-item-has-status {
+  background-color: #ffcb3f;
+}
+
 @media (max-width: 768px) {
   html {
     width: 100%!important;

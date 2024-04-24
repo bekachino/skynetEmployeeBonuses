@@ -28,7 +28,11 @@ const SignIn = () => {
   };
 
   useEffect(() => {
-    if (user) navigate('/bonuses/-')
+    if (
+      user ||
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+      /iPad|Android|tablet|touch/i.test(navigator.userAgent)
+    ) navigate('/bonuses');
   }, [navigate, user]);
 
   return (

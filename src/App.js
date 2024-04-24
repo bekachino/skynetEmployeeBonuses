@@ -6,6 +6,7 @@ import Bonuses from "./containers/bonuses/Bonuses";
 import {useEffect} from "react";
 import NonActive from "./containers/nonActives/NonActive";
 import './App.css';
+import NonActivesList from "./containers/nonActivesList/nonActivesList";
 
 const App = () => {
   const userToken = useAppSelector((state) => state.userState.user);
@@ -23,12 +24,12 @@ const App = () => {
   return (
     <div className="App">
       <Routes>
-        <Route path='*' element={userToken ?
-          <Navigate to="/bonuses/-" replace/> : <Navigate to="/sign-in" replace/>}/>
+        <Route path='*' element={userToken ? <Navigate to="/bonuses" replace/> : <Navigate to="/sign-in" replace/>}/>
         <Route path='sign-up' element={<SignUp/>}/>
         <Route path='sign-in' element={<SignIn/>}/>
-        <Route path='bonuses/:params' element={<Bonuses/>}/>
+        <Route path='bonuses' element={<Bonuses/>}/>
         <Route path='bonuses/non-active' element={<NonActive/>}/>
+        <Route path='bonuses/non-actives-list' element={<NonActivesList/>}/>
       </Routes>
     </div>
   );
