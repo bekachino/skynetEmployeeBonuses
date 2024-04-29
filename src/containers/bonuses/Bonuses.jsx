@@ -194,6 +194,7 @@ const Bonuses = () => {
     }
     setFormLoading(true);
     try {
+      if (!state.date || state.district.id < 0) return;
       await fetchNonActives();
       await fetchConnectedAbonents();
       const formData = new FormData();
