@@ -12,8 +12,12 @@ const NonActivesList = () => {
   const dispatch = useAppDispatch();
   const user = useAppSelector(state => state.userState.user);
   const [state, setState] = useState({
-    district: {id: new URLSearchParams(location.search).get('id') || -1, squares: ''},
-  });
+    district: {
+      id: new URLSearchParams(location.search).get('id') || -1,
+      squares: new URLSearchParams(location.search).get('district_name') || ''
+    },
+    date: new Date(new URLSearchParams(location.search).get('date')),
+  })
   const [data, setData] = useState({
     aab: -1,
     nab: -1,
@@ -38,7 +42,7 @@ const NonActivesList = () => {
 
     const year = date.getFullYear();
     const month = pad(date.getMonth() + 1, 2);
-    const day = pad(date.getDate() - 1, 2);
+    const day = pad(date.getDate() - 2, 2);
 
     return `${year}-${month}-${day}`;
   }
@@ -98,7 +102,7 @@ const NonActivesList = () => {
     }));
     XLSX.utils.book_append_sheet(workbook, worksheet, state.district.squares);
 
-    XLSX.writeFile(workbook, `${state.district.squares} - ${formatDate(state.date)}.xlsx`);
+    XLSX.writeFile(workbook, `${state.district.squares} - ${formatDate(new Date())}.xlsx`);
   };
 
   return (
@@ -115,7 +119,7 @@ const NonActivesList = () => {
       }}
       onClick={(e) => e.stopPropagation()}
     >
-      {
+      {nonActivesLoading ? <span className="non-actives-list-loader" style={{marginTop: '20px'}}/> :
         nonActives.length ?
           <>
             <div style={{padding: '5px', display: 'flex', justifyContent: 'space-between', marginBottom: '5px'}}>
@@ -169,9 +173,7 @@ const NonActivesList = () => {
                   ))
               }
             </div>
-          </>
-          :
-          <h3 className="bonuses-paper">Нет данных</h3>
+          </> : <h3 className="bonuses-paper">Нет данных</h3>
       }
     </div>
   );

@@ -150,17 +150,22 @@ const Bonuses = () => {
   };
 
   useEffect(() => {
-    if (state.date) void onSubmit();
-    // no dependency needed
-  }, []);
-
-  useEffect(() => {
     if (
       !user &&
       (!/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
         !/iPad|Android|tablet|touch/i.test(navigator.userAgent))
     ) navigate('/sign-in');
     dispatch(fetchLocations()).then(res => {
+      if (state.district.id > 0 && !state.district.squares) {
+        setState(prevState => (
+          {
+            ...prevState,
+            district: {
+              id: state.district.id,
+              squares: res.payload.data.filter(location => location.id === Number(state.district.id))[0]?.squares
+            }
+          }));
+      }
       if (user === 'naryn') {
         dispatch(setLocations(res.payload.data.filter(location => ['Ат-Башы', 'Кочкор', 'Нарын'].includes(location.squares))));
       } else if (user === 'ik') {
@@ -179,7 +184,13 @@ const Bonuses = () => {
     } else {
       document.body.style.overflow = 'unset';
     }
+    // no state dependency needed
   }, [dispatch, navigate, toobarOpen, user]);
+
+  useEffect(() => {
+    if (state.date) void onSubmit();
+    // no dependency needed
+  }, []);
 
   useEffect(() => {
     window.addEventListener('click', () => setShowNonActives(false));
@@ -236,7 +247,7 @@ const Bonuses = () => {
     }));
     XLSX.utils.book_append_sheet(workbook, worksheet, state.district.squares);
 
-    XLSX.writeFile(workbook, `${state.district.squares} - ${formatDate(state.date)}.xlsx`);
+    XLSX.writeFile(workbook, `${state.district.squares} - ${formatDate(new Date(state.date))}.xlsx`);
   };
 
   return (
@@ -352,7 +363,7 @@ const Bonuses = () => {
                           /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) &&
                           /iPad|Android|tablet|touch/i.test(navigator.userAgent)
                         ) {
-                          navigate(`/bonuses/non-actives-list?id=${state.district.id}`);
+                          navigate(`/bonuses/non-actives-list?id=${state.district.id}&district_name=${state.district.squares}`);
                         } else {
                           e.stopPropagation();
                           setShowNonActives(true);
@@ -388,12 +399,12 @@ const Bonuses = () => {
                                   nonActives.map((nonActive, i) => (
                                     <div
                                       className={
-                                      "bonuses-paper non-actives-list-item " +
+                                        "bonuses-paper non-actives-list-item " +
                                         `${nonActive?.status && nonActive.status === 'Оплатил' ?
                                           'non-actives-list-item-paid' :
                                           nonActive?.status && nonActive.status !== 'Оплатил' ?
                                             'non-actives-list-item-has-status' : ''}`
-                                    }
+                                      }
                                       key={i}
                                       onClick={() => {
                                         if (
@@ -409,7 +420,8 @@ const Bonuses = () => {
                                         }
                                       }}
                                     >
-                                      <div className="non-actives-list-item-ls-abon" style={{minWidth: '120px', maxWidth: '120px'}}>
+                                      <div className="non-actives-list-item-ls-abon"
+                                           style={{minWidth: '120px', maxWidth: '120px'}}>
                                         <span>Лицевой счёт:</span>
                                         <span>{nonActive.ls_abon}</span>
                                       </div>
