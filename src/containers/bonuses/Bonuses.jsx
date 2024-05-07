@@ -37,7 +37,7 @@ const Bonuses = () => {
     aab: -1,
     nab: -1,
     oab: -1,
-    bonusPerPlanActiveAbonent: 150,
+    bonusPerPlanActiveAbonent: 300,
     planActiveAbsBonusPercentage: 90,
     additionalEarningPercentage: 7,
     connectedAbonentsAmount: 0,
@@ -469,12 +469,7 @@ const Bonuses = () => {
                   </div>
                   <div className="table-col">
                      <span className="table-col-title table-col-value-yellow">
-                      Премия
-                      <input
-                        className="editable-input" type="text"
-                        name="bonusPerPlanActiveAbonent"
-                        value={data.bonusPerPlanActiveAbonent}
-                        onChange={changeHandler}/>
+                      Премия {data.bonusPerPlanActiveAbonent}
                       <span style={{textDecoration: 'underline'}}>c</span>
                       </span>
                     <span className="table-col-value total-bonus">{blockOneBonus}</span>
