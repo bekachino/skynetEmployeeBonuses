@@ -12,6 +12,7 @@ import {setLocations, setNonActive} from "../../features/usersSlice";
 import * as XLSX from 'xlsx';
 import excelLogo from '../../assets/excel.png';
 import './bonuses.css';
+import ReportList from "../../components/reportList/reportList";
 
 const Bonuses = () => {
   const location = useLocation();
@@ -22,6 +23,8 @@ const Bonuses = () => {
   const user = useAppSelector(state => state.userState.user);
   const locations = useAppSelector(state => state.userState.locations);
   const [nonActives, setNonActives] = useState([]);
+  const [list, setList] = useState([]);
+  const [listLoading, setListLoading] = useState(false);
   const [connectedSalesData, setConnectedSalesData] = useState([]);
   const [showNonActives, setShowNonActives] = useState(false);
   const [showConnectedAbonents, setShowConnectedAbonents] = useState(false);
@@ -193,10 +196,40 @@ const Bonuses = () => {
   }, []);
 
   useEffect(() => {
+    if (state.date) void fetchList();
+    // no dependency needed
+  }, [data.aab]);
+
+  useEffect(() => {
     window.addEventListener('click', () => setShowNonActives(false));
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const fetchList = async () => {
+    try {
+      if (!state.date || state.district.id < 0) return;
+      setListLoading(true);
+      const list = await Promise.all(locations.map(async (location) => {
+        const formData = new FormData();
+        formData.append('date_filter', formatDate(new Date(state.date)));
+        formData.append('squares_id', location.id);
+        const req = await axiosApi.post('filtered_squares/', formData);
+        const res = await req.data;
+        return {
+          squares: locations.filter(loc => loc.id === location.id)[0],
+          aab: res.count['Актив'] || -1,
+          nab: res.count['Неактив'] || -1,
+          oab: (res.count['Неактив'] || -1) + (res.count['Актив'] || -1),
+        };
+      }));
+      setList(list);
+      setListLoading(false);
+    }
+    catch (e) {
+      console.log(e);
+    }
+  };
 
   const onSubmit = async (e) => {
     if (e) {
@@ -470,7 +503,7 @@ const Bonuses = () => {
                   <div className="table-col">
                      <span className="table-col-title table-col-value-yellow">
                       Премия {data.bonusPerPlanActiveAbonent}
-                      <span style={{textDecoration: 'underline'}}>c</span>
+                       <span style={{textDecoration: 'underline'}}>c</span>
                       </span>
                     <span className="table-col-value total-bonus">{blockOneBonus}</span>
                   </div>
@@ -664,6 +697,11 @@ const Bonuses = () => {
               </div>
             </>
         }
+        <ReportList
+          date={formatDate(new Date(state.date))}
+          list={list}
+          loading={listLoading}
+        />
       </div>
     </>
   )
