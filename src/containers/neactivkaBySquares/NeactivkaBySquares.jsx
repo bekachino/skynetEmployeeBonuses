@@ -199,7 +199,7 @@ const NeactivkaBySquares = () => {
                   </div>
                   <div className="neactivka-all-square-item br-10">
                     <span className="neactivka-all-square-item-title br-10">ААБ/ОАБ%</span>
-                    <span className="neactivka-all-square-item-value br-10">{item.aabPercentage}%</span>
+                    <span className="neactivka-all-square-item-value br-10">{Number(item.aabPercentage) || 0}%</span>
                   </div>
                   <div className="neactivka-all-square-item br-10">
                     <span className="neactivka-all-square-item-title br-10">Отклонение %</span>
