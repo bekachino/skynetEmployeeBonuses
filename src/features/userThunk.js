@@ -23,7 +23,8 @@ export const signIn = createAsyncThunk("user/signIn", async (userData) => {
     (userData.login === 'talas' && userData.password === 'talasskynet07') ||
     (userData.login === 'ik' && userData.password === 'ikskynet09') ||
     (userData.login === 'naryn' && userData.password === 'narynskynet05') ||
-    (userData.login === 'meerim' && userData.password === '665688')
+    (userData.login === 'meerim' && userData.password === '665688') ||
+    (userData.login === 'ruslan' && userData.password === 'skyboss')
   ) {
     return userData.login;
   } else return '';

@@ -7,6 +7,7 @@ import {useEffect} from "react";
 import NonActive from "./containers/nonActives/NonActive";
 import './App.css';
 import NonActivesList from "./containers/nonActivesList/nonActivesList";
+import NeactivkaBySquares from "./containers/neactivkaBySquares/NeactivkaBySquares";
 
 const App = () => {
   const userToken = useAppSelector((state) => state.userState.user);
@@ -28,6 +29,7 @@ const App = () => {
         <Route path='sign-up' element={<SignUp/>}/>
         <Route path='sign-in' element={<SignIn/>}/>
         <Route path='bonuses' element={<Bonuses/>}/>
+        <Route path='bonuses-by-all-squares' element={<NeactivkaBySquares/>}/>
         <Route path='bonuses/non-active' element={<NonActive/>}/>
         <Route path='bonuses/non-actives-list' element={<NonActivesList/>}/>
       </Routes>

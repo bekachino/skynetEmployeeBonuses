@@ -12,7 +12,6 @@ import {setLocations, setNonActive} from "../../features/usersSlice";
 import * as XLSX from 'xlsx';
 import excelLogo from '../../assets/excel.png';
 import './bonuses.css';
-import ReportList from "../../components/reportList/reportList";
 
 const Bonuses = () => {
   const location = useLocation();
@@ -23,8 +22,6 @@ const Bonuses = () => {
   const user = useAppSelector(state => state.userState.user);
   const locations = useAppSelector(state => state.userState.locations);
   const [nonActives, setNonActives] = useState([]);
-  const [list, setList] = useState([]);
-  const [listLoading, setListLoading] = useState(false);
   const [connectedSalesData, setConnectedSalesData] = useState([]);
   const [showNonActives, setShowNonActives] = useState(false);
   const [showConnectedAbonents, setShowConnectedAbonents] = useState(false);
@@ -97,7 +94,7 @@ const Bonuses = () => {
     const day = pad(date.getDate(), 2);
 
     return `${year}-${month}-${day}`;
-  }
+  };
 
   const formatNumber = (number) => {
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
@@ -196,40 +193,10 @@ const Bonuses = () => {
   }, []);
 
   useEffect(() => {
-    if (state.date) void fetchList();
-    // no dependency needed
-  }, [data.aab]);
-
-  useEffect(() => {
     window.addEventListener('click', () => setShowNonActives(false));
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  const fetchList = async () => {
-    try {
-      if (!state.date || state.district.id < 0) return;
-      setListLoading(true);
-      const list = await Promise.all(locations.map(async (location) => {
-        const formData = new FormData();
-        formData.append('date_filter', formatDate(new Date(state.date)));
-        formData.append('squares_id', location.id);
-        const req = await axiosApi.post('filtered_squares/', formData);
-        const res = await req.data;
-        return {
-          squares: locations.filter(loc => loc.id === location.id)[0],
-          aab: res.count['Актив'] || -1,
-          nab: res.count['Неактив'] || -1,
-          oab: (res.count['Неактив'] || -1) + (res.count['Актив'] || -1),
-        };
-      }));
-      setList(list);
-      setListLoading(false);
-    }
-    catch (e) {
-      console.log(e);
-    }
-  };
 
   const onSubmit = async (e) => {
     if (e) {
@@ -312,7 +279,6 @@ const Bonuses = () => {
             disabled={!state.date || (
               !/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) &&
               !/iPad|Android|tablet|touch/i.test(navigator.userAgent) && !state.district.squares)}
-            onClick={onSubmit}
             loading={formLoading}
             label="Поиск"
           />
@@ -320,8 +286,17 @@ const Bonuses = () => {
       </Toolbar>
       <div className="bonuses-container">
         {
+          user === 'ruslan' &&
+          <Button
+            type="button"
+            onClick={() => navigate('/bonuses-by-all-squares')}
+            label="Общий просмотр"
+            style={{margin: '10px 5px 0 auto'}}
+          />
+        }
+        {
           data.aab < 0 ?
-            <h3 className="bonuses-paper" style={{padding: '20px 0'}}>
+            <h3 className="bonuses-paper" style={{padding: '20px 0', margin: '0'}}>
               Нет данных
             </h3> :
             <>
@@ -697,11 +672,6 @@ const Bonuses = () => {
               </div>
             </>
         }
-        <ReportList
-          date={formatDate(new Date(state.date))}
-          list={list}
-          loading={listLoading}
-        />
       </div>
     </>
   )
