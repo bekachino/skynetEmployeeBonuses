@@ -42,7 +42,7 @@ const NonActivesList = () => {
 
     const year = date.getFullYear();
     const month = pad(date.getMonth() + 1, 2);
-    const day = pad(date.getDate() - 2, 2);
+    const day = pad(date.getDate() - 1, 2);
 
     return `${year}-${month}-${day}`;
   }
@@ -62,7 +62,7 @@ const NonActivesList = () => {
       setNonActivesLoading(true);
       const formData = new FormData();
 
-      formData.append('date_filter', formatDate(new Date()));
+      formData.append('date_filter', formatDate(new Date('Mon May 15 2024 10:24:59 GMT+0600 (Kyrgyzstan Time)')));
       formData.append('squares_id', state.district.id);
 
       const req = await axiosApi.post(
@@ -102,7 +102,7 @@ const NonActivesList = () => {
     }));
     XLSX.utils.book_append_sheet(workbook, worksheet, state.district.squares);
 
-    XLSX.writeFile(workbook, `${state.district.squares} - ${formatDate(new Date())}.xlsx`);
+    XLSX.writeFile(workbook, `${state.district.squares} - ${formatDate(new Date('Mon May 15 2024 10:24:59 GMT+0600 (Kyrgyzstan Time)'))}.xlsx`);
   };
 
   return (
