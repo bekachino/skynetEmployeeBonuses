@@ -72,7 +72,7 @@ const NeactivkaBySquares = () => {
       const listBySquares = [];
       setListLoading(true);
       
-      for (const location of locations) {
+      for (const location of locations.slice(5, 10)) {
         const formData = new FormData();
         formData.append('date_filter', formatDate(new Date(state.date)));
         formData.append('squares_id', location.id);
@@ -163,12 +163,12 @@ const NeactivkaBySquares = () => {
                 <span>{nab}</span>
               </div>
               <div className="neactivka-all-main-item">
-                <span>Отклонение</span>
-                <span>{Number(otklonenieKolvo) || 0}</span>
+                <span>{otklonenieKolvo >= 0 ? 'Соответствие' : 'Отклонение'}</span>
+                <span>{otklonenieKolvo || 0}</span>
               </div>
               <div className="neactivka-all-main-item">
-                <span>Отклонение %</span>
-                <span>{Number(otkloneniePercentage) || 0}%</span>
+                <span>{otkloneniePercentage >= 0 ? 'Соответствие' : 'Отклонение'}Отклонение %</span>
+                <span>{otkloneniePercentage || 0}%</span>
               </div>
             </div>
           </div>
@@ -197,11 +197,13 @@ const NeactivkaBySquares = () => {
                     <span className="neactivka-all-square-item-value br-10">{Number(item.aabPercentage) || 0}%</span>
                   </div>
                   <div className="neactivka-all-square-item br-10">
-                    <span className="neactivka-all-square-item-title br-10">Отклонение %</span>
+                    <span
+                      className="neactivka-all-square-item-title br-10">{Number(item.otkl_percentage) >= 0 ? 'Соответствие' : 'Отклонение'} %</span>
                     <span className="neactivka-all-square-item-value br-10">{Number(item.otkl_percentage) || 0}%</span>
                   </div>
                   <div className="neactivka-all-square-item br-10">
-                    <span className="neactivka-all-square-item-title br-10">Отклонение, кол-во</span>
+                    <span
+                      className="neactivka-all-square-item-title br-10">{Number(item.otkl_kolvo) >= 0 ? 'Соответствие' : 'Отклонение'}, кол-во</span>
                     <span className="neactivka-all-square-item-value br-10">{item.otkl_kolvo}</span>
                   </div>
                 </div>
