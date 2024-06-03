@@ -41,7 +41,7 @@ const NeactivkaBySquares = () => {
   
   useEffect(() => {
     dispatch(fetchLocations()).then(res => {
-      dispatch(setLocations(res.payload.data.filter(location => ![35, 36].includes(location.id))));
+      dispatch(setLocations(res.payload.data.filter(location => ![36].includes(location.id))));
     }).catch(e => console.log(e));
     if (toobarOpen) {
       document.body.style.overflow = 'hidden';
