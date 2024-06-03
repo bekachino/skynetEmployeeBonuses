@@ -1,14 +1,14 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import './neactivkaBySquares.css';
 import axiosApi from "../../axiosApi";
-import {useNavigate} from "react-router-dom";
-import {useAppDispatch, useAppSelector} from "../../app/hooks";
+import { useNavigate } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import Logout from "../../components/logout/Logout";
 import DatePicker from "../../components/datePicker/DatePicker";
 import Button from "../../components/button/Button";
 import Toolbar from "../../components/toolbar/Toolbar";
-import {fetchLocations} from "../../features/userThunk";
-import {setLocations} from "../../features/usersSlice";
+import { fetchLocations } from "../../features/userThunk";
+import { setLocations } from "../../features/usersSlice";
 
 const NeactivkaBySquares = () => {
   const navigate = useNavigate();
@@ -26,7 +26,7 @@ const NeactivkaBySquares = () => {
   const [nab, setNab] = useState(0);
   const otkloneniePercentage = Number((Number(((aab || 0) / (oab || 0) * 100).toFixed(2)) - 90).toFixed(2));
   const otklonenieKolvo = Number((((oab || 0) / 100 * 90) / 100 * otkloneniePercentage).toFixed());
-
+  
   const changeHandler = (e) => {
     const {name, value} = e.target;
     setState(prevState => ({
@@ -34,18 +34,18 @@ const NeactivkaBySquares = () => {
       [name]: value || '',
     }));
   };
-
+  
   useEffect(() => {
     if (!user || user !== 'ruslan') navigate('/sign-in');
   }, [navigate, user]);
-
+  
   useEffect(() => {
     dispatch(fetchLocations()).then(res => {
       if (user === 'naryn') {
         dispatch(setLocations(res.payload.data.filter(location => ['Ат-Башы', 'Кочкор', 'Нарын'].includes(location.squares))));
       } else if (user === 'ik') {
         dispatch(setLocations(res.payload.data.filter(location => ['Кызыл-Суу', 'Ананьева', 'Чолпон-Ата', 'Балыкчы', 'Боконбаево', 'Барскоон']
-          .includes(location.squares))));
+        .includes(location.squares))));
       } else if (user === 'talas') {
         dispatch(setLocations(res.payload.data.filter(location => ['Талас', 'Талас1'].includes(location.squares))));
       } else if (user === 'djalalabad') {
@@ -61,33 +61,35 @@ const NeactivkaBySquares = () => {
     }
     // no dependencies needed
   }, []);
-
+  
   useEffect(() => {
     void fetchList();
   }, [locations]);
-
+  
   const formatDate = (date) => {
     const pad = (num, size) => num.toString().padStart(size, '0');
-
+    
     const year = date.getFullYear();
     const month = pad(date.getMonth() + 1, 2);
     const day = pad(date.getDate(), 2);
-
+    
     return `${year}-${month}-${day}`;
   };
-
+  
   const fetchList = async (e) => {
     e?.preventDefault();
     try {
       if (!state.date) return;
+      const listBySquares = [];
       setListLoading(true);
-      const list = await Promise.all(locations.map(async (location) => {
+      
+      for (const location of locations) {
         const formData = new FormData();
         formData.append('date_filter', formatDate(new Date(state.date)));
         formData.append('squares_id', location.id);
         const req = await axiosApi.post('filtered_squares/', formData);
         const res = await req.data;
-        return {
+        listBySquares.push({
           squares: locations.filter(loc => loc.id === location.id)[0],
           aab: res.count['Актив'] || 0,
           nab: res.count['Неактив'] || 0,
@@ -96,30 +98,30 @@ const NeactivkaBySquares = () => {
           otkl_percentage: Number(((res.count['Актив'] || 0) / (res.count['Актив'] + res.count['Неактив'] || 0) * 100) - 90).toFixed(2) || 0,
           otkl_kolvo: Number((((res.count['Актив'] + res.count['Неактив'] || 0) / 100 * 90) / 100 *
             Number(((res.count['Актив'] || 0) / (res.count['Актив'] + res.count['Неактив'] || 0) * 100) - 90)).toFixed()) || 0,
-        };
-      }));
-      setList(list);
-      setOab(list.reduce((accumulator, currentValue) => {
+        });
+      }
+      
+      setList(listBySquares);
+      setOab(listBySquares.reduce((accumulator, currentValue) => {
         accumulator += currentValue?.oab;
         return accumulator;
       }, 0));
-      setAab(list.reduce((accumulator, currentValue) => {
+      setAab(listBySquares.reduce((accumulator, currentValue) => {
         accumulator += currentValue?.aab;
         return accumulator;
       }, 0));
-      setNab(list.reduce((accumulator, currentValue) => {
+      setNab(listBySquares.reduce((accumulator, currentValue) => {
         accumulator += currentValue?.nab;
         return accumulator;
       }, 0));
-
+      
       setListLoading(false);
-    }
-    catch (e) {
+    } catch (e) {
       setListLoading(false);
       console.log(e);
     }
   };
-
+  
   return (
     <>
       <Toolbar open={toobarOpen} onClick={() => setToolbarOpen(!toobarOpen)}>
