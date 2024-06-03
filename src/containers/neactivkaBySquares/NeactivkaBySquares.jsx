@@ -167,7 +167,7 @@ const NeactivkaBySquares = () => {
                 <span>{otklonenieKolvo || 0}</span>
               </div>
               <div className="neactivka-all-main-item">
-                <span>{otkloneniePercentage >= 0 ? 'Соответствие' : 'Отклонение'}Отклонение %</span>
+                <span>{otkloneniePercentage >= 0 ? 'Соответствие' : 'Отклонение'} %</span>
                 <span>{otkloneniePercentage || 0}%</span>
               </div>
             </div>
