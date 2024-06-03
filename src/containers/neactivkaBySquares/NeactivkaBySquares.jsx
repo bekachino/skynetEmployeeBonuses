@@ -41,18 +41,7 @@ const NeactivkaBySquares = () => {
   
   useEffect(() => {
     dispatch(fetchLocations()).then(res => {
-      if (user === 'naryn') {
-        dispatch(setLocations(res.payload.data.filter(location => ['Ат-Башы', 'Кочкор', 'Нарын'].includes(location.squares))));
-      } else if (user === 'ik') {
-        dispatch(setLocations(res.payload.data.filter(location => ['Кызыл-Суу', 'Ананьева', 'Чолпон-Ата', 'Балыкчы', 'Боконбаево', 'Барскоон']
-        .includes(location.squares))));
-      } else if (user === 'talas') {
-        dispatch(setLocations(res.payload.data.filter(location => ['Талас', 'Талас1'].includes(location.squares))));
-      } else if (user === 'djalalabad') {
-        dispatch(setLocations(res.payload.data.filter(location => ['Базар-Коргон', 'Джалал-Абад'].includes(location.squares))));
-      } else if (user === 'osh') {
-        dispatch(setLocations(res.payload.data.filter(location => ['Ош', 'Араван', 'Кара-Суу'].includes(location.squares))));
-      }
+      dispatch(setLocations(res.payload.data.filter(location => ![35, 36].includes(location.id))));
     }).catch(e => console.log(e));
     if (toobarOpen) {
       document.body.style.overflow = 'hidden';
@@ -83,7 +72,7 @@ const NeactivkaBySquares = () => {
       const listBySquares = [];
       setListLoading(true);
       
-      for (const location of locations) {
+      for (const location of locations.slice(0, 5)) {
         const formData = new FormData();
         formData.append('date_filter', formatDate(new Date(state.date)));
         formData.append('squares_id', location.id);
@@ -98,6 +87,7 @@ const NeactivkaBySquares = () => {
           otkl_percentage: Number(((res.count['Актив'] || 0) / (res.count['Актив'] + res.count['Неактив'] || 0) * 100) - 90).toFixed(2) || 0,
           otkl_kolvo: Number((((res.count['Актив'] + res.count['Неактив'] || 0) / 100 * 90) / 100 *
             Number(((res.count['Актив'] || 0) / (res.count['Актив'] + res.count['Неактив'] || 0) * 100) - 90)).toFixed()) || 0,
+          locations: res.locations.join(', '),
         });
       }
       
@@ -185,7 +175,10 @@ const NeactivkaBySquares = () => {
           {
             list.map((item, i) => (
               <div className="neactivka-all-square br-10" key={i}>
-                <span className="neactivka-all-square-title">{item.squares.squares}</span>
+                <span className="neactivka-all-square-title">
+                  {item.squares.squares}
+                  <span style={{fontSize: '16px', marginLeft: '10px'}}>({item.locations})</span>
+                </span>
                 <div className="neactivka-all-square-items">
                   <div className="neactivka-all-square-item br-10">
                     <span className="neactivka-all-square-item-title br-10">ААБ</span>
