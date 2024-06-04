@@ -77,7 +77,7 @@ const NeactivkaBySquares = () => {
       const listBySquares = [];
       setListLoading(true);
       
-      for (const location of locations.slice(5, 10)) {
+      for (const location of locations) {
         const formData = new FormData();
         formData.append('date_filter', formatDate(new Date(state.date)));
         formData.append('squares_id', location.id);
