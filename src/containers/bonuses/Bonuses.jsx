@@ -401,7 +401,7 @@ const Bonuses = () => {
                           /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) &&
                           /iPad|Android|tablet|touch/i.test(navigator.userAgent)
                         ) {
-                          navigate(`/bonuses/non-actives-list?id=${state.district.id}&district_name=${state.district.squares}`);
+                          navigate(`/bonuses/actives-list?id=${state.district.id}&district_name=${state.district.squares}`);
                         } else {
                           e.stopPropagation();
                           setShowActives(true);
