@@ -1,14 +1,14 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Toolbar from "../../components/toolbar/Toolbar";
 import DatePicker from "../../components/datePicker/DatePicker";
 import Autocomplete from "../../components/autocomplete/Autocomplete";
 import Button from "../../components/button/Button";
 import Logout from "../../components/logout/Logout";
 import axiosApi from "../../axiosApi";
-import {useLocation, useNavigate} from "react-router-dom";
-import {useAppDispatch, useAppSelector} from "../../app/hooks";
-import {fetchLocations} from "../../features/userThunk";
-import {setLocations, setNonActive} from "../../features/usersSlice";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { fetchLocations } from "../../features/userThunk";
+import { setLocations, setNonActive } from "../../features/usersSlice";
 import * as XLSX from 'xlsx';
 import excelLogo from '../../assets/excel.png';
 import './bonuses.css';
@@ -22,12 +22,15 @@ const Bonuses = () => {
   const user = useAppSelector(state => state.userState.user);
   const locations = useAppSelector(state => state.userState.locations);
   const [nonActives, setNonActives] = useState([]);
+  const [actives, setActives] = useState([]);
   const [connectedSalesData, setConnectedSalesData] = useState([]);
   const [showNonActives, setShowNonActives] = useState(false);
+  const [showActives, setShowActives] = useState(false);
   const [showConnectedAbonents, setShowConnectedAbonents] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
   const [toobarOpen, setToolbarOpen] = useState(false);
   const [nonActivesLoading, setNonActivesLoading] = useState(false);
+  const [activesLoading, setActivesLoading] = useState(false);
   const [connectedAbonentsListLoading, setConnectedAbonentsListLoading] = useState(false);
   const [state, setState] = useState({
     date: new URLSearchParams(location.search).get('date') || '',
@@ -48,7 +51,7 @@ const Bonuses = () => {
     locations: [],
     user_list: [],
   });
-
+  
   const aabPercentage = Number(((data.aab || 0) / (data.oab || 0) * 100).toFixed(2));
   const otkloneniePercentage = Number((aabPercentage - data.planActiveAbsBonusPercentage).toFixed(2));
   const otklonenieKolvo = Number((((data.oab || 0) / 100 * data.planActiveAbsBonusPercentage) / 100 * otkloneniePercentage).toFixed());
@@ -61,7 +64,7 @@ const Bonuses = () => {
   const additionalBonus = Number((
     ((100 - data.planActiveAbsBonusPercentage) - data.additionalEarningPercentage) * (data.oab || 0) / 100 * 150
   ).toFixed());
-
+  
   const changeHandler = (e) => {
     const {name, value} = e.target;
     if (
@@ -81,49 +84,66 @@ const Bonuses = () => {
       }));
     }
   };
-
+  
   const getDistrictByName = (name) => {
     return locations.filter(district => district.squares === name)[0] || {id: -1, squares: name};
   };
-
+  
   const formatDate = (date) => {
     const pad = (num, size) => num.toString().padStart(size, '0');
-
+    
     const year = date.getFullYear();
     const month = pad(date.getMonth() + 1, 2);
     const day = pad(date.getDate(), 2);
-
+    
     return `${year}-${month}-${day}`;
   };
-
+  
   const formatNumber = (number) => {
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
   };
-
+  
   const fetchNonActives = async () => {
     try {
       setNonActivesLoading(true);
       const formData = new FormData();
-
+      
       formData.append('date_filter', formatDate(new Date(state.date)));
       formData.append('squares_id', state.district.id);
-
+      
       const req = await axiosApi.post(
         'noactive_squares/', formData);
       const res = await req.data;
       setNonActives(res.data);
       setNonActivesLoading(false);
-    }
-    catch (e) {
+    } catch (e) {
       console.log(e);
     }
-  }
-
+  };
+  
+  const fetchActives = async () => {
+    try {
+      setNonActivesLoading(true);
+      const formData = new FormData();
+      
+      formData.append('date_filter', formatDate(new Date(state.date)));
+      formData.append('squares_id', state.district.id);
+      
+      const req = await axiosApi.post(
+        'active_squares/', formData);
+      const res = await req.data;
+      setActives(res.data);
+      setActivesLoading(false);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+  
   const fetchConnectedAbonents = async () => {
     try {
       setConnectedAbonentsListLoading(true);
       const formData = new FormData();
-
+      
       formData.append('date_filter', formatDate(new Date(state.date)));
       formData.append('squares_id', state.district.id);
       const req = await axiosApi.post(
@@ -136,19 +156,18 @@ const Bonuses = () => {
         }
       }));
       setConnectedAbonentsListLoading(false);
-    }
-    catch (e) {
+    } catch (e) {
       console.log(e);
     }
   };
-
+  
   const handleScroll = () => {
     const pos = kolZayContainerRef.current?.getBoundingClientRect();
     if (pos) {
       setKolZayContainerPosition({x: pos.left, y: pos.top});
     }
   };
-
+  
   useEffect(() => {
     if (
       !user &&
@@ -170,7 +189,7 @@ const Bonuses = () => {
         dispatch(setLocations(res.payload.data.filter(location => ['Ат-Башы', 'Кочкор', 'Нарын'].includes(location.squares))));
       } else if (user === 'ik') {
         dispatch(setLocations(res.payload.data.filter(location => ['Кызыл-Суу', 'Ананьева', 'Чолпон-Ата', 'Балыкчы', 'Боконбаево', 'Барскоон']
-          .includes(location.squares))));
+        .includes(location.squares))));
       } else if (user === 'talas') {
         dispatch(setLocations(res.payload.data.filter(location => ['Талас', 'Талас1'].includes(location.squares))));
       } else if (user === 'djalalabad') {
@@ -186,18 +205,21 @@ const Bonuses = () => {
     }
     // no state dependency needed
   }, [dispatch, navigate, toobarOpen, user]);
-
+  
   useEffect(() => {
     if (state.date) void onSubmit();
     // no dependency needed
   }, []);
-
+  
   useEffect(() => {
-    window.addEventListener('click', () => setShowNonActives(false));
+    window.addEventListener('click', () => {
+      setShowNonActives(false);
+      setShowActives(false)
+    });
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
+  
   const onSubmit = async (e) => {
     if (e) {
       e.preventDefault();
@@ -206,13 +228,14 @@ const Bonuses = () => {
     setFormLoading(true);
     try {
       if (!state.date || state.district.id < 0) return;
-      await fetchNonActives();
-      await fetchConnectedAbonents();
+      void fetchActives();
+      void fetchNonActives();
+      void fetchConnectedAbonents();
       const formData = new FormData();
-
+      
       formData.append('date_filter', formatDate(new Date(state.date)));
       formData.append('squares_id', state.district.id);
-
+      
       const req = await axiosApi.post(
         'filtered_squares/', formData);
       const res = await req.data;
@@ -226,30 +249,41 @@ const Bonuses = () => {
       }));
       setFormLoading(false);
       setToolbarOpen(false);
-    }
-    catch (e) {
+    } catch (e) {
       console.log(e);
     }
   };
-
-  const handleExcelFileExport = () => {
+  
+  const handleExcelFileExport = (tab) => {
     const workbook = XLSX.utils.book_new();
-    const worksheet = XLSX.utils.json_to_sheet(nonActives.map(nonActive => {
-      return {
-        ls_abon: nonActive.ls_abon,
-        address: nonActive.address,
-        balance: nonActive.balance,
-        name_abon: nonActive.name_abon,
-        type_abon: nonActive.type_abon,
-        phone_abon: nonActive.phone_abon,
-        last_pay: nonActive.last_pay,
-      }
-    }));
+    const worksheet = XLSX.utils.json_to_sheet(
+      (tab === 'aab' ? (actives || []) : (nonActives || [])).map(nonActive => {
+        if (tab === 'aab') {
+          return {
+            ls_abon: nonActive.ls_abon,
+            address: nonActive.address,
+            balance: nonActive.balance,
+            ip_address: nonActive.ip_address,
+          }
+        } else {
+          return {
+            ls_abon: nonActive.ls_abon,
+            address: nonActive.address,
+            balance: nonActive.balance,
+            ip_address: nonActive.ip_address,
+            name_abon: nonActive.name_abon,
+            type_abon: nonActive.type_abon,
+            phone_abon: nonActive.phone_abon,
+            last_pay: nonActive.last_pay,
+          }
+        }
+      })
+    );
     XLSX.utils.book_append_sheet(workbook, worksheet, state.district.squares);
-
+    
     XLSX.writeFile(workbook, `${state.district.squares} - ${formatDate(new Date(state.date))}.xlsx`);
   };
-
+  
   return (
     <>
       <Toolbar open={toobarOpen} onClick={() => setToolbarOpen(!toobarOpen)}>
@@ -359,7 +393,71 @@ const Bonuses = () => {
                 </h1>
                 <div className="bonuses-table bonuses-table-1">
                   <div className="table-col">
-                    <span className="table-col-title">ААБ</span>
+                    <span
+                      className="table-col-title" style={{cursor: 'pointer', position: 'relative'}}
+                      onClick={(e) => {
+                        if (data.nab < 0) return;
+                        if (
+                          /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) &&
+                          /iPad|Android|tablet|touch/i.test(navigator.userAgent)
+                        ) {
+                          navigate(`/bonuses/non-actives-list?id=${state.district.id}&district_name=${state.district.squares}`);
+                        } else {
+                          e.stopPropagation();
+                          setShowActives(true);
+                          setShowNonActives(false);
+                        }
+                      }}
+                    >
+                      ААБ
+                      {
+                        showActives &&
+                        <div
+                          className="bonuses-paper non-actives-list"
+                          style={{display: 'flex', flexDirection: 'column',}}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <div style={{
+                            padding: '5px',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            marginBottom: '5px'
+                          }}>
+                            {
+                              user === 'meerim' &&
+                              <div className="export-to-excel" onClick={() => handleExcelFileExport('aab')}>
+                                <img src={excelLogo} alt="excel logo" width="30px" height="30px"/>
+                                <span style={{color: 'black'}}>экспорт</span>
+                              </div>
+                            }
+                          </div>
+                          <div className="non-actives-list-inner">
+                            {
+                              activesLoading ? <span className="non-actives-list-loader"/> :
+                                actives.length ?
+                                  actives.map((active, i) => (
+                                    <div className="bonuses-paper non-actives-list-item" key={i}>
+                                      <div
+                                        className="non-actives-list-item-ls-abon"
+                                        style={{minWidth: '120px', maxWidth: '120px'}}
+                                      >
+                                        <span>Лицевой счёт:</span>
+                                        <span>{active.ls_abon}</span>
+                                      </div>
+                                      <div className="non-actives-list-item-address" style={{flexGrow: 1}}>
+                                        <span>Адрес:</span>
+                                        <span>{active.address}</span>
+                                      </div>
+                                    </div>
+                                  )) :
+                                  <h3 className="bonuses-paper" style={{color: 'black'}}>
+                                    Нет данных
+                                  </h3>
+                            }
+                          </div>
+                        </div>
+                      }
+                    </span>
                     <span className="table-col-value">{data.aab > 0 ? data.aab : '-'}</span>
                   </div>
                   <div className="table-col">
@@ -375,6 +473,7 @@ const Bonuses = () => {
                         } else {
                           e.stopPropagation();
                           setShowNonActives(true);
+                          setShowActives(false);
                         }
                       }}
                     >
@@ -394,7 +493,7 @@ const Bonuses = () => {
                           }}>
                             {
                               user === 'meerim' &&
-                              <div className="export-to-excel" onClick={handleExcelFileExport}>
+                              <div className="export-to-excel" onClick={() => handleExcelFileExport('nab')}>
                                 <img src={excelLogo} alt="excel logo" width="30px" height="30px"/>
                                 <span style={{color: 'black'}}>экспорт</span>
                               </div>
