@@ -10,6 +10,7 @@ const initialState = {
   popupId: "",
   locations: [],
   nonActive: null,
+  lastViewedActiveLs: '',
 };
 
 const UsersSlice = createSlice({
@@ -27,7 +28,10 @@ const UsersSlice = createSlice({
     },
     setNonActive: (state, action) => {
       state.nonActive = action.payload;
-    }
+    },
+    setLastViewedActiveLs: (state, action) => {
+      state.lastViewedActiveLs = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(signUp.pending, (state) => {
@@ -68,11 +72,11 @@ const UsersSlice = createSlice({
     builder.addCase(fetchLocations.fulfilled, (state, {payload: res}) => {
       state.locations = res.data;
     });
-    builder.addCase(fetchLocations.rejected, (state, {payload: error}) => {
+    builder.addCase(fetchLocations.rejected, (state, {payload: _}) => {
       state.locations = [];
     });
   },
 });
 
 export const userReducer = UsersSlice.reducer;
-export const {logout, setPopupId, setLocations, setNonActive} = UsersSlice.actions;
+export const {logout, setPopupId, setLocations, setNonActive, setLastViewedActiveLs} = UsersSlice.actions;

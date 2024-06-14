@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import excelLogo from "../../assets/excel.png";
-import {setNonActive} from "../../features/usersSlice";
+import { setLastViewedActiveLs, setNonActive } from "../../features/usersSlice";
 import {useAppDispatch, useAppSelector} from "../../app/hooks";
 import * as XLSX from "xlsx";
 import {useLocation, useNavigate} from "react-router-dom";
@@ -11,6 +11,7 @@ const NonActivesList = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const user = useAppSelector(state => state.userState.user);
+  const lastViewedActiveLs = useAppSelector(state => state.userState.lastViewedActiveLs);
   const [state, setState] = useState({
     district: {
       id: new URLSearchParams(location.search).get('id') || -1,
@@ -81,6 +82,13 @@ const NonActivesList = () => {
         locations: res2.locations,
         user_list: res2.user_list,
       }));
+      setTimeout(() => {
+        const lastViewedActiveItem = document.querySelector('.last-viewed-active');
+        console.log(lastViewedActiveItem);
+        if (lastViewedActiveItem) {
+          lastViewedActiveItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 500);
     }
     catch (e) {
       console.log(e);
@@ -145,7 +153,7 @@ const NonActivesList = () => {
                   nonActives.length && nonActives.map((nonActive, i) => (
                     <div
                       className={
-                        "bonuses-paper non-actives-list-item " +
+                        `bonuses-paper non-actives-list-item ${nonActive.ls_abon === lastViewedActiveLs ? 'last-viewed-active' : ''}` +
                         `${nonActive?.status && nonActive.status === 'Оплатил' ?
                           'non-actives-list-item-paid' :
                           nonActive?.status && nonActive.status !== 'Оплатил' ?
@@ -153,6 +161,7 @@ const NonActivesList = () => {
                       }
                       key={i}
                       onClick={() => {
+                        dispatch(setLastViewedActiveLs(nonActive.ls_abon));
                         dispatch(setNonActive({
                           ...nonActive,
                           squares_id: locations.filter(location => `${location.id}` === state.district.id)[0]?.squares,

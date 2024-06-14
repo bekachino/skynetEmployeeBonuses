@@ -80,7 +80,7 @@ const NonActive = () => {
         <span className="non-active-item-row-title">Номер телефона:</span>
         <div style={{display: 'flex', flexWrap: 'wrap'}}>
           {
-            nonActive?.phone_abon.split(', ').map((phone, i) => (
+            nonActive?.phone_abon?.split(', ').map((phone, i) => (
               <div key={phone}>
                 <span className="non-active-item-phone">
                   {phone || '-'}
