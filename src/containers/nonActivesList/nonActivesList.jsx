@@ -84,7 +84,6 @@ const NonActivesList = () => {
       }));
       setTimeout(() => {
         const lastViewedActiveItem = document.querySelector('.last-viewed-active');
-        console.log(lastViewedActiveItem);
         if (lastViewedActiveItem) {
           lastViewedActiveItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
