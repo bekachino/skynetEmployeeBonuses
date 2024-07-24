@@ -4,9 +4,9 @@ import App from './App';
 import {PersistGate} from "redux-persist/integration/react";
 import {persistor, store} from "./app/store";
 import {Provider} from "react-redux";
-import './index.css';
 import {BrowserRouter} from "react-router-dom";
 import {addInterceptors} from "./axiosApi";
+import './index.css';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 addInterceptors(store);

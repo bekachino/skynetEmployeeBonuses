@@ -1,8 +1,8 @@
 import React from 'react';
-import './logout.css';
 import {useAppDispatch} from "../../app/hooks";
 import {logout} from "../../features/usersSlice";
 import {useNavigate} from "react-router-dom";
+import './logout.css';
 
 const Logout = () => {
   const dispatch = useAppDispatch();
