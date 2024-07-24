@@ -322,6 +322,10 @@ h1, h2 {
   font-size: 16px;
 }
 
+.last-viewed-active {
+  background-color: #a4cfff;
+}
+
 .non-actives-list-item-ls-abon,
 .non-actives-list-item-address,
 .non-actives-list-item-balance,

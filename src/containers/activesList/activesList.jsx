@@ -1,17 +1,14 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import excelLogo from "../../assets/excel.png";
-import { setLastViewedActiveLs, setNonActive } from "../../features/usersSlice";
-import {useAppDispatch, useAppSelector} from "../../app/hooks";
+import { useAppSelector } from "../../app/hooks";
 import * as XLSX from "xlsx";
-import {useLocation, useNavigate} from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import axiosApi from "../../axiosApi";
 
-const NonActivesList = () => {
+const ActivesList = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
   const user = useAppSelector(state => state.userState.user);
-  const lastViewedActiveLs = useAppSelector(state => state.userState.lastViewedActiveLs);
   const [state, setState] = useState({
     district: {
       id: new URLSearchParams(location.search).get('id') || -1,
@@ -19,23 +16,7 @@ const NonActivesList = () => {
     },
     date: new Date(new URLSearchParams(location.search).get('date')),
   })
-  const [data, setData] = useState({
-    aab: -1,
-    nab: -1,
-    oab: -1,
-    bonusPerPlanActiveAbonent: 150,
-    planActiveAbsBonusPercentage: 90,
-    additionalEarningPercentage: 7,
-    connectedAbonentsAmount: 0,
-    bonusPerConnectedReq: 1000,
-    bonusPerConnectedAbonent: 1000,
-    bonusPerActiveAbonent2: 25,
-    bonusPerReturnedAbonent2: 25,
-    locations: [],
-    user_list: [],
-  });
-  const [nonActives, setNonActives] = useState([]);
-  const locations = useAppSelector(state => state.userState.locations);
+  const [actives, setActives] = useState([]);
   const [nonActivesLoading, setNonActivesLoading] = useState(false);
 
   const formatDate = (date) => {
@@ -67,28 +48,10 @@ const NonActivesList = () => {
       formData.append('squares_id', state.district.id);
 
       const req = await axiosApi.post(
-        'noactive_squares/', formData);
-      const req2 = await axiosApi.post(
-        'filtered_squares/', formData);
+        'active_squares/', formData);
       const res = await req.data;
-      const res2 = await req2.data;
-      setNonActives(res.data);
+      setActives(res.data);
       setNonActivesLoading(false);
-      setData(prevState => ({
-        ...prevState,
-        aab: res2.count?.['Актив'] || -1,
-        nab: res2.count?.['Неактив'] || -1,
-        oab: (res2.count?.['Неактив'] || -1) + (res.count?.['Актив'] || -1),
-        locations: res2.locations,
-        user_list: res2.user_list,
-      }));
-      setTimeout(() => {
-        const lastViewedActiveItem = document.querySelector('.last-viewed-active');
-        console.log(lastViewedActiveItem);
-        if (lastViewedActiveItem) {
-          lastViewedActiveItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-      }, 500);
     }
     catch (e) {
       console.log(e);
@@ -97,15 +60,12 @@ const NonActivesList = () => {
 
   const handleExcelFileExport = () => {
     const workbook = XLSX.utils.book_new();
-    const worksheet = XLSX.utils.json_to_sheet(nonActives.map(nonActive => {
+    const worksheet = XLSX.utils.json_to_sheet(actives.map(active => {
       return {
-        ls_abon: nonActive.ls_abon,
-        address: nonActive.address,
-        balance: nonActive.balance,
-        name_abon: nonActive.name_abon,
-        type_abon: nonActive.type_abon,
-        phone_abon: nonActive.phone_abon,
-        last_pay: nonActive.last_pay,
+        ls_abon: active.ls_abon,
+        address: active.address,
+        balance: active.balance,
+        ip_address: active.ip_address,
       }
     }));
     XLSX.utils.book_append_sheet(workbook, worksheet, state.district.squares);
@@ -128,7 +88,7 @@ const NonActivesList = () => {
       onClick={(e) => e.stopPropagation()}
     >
       {nonActivesLoading ? <span className="non-actives-list-loader" style={{marginTop: '20px'}}/> :
-        nonActives.length ?
+        actives.length ?
           <>
             <div style={{padding: '5px', display: 'flex', justifyContent: 'space-between', marginBottom: '5px'}}>
               <div
@@ -150,25 +110,10 @@ const NonActivesList = () => {
             <div className="non-actives-list-inner">
               {
                 nonActivesLoading ? <span className="non-actives-list-loader"/> :
-                  nonActives.length && nonActives.map((nonActive, i) => (
+                  actives.length && actives.map((nonActive, i) => (
                     <div
-                      className={
-                        `bonuses-paper non-actives-list-item ${nonActive.ls_abon === lastViewedActiveLs ? 'last-viewed-active' : ''}` +
-                        `${nonActive?.status && nonActive.status === 'Оплатил' ?
-                          'non-actives-list-item-paid' :
-                          nonActive?.status && nonActive.status !== 'Оплатил' ?
-                            'non-actives-list-item-has-status' : ''}`
-                      }
+                      className="bonuses-paper non-actives-list-item"
                       key={i}
-                      onClick={() => {
-                        dispatch(setLastViewedActiveLs(nonActive.ls_abon));
-                        dispatch(setNonActive({
-                          ...nonActive,
-                          squares_id: locations.filter(location => `${location.id}` === state.district.id)[0]?.squares,
-                          user_listt: data.user_list,
-                        }));
-                        navigate(`/bonuses/non-active`);
-                      }}
                     >
                       <div className="non-actives-list-item-ls-abon" style={{width: '70px'}}>
                         <span style={{fontWeight: '700'}}>Лицевой счёт:</span>
@@ -188,4 +133,4 @@ const NonActivesList = () => {
   );
 };
 
-export default NonActivesList;
+export default ActivesList;
