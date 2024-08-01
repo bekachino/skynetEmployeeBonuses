@@ -1,10 +1,11 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import excelLogo from "../../assets/excel.png";
 import { setLastViewedActiveLs, setNonActive } from "../../features/usersSlice";
-import {useAppDispatch, useAppSelector} from "../../app/hooks";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import * as XLSX from "xlsx";
-import {useLocation, useNavigate} from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import axiosApi from "../../axiosApi";
+import moment from "moment";
 
 const NonActivesList = () => {
   const location = useLocation();
@@ -37,17 +38,11 @@ const NonActivesList = () => {
   const [nonActives, setNonActives] = useState([]);
   const locations = useAppSelector(state => state.userState.locations);
   const [nonActivesLoading, setNonActivesLoading] = useState(false);
-
-  const formatDate = (date) => {
-    const pad = (num, size) => num.toString().padStart(size, '0');
-
-    const year = date.getFullYear();
-    const month = pad(date.getMonth() + 1, 2);
-    const day = pad(date.getDate() - 1, 2);
-
-    return `${year}-${month}-${day}`;
+  
+  const formatDate = () => {
+    return moment().subtract(1, 'days').format('YYYY-MM-DD');
   }
-
+  
   useEffect(() => {
     void fetchNonActives();
     if (
@@ -57,15 +52,15 @@ const NonActivesList = () => {
       navigate('/bonuses');
     }
   }, []);
-
+  
   const fetchNonActives = async () => {
     try {
       setNonActivesLoading(true);
       const formData = new FormData();
-
+      
       formData.append('date_filter', formatDate(new Date()));
       formData.append('squares_id', state.district.id);
-
+      
       const req = await axiosApi.post(
         'noactive_squares/', formData);
       const req2 = await axiosApi.post(
@@ -74,26 +69,34 @@ const NonActivesList = () => {
       const res2 = await req2.data;
       setNonActives(res.data);
       setNonActivesLoading(false);
-      setData(prevState => ({
-        ...prevState,
-        aab: res2.count?.['Актив'] || -1,
-        nab: res2.count?.['Неактив'] || -1,
-        oab: (res2.count?.['Неактив'] || -1) + (res.count?.['Актив'] || -1),
-        locations: res2.locations,
-        user_list: res2.user_list,
-      }));
+      setData(prevState => (
+        {
+          ...prevState,
+          aab: res2.count?.['Актив'] || -1,
+          nab: res2.count?.['Неактив'] || -1,
+          oab: (
+            res2.count?.['Неактив'] || -1
+          ) + (
+            res.count?.['Актив'] || -1
+          ),
+          locations: res2.locations,
+          user_list: res2.user_list,
+        }
+      ));
       setTimeout(() => {
         const lastViewedActiveItem = document.querySelector('.last-viewed-active');
         if (lastViewedActiveItem) {
-          lastViewedActiveItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          lastViewedActiveItem.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+          });
         }
       }, 500);
-    }
-    catch (e) {
+    } catch (e) {
       console.log(e);
     }
   }
-
+  
   const handleExcelFileExport = () => {
     const workbook = XLSX.utils.book_new();
     const worksheet = XLSX.utils.json_to_sheet(nonActives.map(nonActive => {
@@ -108,13 +111,13 @@ const NonActivesList = () => {
       }
     }));
     XLSX.utils.book_append_sheet(workbook, worksheet, state.district.squares);
-
-    XLSX.writeFile(workbook, `${state.district.squares} - ${formatDate(new Date())}.xlsx`);
+    
+    XLSX.writeFile(workbook, `${state.district.squares} - ${formatDate()}.xlsx`);
   };
-
+  
   return (
     <div
-      className="bonuses-paper non-actives-list"
+      className='bonuses-paper non-actives-list'
       style={{
         display: 'flex',
         flexDirection: 'column',
@@ -126,12 +129,18 @@ const NonActivesList = () => {
       }}
       onClick={(e) => e.stopPropagation()}
     >
-      {nonActivesLoading ? <span className="non-actives-list-loader" style={{marginTop: '20px'}}/> :
+      {nonActivesLoading ? <span className='non-actives-list-loader'
+          style={{ marginTop: '20px' }}/> :
         nonActives.length ?
           <>
-            <div style={{padding: '5px', display: 'flex', justifyContent: 'space-between', marginBottom: '5px'}}>
+            <div style={{
+              padding: '5px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              marginBottom: '5px'
+            }}>
               <div
-                className="close-actives-modal"
+                className='close-actives-modal'
                 onClick={(e) => {
                   e.stopPropagation();
                   window.history.back();
@@ -140,15 +149,23 @@ const NonActivesList = () => {
               </div>
               {
                 user === 'meerim' &&
-                <div className="export-to-excel" onClick={handleExcelFileExport}>
-                  <img src={excelLogo} alt="excel logo" width="30px" height="30px"/>
-                  <span style={{color: 'black', fontWeight: '700'}}>экспорт</span>
+                <div className='export-to-excel'
+                  onClick={handleExcelFileExport}>
+                  <img src={excelLogo}
+                    alt='excel logo'
+                    width='30px'
+                    height='30px'/>
+                  <span style={{
+                    color: 'black',
+                    fontWeight: '700'
+                  }}>экспорт</span>
                 </div>
               }
             </div>
-            <div className="non-actives-list-inner">
+            <div className='non-actives-list-inner'>
               {
-                nonActivesLoading ? <span className="non-actives-list-loader"/> :
+                nonActivesLoading ?
+                  <span className='non-actives-list-loader'/> :
                   nonActives.length && nonActives.map((nonActive, i) => (
                     <div
                       className={
@@ -169,19 +186,21 @@ const NonActivesList = () => {
                         navigate(`/bonuses/non-active`);
                       }}
                     >
-                      <div className="non-actives-list-item-ls-abon" style={{width: '70px'}}>
-                        <span style={{fontWeight: '700'}}>Лицевой счёт:</span>
+                      <div className='non-actives-list-item-ls-abon'
+                        style={{ width: '70px' }}>
+                        <span style={{ fontWeight: '700' }}>Лицевой счёт:</span>
                         <span>{nonActive.ls_abon}</span>
                       </div>
-                      <div className="non-actives-list-item-address" style={{flexGrow: 1}}>
-                        <span style={{fontWeight: '700'}}>Адрес:</span>
+                      <div className='non-actives-list-item-address'
+                        style={{ flexGrow: 1 }}>
+                        <span style={{ fontWeight: '700' }}>Адрес:</span>
                         <span>{nonActive.address}</span>
                       </div>
                     </div>
                   ))
               }
             </div>
-          </> : <h3 className="bonuses-paper">Нет данных</h3>
+          </> : <h3 className='bonuses-paper'>Нет данных</h3>
       }
     </div>
   );
