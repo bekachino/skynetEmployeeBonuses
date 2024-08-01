@@ -6,7 +6,7 @@ import {userReducer} from "../features/usersSlice";
 const usersPersistConfig = {
   key: "skynetUser:user",
   storage,
-  whitelist: ["user"],
+  whitelist: ["user", "lastViewedActiveLs"],
 };
 
 const rootReducer = combineReducers({

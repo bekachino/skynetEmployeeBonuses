@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import excelLogo from "../../assets/excel.png";
 import { setLastViewedActiveLs, setNonActive } from "../../features/usersSlice";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
@@ -6,6 +6,19 @@ import * as XLSX from "xlsx";
 import { useLocation, useNavigate } from "react-router-dom";
 import axiosApi from "../../axiosApi";
 import moment from "moment";
+
+const inputStyles = {
+  fontSize: '20px',
+  color: '#36495E',
+  borderRadius: '20px',
+  padding: '6px 10px 6px',
+  boxSizing: 'border-box',
+  border: '0',
+  outline: 'none',
+  width: 'auto',
+  minWidth: '1px',
+  marginRight: 'auto'
+}
 
 const NonActivesList = () => {
   const location = useLocation();
@@ -17,8 +30,7 @@ const NonActivesList = () => {
     district: {
       id: new URLSearchParams(location.search).get('id') || -1,
       squares: new URLSearchParams(location.search).get('district_name') || ''
-    },
-    date: new Date(new URLSearchParams(location.search).get('date')),
+    }, date: new Date(new URLSearchParams(location.search).get('date')),
   })
   const [data, setData] = useState({
     aab: -1,
@@ -45,13 +57,18 @@ const NonActivesList = () => {
   
   useEffect(() => {
     void fetchNonActives();
-    if (
-      !/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) &&
-      !/iPad|Android|tablet|touch/i.test(navigator.userAgent)
-    ) {
+    if (!/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) && !/iPad|Android|tablet|touch/i.test(navigator.userAgent)) {
       navigate('/bonuses');
     }
   }, []);
+  
+  const handleChange = e => setState(prevState => (
+    { ...prevState, [e.target.name]: e.target.value }
+  ));
+  
+  const nonActivesBySearchWord = useCallback(() => {
+    return nonActives.filter(nonActive => nonActive?.ls_abon?.includes(state.searchWord?.toLowerCase() || '') || nonActive?.address?.toLowerCase()?.includes(state.searchWord?.toLowerCase() || ''))
+  }, [nonActives, state.searchWord]);
   
   const fetchNonActives = async () => {
     try {
@@ -61,10 +78,8 @@ const NonActivesList = () => {
       formData.append('date_filter', formatDate(new Date()));
       formData.append('squares_id', state.district.id);
       
-      const req = await axiosApi.post(
-        'noactive_squares/', formData);
-      const req2 = await axiosApi.post(
-        'filtered_squares/', formData);
+      const req = await axiosApi.post('noactive_squares/', formData);
+      const req2 = await axiosApi.post('filtered_squares/', formData);
       const res = await req.data;
       const res2 = await req2.data;
       setNonActives(res.data);
@@ -87,8 +102,7 @@ const NonActivesList = () => {
         const lastViewedActiveItem = document.querySelector('.last-viewed-active');
         if (lastViewedActiveItem) {
           lastViewedActiveItem.scrollIntoView({
-            behavior: 'smooth',
-            block: 'center'
+            behavior: 'smooth', block: 'center'
           });
         }
       }, 500);
@@ -130,78 +144,69 @@ const NonActivesList = () => {
       onClick={(e) => e.stopPropagation()}
     >
       {nonActivesLoading ? <span className='non-actives-list-loader'
-          style={{ marginTop: '20px' }}/> :
-        nonActives.length ?
-          <>
-            <div style={{
-              padding: '5px',
-              display: 'flex',
-              justifyContent: 'space-between',
-              marginBottom: '5px'
-            }}>
-              <div
-                className='close-actives-modal'
-                onClick={(e) => {
-                  e.stopPropagation();
-                  window.history.back();
-                }}
-              >
+        style={{ marginTop: '20px' }}/> : nonActives.length ? <>
+        <div style={{
+          padding: '5px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          marginBottom: '5px'
+        }}>
+          <div
+            className='close-actives-modal'
+            onClick={(e) => {
+              e.stopPropagation();
+              window.history.back();
+            }}
+          />
+          <input
+            name='searchWord'
+            value={state?.searchWord}
+            placeholder='Поиск...'
+            onChange={handleChange}
+            required
+            style={inputStyles}
+          />
+          {user === 'meerim' && <div className='export-to-excel'
+            onClick={handleExcelFileExport}>
+            <img src={excelLogo}
+              alt='excel logo'
+              width='30px'
+              height='30px'/>
+            <span style={{
+              color: 'black', fontWeight: '700'
+            }}>экспорт</span>
+          </div>}
+        </div>
+        <div className='non-actives-list-inner'>
+          {nonActivesLoading ?
+            <span className='non-actives-list-loader'/> : nonActives.length && nonActivesBySearchWord()?.map((nonActive, i) => (
+            <div
+              className={`bonuses-paper non-actives-list-item ${nonActive.ls_abon === lastViewedActiveLs ? 'last-viewed-active' : ''}${nonActive?.status && nonActive.status === 'Оплатил' ? 'non-actives-list-item-paid' : nonActive?.status && nonActive.status !== 'Оплатил' ? 'non-actives-list-item-has-status' : ''}`}
+              key={i}
+              onClick={() => {
+                dispatch(setLastViewedActiveLs(nonActive.ls_abon));
+                dispatch(setNonActive({
+                  ...nonActive,
+                  squares_id: locations.filter(location => `${location.id}` === state.district.id)[0]?.squares,
+                  user_listt: data.user_list,
+                }));
+                navigate(`/bonuses/non-active`);
+              }}
+            >
+              <div className='non-actives-list-item-ls-abon'
+                style={{ width: '70px' }}>
+                <span style={{ fontWeight: '700' }}>Лицевой счёт:</span>
+                <span>{nonActive.ls_abon}</span>
               </div>
-              {
-                user === 'meerim' &&
-                <div className='export-to-excel'
-                  onClick={handleExcelFileExport}>
-                  <img src={excelLogo}
-                    alt='excel logo'
-                    width='30px'
-                    height='30px'/>
-                  <span style={{
-                    color: 'black',
-                    fontWeight: '700'
-                  }}>экспорт</span>
-                </div>
-              }
+              <div className='non-actives-list-item-address'
+                style={{ flexGrow: 1 }}>
+                <span style={{ fontWeight: '700' }}>Адрес:</span>
+                <span>{nonActive.address}</span>
+              </div>
             </div>
-            <div className='non-actives-list-inner'>
-              {
-                nonActivesLoading ?
-                  <span className='non-actives-list-loader'/> :
-                  nonActives.length && nonActives.map((nonActive, i) => (
-                    <div
-                      className={
-                        `bonuses-paper non-actives-list-item ${nonActive.ls_abon === lastViewedActiveLs ? 'last-viewed-active' : ''}` +
-                        `${nonActive?.status && nonActive.status === 'Оплатил' ?
-                          'non-actives-list-item-paid' :
-                          nonActive?.status && nonActive.status !== 'Оплатил' ?
-                            'non-actives-list-item-has-status' : ''}`
-                      }
-                      key={i}
-                      onClick={() => {
-                        dispatch(setLastViewedActiveLs(nonActive.ls_abon));
-                        dispatch(setNonActive({
-                          ...nonActive,
-                          squares_id: locations.filter(location => `${location.id}` === state.district.id)[0]?.squares,
-                          user_listt: data.user_list,
-                        }));
-                        navigate(`/bonuses/non-active`);
-                      }}
-                    >
-                      <div className='non-actives-list-item-ls-abon'
-                        style={{ width: '70px' }}>
-                        <span style={{ fontWeight: '700' }}>Лицевой счёт:</span>
-                        <span>{nonActive.ls_abon}</span>
-                      </div>
-                      <div className='non-actives-list-item-address'
-                        style={{ flexGrow: 1 }}>
-                        <span style={{ fontWeight: '700' }}>Адрес:</span>
-                        <span>{nonActive.address}</span>
-                      </div>
-                    </div>
-                  ))
-              }
-            </div>
-          </> : <h3 className='bonuses-paper'>Нет данных</h3>
-      }
+          ))}
+        </div>
+      </> : <h3 className='bonuses-paper'>Нет данных</h3>}
     </div>
   );
 };

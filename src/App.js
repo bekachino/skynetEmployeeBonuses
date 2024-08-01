@@ -4,7 +4,7 @@ import SignUp from "./containers/signUp/SignUp";
 import SignIn from "./containers/signIn/SignIn";
 import Bonuses from "./containers/bonuses/Bonuses";
 import {useEffect} from "react";
-import NonActive from "./containers/nonActives/NonActive";
+import NonActive from "./containers/nonActive/NonActive";
 import NonActivesList from "./containers/nonActivesList/nonActivesList";
 import NeactivkaBySquares from "./containers/neactivkaBySquares/NeactivkaBySquares";
 import ActivesList from "./containers/activesList/activesList";

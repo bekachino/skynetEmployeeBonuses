@@ -1,5 +1,5 @@
 html {
-  width: 1440px!important;
+  width: 1440px !important;
   margin: 0 auto;
 }
 
@@ -23,9 +23,13 @@ html, body, #root, .App {
   background-color: #ffcb3f;
 }
 
+input::placeholder {
+  color: rgba(54, 73, 94, 0.70);
+}
+
 @media (max-width: 768px) {
   html {
-    width: 100%!important;
+    width: 100% !important;
     height: 100%;
   }
 }
