@@ -1,4 +1,4 @@
-import { Route, Routes, useLocation } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import SignUp from "./containers/signUp/SignUp";
 import SignIn from "./containers/signIn/SignIn";
 import Bonuses from "./containers/bonuses/Bonuses";
@@ -9,10 +9,12 @@ import NeactivkaBySquares
   from "./containers/neactivkaBySquares/NeactivkaBySquares";
 import ActivesList from "./containers/activesList/activesList";
 import './App.css';
+import { useAppSelector } from "./app/hooks";
 
 const App = () => {
   const location = useLocation();
-
+  const userToken = useAppSelector((state) => state.userState.user);
+  
   useEffect(() => {
     document.body.style.backgroundColor =
       location.pathname === '/sign-in' || location.pathname === '/sign-up' ? '#29384A' : '#E8E8E8';
@@ -25,6 +27,7 @@ const App = () => {
   return (
     <div className="App">
       <Routes>
+        <Route path='*' element={userToken ? <Navigate to="/bonuses" replace/> : <Navigate to="/sign-in" replace/>}/>
         <Route path='sign-up' element={<SignUp/>}/>
         <Route path='sign-in' element={<SignIn/>}/>
         <Route path='bonuses' element={<Bonuses/>}/>
