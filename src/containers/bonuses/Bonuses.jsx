@@ -320,7 +320,7 @@ const Bonuses = () => {
       </Toolbar>
       <div className="bonuses-container">
         {
-          user === 'ruslan' &&
+          ['ruslan', 'meerim'].includes(user) &&
           <Button
             type="button"
             onClick={() => navigate('/bonuses-by-all-squares')}
