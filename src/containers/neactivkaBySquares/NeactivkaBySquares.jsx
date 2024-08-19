@@ -24,19 +24,45 @@ const NeactivkaBySquares = () => {
   const [oab, setOab] = useState(0);
   const [aab, setAab] = useState(0);
   const [nab, setNab] = useState(0);
-  const otkloneniePercentage = Number((Number(((aab || 0) / (oab || 0) * 100).toFixed(2)) - 90).toFixed(2));
-  const otklonenieKolvo = Number((((oab || 0) / 100 * 90) / 100 * otkloneniePercentage).toFixed());
+  const otkloneniePercentage = Number((
+    Number((
+      (
+        aab || 0
+      ) / (
+        oab || 0
+      ) * 100
+    ).toFixed(2)) - 90
+  ).toFixed(2));
+  const otklonenieKolvo = Number((
+    (
+      (
+        oab || 0
+      ) / 100 * 90
+    ) / 100 * otkloneniePercentage
+  ).toFixed());
   
   const changeHandler = (e) => {
-    const {name, value} = e.target;
-    setState(prevState => ({
-      ...prevState, [name]: value || '',
-    }));
+    const {
+      name,
+      value
+    } = e.target;
+    setState(prevState => (
+      {
+        ...prevState,
+        [name]: value || '',
+      }
+    ));
   };
   
   useEffect(() => {
-    if (!user || user !== 'ruslan') navigate('/sign-in');
-  }, [navigate, user]);
+    if (!user || ![
+      'ruslan',
+      'meerim'
+    ].includes(user)) navigate('/sign-in');
+  }, [
+    navigate,
+    user
+  ]);
   
   useEffect(() => {
     dispatch(fetchLocations()).then(res => {
@@ -87,10 +113,38 @@ const NeactivkaBySquares = () => {
           squares: locations.filter(loc => loc.id === location.id)[0],
           aab: res.count['Актив'] || 0,
           nab: res.count['Неактив'] || 0,
-          oab: (res.count['Неактив'] || 0) + (res.count['Актив'] || 0),
-          aabPercentage: ((res.count['Актив'] || 0) / (res.count['Актив'] + res.count['Неактив'] || 0) * 100).toFixed(2) || 0,
-          otkl_percentage: Number(((res.count['Актив'] || 0) / (res.count['Актив'] + res.count['Неактив'] || 0) * 100) - 90).toFixed(2) || 0,
-          otkl_kolvo: Number((((res.count['Актив'] + res.count['Неактив'] || 0) / 100 * 90) / 100 * Number(((res.count['Актив'] || 0) / (res.count['Актив'] + res.count['Неактив'] || 0) * 100) - 90)).toFixed()) || 0,
+          oab: (
+            res.count['Неактив'] || 0
+          ) + (
+            res.count['Актив'] || 0
+          ),
+          aabPercentage: (
+            (
+              res.count['Актив'] || 0
+            ) / (
+              res.count['Актив'] + res.count['Неактив'] || 0
+            ) * 100
+          ).toFixed(2) || 0,
+          otkl_percentage: Number((
+            (
+              res.count['Актив'] || 0
+            ) / (
+              res.count['Актив'] + res.count['Неактив'] || 0
+            ) * 100
+          ) - 90).toFixed(2) || 0,
+          otkl_kolvo: Number((
+            (
+              (
+                res.count['Актив'] + res.count['Неактив'] || 0
+              ) / 100 * 90
+            ) / 100 * Number((
+              (
+                res.count['Актив'] || 0
+              ) / (
+                res.count['Актив'] + res.count['Неактив'] || 0
+              ) * 100
+            ) - 90)
+          ).toFixed()) || 0,
           locations: res.locations.join(', '),
           percentage: 90,
         });
@@ -117,131 +171,221 @@ const NeactivkaBySquares = () => {
     }
   };
   
-  return (<>
-    <Toolbar open={toobarOpen} onClick={() => setToolbarOpen(!toobarOpen)}>
-      {(!/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) && !/iPad|Android|tablet|touch/i.test(navigator.userAgent)) &&
-        <Logout/>}
-      <form className="toolbar-form" onSubmit={fetchList}>
-        <DatePicker value={state.date} changeHandler={changeHandler} i={''}/>
+  return (
+    <>
+      <Toolbar
+        open={toobarOpen}
+        onClick={() => setToolbarOpen(!toobarOpen)}
+      >
+        {(
+          !/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) && !/iPad|Android|tablet|touch/i.test(navigator.userAgent)
+        ) && <Logout/>}
+        <form
+          className='toolbar-form'
+          onSubmit={fetchList}
+        >
+          <DatePicker
+            value={state.date}
+            changeHandler={changeHandler}
+            i={''}
+          />
+          <Button
+            type='submit'
+            disabled={!state.date}
+            loading={listLoading}
+            label='Поиск'
+          />
+        </form>
+      </Toolbar>
+      <div
+        style={{
+          width: '100%',
+          display: 'flex',
+          marginTop: '20px'
+        }}
+      >
         <Button
-          type="submit"
-          disabled={!state.date}
-          loading={listLoading}
-          label="Поиск"
+          type='button'
+          onClick={() => navigate('/bonuses')}
+          label='Одиночный просмотр'
+          style={{ margin: '0 5px 0 auto' }}
         />
-      </form>
-    </Toolbar>
-    <div style={{width: '100%', display: 'flex', marginTop: '20px'}}>
-      <Button
-        type="button"
-        onClick={() => navigate('/bonuses')}
-        label="Одиночный просмотр"
-        style={{margin: '0 5px 0 auto'}}
-      />
-    </div>
-    {!list.length && <div className="bonuses-paper" style={{marginTop: '20px', color: '#29384A'}}>
-      <h2>Выберите дату</h2>
-    </div>}
-    {!!list.length && <div className="neactivka-all">
-      <div className="neactivka-all-main br-10">
-        <span className="neactivka-all-main-title">Все квадраты</span>
-        <span className="neactivka-all-main-desc">Общая статистика</span>
-        <div className="neactivka-all-main-items">
-          <div className="neactivka-all-main-item">
-            <span>ОАБ</span>
-            <span>{oab}</span>
-          </div>
-          <div className="neactivka-all-main-item">
-            <span>ААБ</span>
-            <span>{aab}</span>
-          </div>
-          <div className="neactivka-all-main-item">
-            <span>НАБ</span>
-            <span>{nab}</span>
-          </div>
-          <div className="neactivka-all-main-item">
-            <span>{otklonenieKolvo >= 0 ? 'Соответствие' : 'Отклонение'}</span>
-            <span>{otklonenieKolvo || 0}</span>
-          </div>
-          <div className="neactivka-all-main-item">
-            <span>{otkloneniePercentage >= 0 ? 'Соответствие' : 'Отклонение'} %</span>
-            <span>{otkloneniePercentage || 0}%</span>
+      </div>
+      {!list.length && <div
+        className='bonuses-paper'
+        style={{
+          marginTop: '20px',
+          color: '#29384A'
+        }}
+      >
+        <h2>Выберите дату</h2>
+      </div>}
+      {!!list.length && <div className='neactivka-all'>
+        <div className='neactivka-all-main br-10'>
+          <span className='neactivka-all-main-title'>Все квадраты</span>
+          <span className='neactivka-all-main-desc'>Общая статистика</span>
+          <div className='neactivka-all-main-items'>
+            <div className='neactivka-all-main-item'>
+              <span>ОАБ</span>
+              <span>{oab}</span>
+            </div>
+            <div className='neactivka-all-main-item'>
+              <span>ААБ</span>
+              <span>{aab}</span>
+            </div>
+            <div className='neactivka-all-main-item'>
+              <span>НАБ</span>
+              <span>{nab}</span>
+            </div>
+            <div className='neactivka-all-main-item'>
+              <span>{otklonenieKolvo >= 0 ? 'Соответствие' : 'Отклонение'}</span>
+              <span>{otklonenieKolvo || 0}</span>
+            </div>
+            <div className='neactivka-all-main-item'>
+              <span>{otkloneniePercentage >= 0 ? 'Соответствие' : 'Отклонение'} %</span>
+              <span>{otkloneniePercentage || 0}%</span>
+            </div>
           </div>
         </div>
-      </div>
-      {list.map((item, i) => (<div className="neactivka-all-square br-10" key={i}>
-                <span className="neactivka-all-square-title">
+        {list.map((item, i) => (
+          <div
+            className='neactivka-all-square br-10'
+            key={i}
+          >
+                <span className='neactivka-all-square-title'>
                   {item.squares.squares}
-                  <span style={{fontSize: '16px', marginLeft: '10px'}}>({item.locations})</span>
-                  <div style={{display: 'flex', flexWrap: 'nowrap'}}>
-                    <div style={{margin: '0 2px 0 7px', display: 'flex', flexDirection: 'column'}}>
+                  <span
+                    style={{
+                      fontSize: '16px',
+                      marginLeft: '10px'
+                    }}
+                  >({item.locations})</span>
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexWrap: 'nowrap'
+                    }}
+                  >
+                    <div
+                      style={{
+                        margin: '0 2px 0 7px',
+                        display: 'flex',
+                        flexDirection: 'column'
+                      }}
+                    >
                     <span
-                      className="currentPercentage-increase"
+                      className='currentPercentage-increase'
                       onClick={() => {
-                        percentageChange(i, (item.percentage || 90) + 1);
+                        percentageChange(i, (
+                          item.percentage || 90
+                        ) + 1);
                       }}
                     >&#x25B2;</span>
                     <span
-                      className="currentPercentage-decrease"
+                      className='currentPercentage-decrease'
                       onClick={() => {
-                        percentageChange(i, (item.percentage || 90) - 1);
+                        percentageChange(i, (
+                          item.percentage || 90
+                        ) - 1);
                       }}
                     >&#x25BC;</span>
                   </div>
                     {' ' + item.percentage}%
                   </div>
                 </span>
-        <div className="neactivka-all-square-items">
-          <div className="neactivka-all-square-item br-10">
-            <span className="neactivka-all-square-item-title br-10">ААБ</span>
-            <span className="neactivka-all-square-item-value br-10">{item.aab}</span>
-          </div>
-          <div className="neactivka-all-square-item br-10">
-            <span className="neactivka-all-square-item-title br-10">НАБ</span>
-            <span className="neactivka-all-square-item-value br-10">{item.nab}</span>
-          </div>
-          <div className="neactivka-all-square-item br-10">
-            <span className="neactivka-all-square-item-title br-10">ОАБ</span>
-            <span className="neactivka-all-square-item-value br-10">{item.oab}</span>
-          </div>
-          <div className="neactivka-all-square-item br-10">
-            <span className="neactivka-all-square-item-title br-10">ААБ/ОАБ%</span>
-            <span className="neactivka-all-square-item-value br-10">
+            <div className='neactivka-all-square-items'>
+              <div className='neactivka-all-square-item br-10'>
+                <span className='neactivka-all-square-item-title br-10'>ААБ</span>
+                <span className='neactivka-all-square-item-value br-10'>{item.aab}</span>
+              </div>
+              <div className='neactivka-all-square-item br-10'>
+                <span className='neactivka-all-square-item-title br-10'>НАБ</span>
+                <span className='neactivka-all-square-item-value br-10'>{item.nab}</span>
+              </div>
+              <div className='neactivka-all-square-item br-10'>
+                <span className='neactivka-all-square-item-title br-10'>ОАБ</span>
+                <span className='neactivka-all-square-item-value br-10'>{item.oab}</span>
+              </div>
+              <div className='neactivka-all-square-item br-10'>
+                <span className='neactivka-all-square-item-title br-10'>ААБ/ОАБ%</span>
+                <span className='neactivka-all-square-item-value br-10'>
               {Number(item.aabPercentage) || 0}%
             </span>
-          </div>
-          <div className="neactivka-all-square-item br-10">
+              </div>
+              <div className='neactivka-all-square-item br-10'>
             <span
-              className="neactivka-all-square-item-title br-10">
-              {(Number(((item.aab || 0) / (item.aab + item.nab || 0) * 100) - item.percentage)
-              .toFixed(2) || 0) ? 'Соответствие' : 'Отклонение'} %
+              className='neactivka-all-square-item-title br-10'
+            >
+              {(
+                Number((
+                  (
+                    item.aab || 0
+                  ) / (
+                    item.aab + item.nab || 0
+                  ) * 100
+                ) - item.percentage)
+                .toFixed(2) || 0
+              ) ? 'Соответствие' : 'Отклонение'} %
             </span>
-            <span className="neactivka-all-square-item-value br-10">
-              {(Number(((item.aab || 0) / (item.aab + item.nab || 0) * 100) - item.percentage)
-              .toFixed(2) || 0) || 0}%
+                <span className='neactivka-all-square-item-value br-10'>
+              {(
+                Number((
+                  (
+                    item.aab || 0
+                  ) / (
+                    item.aab + item.nab || 0
+                  ) * 100
+                ) - item.percentage)
+                .toFixed(2) || 0
+              ) || 0}%
             </span>
-          </div>
-          <div className="neactivka-all-square-item br-10">
+              </div>
+              <div className='neactivka-all-square-item br-10'>
             <span
-              className="neactivka-all-square-item-title br-10">
-              {
-                (Number((((item.aab + item.nab || 0) / 100 * item.percentage) / 100 *
-                  Number(((item.aab || 0) / (item.aab + item.nab || 0) * 100) - item.percentage))
-                .toFixed()) || 0) >= 0 ? 'Соответствие' : 'Отклонение'
-              }
+              className='neactivka-all-square-item-title br-10'
+            >
+              {(
+                Number((
+                  (
+                    (
+                      item.aab + item.nab || 0
+                    ) / 100 * item.percentage
+                  ) / 100 * Number((
+                    (
+                      item.aab || 0
+                    ) / (
+                      item.aab + item.nab || 0
+                    ) * 100
+                  ) - item.percentage)
+                )
+                .toFixed()) || 0
+              ) >= 0 ? 'Соответствие' : 'Отклонение'}
               , кол-во</span>
-            <span className="neactivka-all-square-item-value br-10">
-              {
-                (Number((((item.aab + item.nab || 0) / 100 * item.percentage) / 100 *
-                  Number(((item.aab || 0) / (item.aab + item.nab || 0) * 100) - item.percentage))
-                .toFixed()) || 0)
-              }
+                <span className='neactivka-all-square-item-value br-10'>
+              {(
+                Number((
+                  (
+                    (
+                      item.aab + item.nab || 0
+                    ) / 100 * item.percentage
+                  ) / 100 * Number((
+                    (
+                      item.aab || 0
+                    ) / (
+                      item.aab + item.nab || 0
+                    ) * 100
+                  ) - item.percentage)
+                )
+                .toFixed()) || 0
+              )}
             </span>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>))}
-    </div>}
-  </>);
+        ))}
+      </div>}
+    </>
+  );
 };
 
 export default NeactivkaBySquares;
