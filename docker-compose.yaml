@@ -1,8 +1,0 @@
-services:
-  bonuses:
-    build: ./
-    container_name: dashboard
-    ports:
-      - '3000:3000'
-    stdin_open: true
-    tty: true
