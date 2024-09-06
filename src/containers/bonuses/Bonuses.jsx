@@ -181,7 +181,7 @@ const Bonuses = () => {
             ...prevState,
             district: {
               id: state.district.id,
-              squares: res.payload.data.filter(location => location.id === Number(state.district.id))[0]?.squares
+              squares: res.payload?.data.filter(location => location.id === Number(state.district.id))[0]?.squares
             }
           }));
       }
