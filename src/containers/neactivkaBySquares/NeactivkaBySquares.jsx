@@ -321,9 +321,13 @@ const NeactivkaBySquares = () => {
                   (
                     item.aab || 0
                   ) / (
-                    item.aab + item.nab || 0
+                    (
+                      item.aab || 0
+                    ) + (
+                      item.nab || 0
+                    )
                   ) * 100
-                ) - item.percentage)
+                ) - item.percentage || 0)
                 .toFixed(2) || 0
               ) ? 'Соответствие' : 'Отклонение'} %
             </span>
@@ -333,9 +337,13 @@ const NeactivkaBySquares = () => {
                   (
                     item.aab || 0
                   ) / (
-                    item.aab + item.nab || 0
+                    (
+                      item.aab || 0
+                    ) + (
+                      item.nab || 0
+                    )
                   ) * 100
-                ) - item.percentage)
+                ) - item.percentage || 0)
                 .toFixed(2) || 0
               ) || 0}%
             </span>
