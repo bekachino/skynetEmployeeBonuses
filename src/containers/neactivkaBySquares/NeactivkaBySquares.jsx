@@ -257,13 +257,14 @@ const NeactivkaBySquares = () => {
                   <span
                     style={{
                       fontSize: '16px',
-                      marginLeft: '10px'
+                      marginLeft: '10px',
                     }}
                   >({item.locations})</span>
                   <div
                     style={{
                       display: 'flex',
-                      flexWrap: 'nowrap'
+                      flexWrap: 'nowrap',
+                      maxHeight: '28px',
                     }}
                   >
                     <div
