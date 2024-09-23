@@ -1,12 +1,21 @@
-import {combineReducers, configureStore} from "@reduxjs/toolkit";
-import {FLUSH, PAUSE, PERSIST, persistReducer, persistStore, PURGE, REGISTER, REHYDRATE,} from "redux-persist";
-import storage from "redux-persist/lib/storage";
-import {userReducer} from "../features/usersSlice";
+import { combineReducers, configureStore } from '@reduxjs/toolkit';
+import {
+  FLUSH,
+  PAUSE,
+  PERSIST,
+  persistReducer,
+  persistStore,
+  PURGE,
+  REGISTER,
+  REHYDRATE,
+} from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
+import { userReducer } from '../features/usersSlice';
 
 const usersPersistConfig = {
-  key: "skynetUser:user",
+  key: 'skynetUser:user',
   storage,
-  whitelist: ["user", "lastViewedActiveLs"],
+  whitelist: ['user', 'lastViewedActiveLs'],
 };
 
 const rootReducer = combineReducers({

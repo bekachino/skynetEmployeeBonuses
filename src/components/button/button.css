@@ -1,7 +1,7 @@
 #button {
   position: relative;
-  color: #29384A;
-  background-color: #FFFFFF;
+  color: #29384a;
+  background-color: #ffffff;
   font-weight: 600;
   font-size: 18px;
   max-width: 240px;
@@ -20,8 +20,8 @@
 
 #button:disabled {
   transform: scale(1);
-  background-color: #F0F0F0;
-  color: #CCCCCC;
+  background-color: #f0f0f0;
+  color: #cccccc;
   box-shadow: none;
 }
 

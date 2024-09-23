@@ -20,7 +20,7 @@
 
 .form-container input {
   font-size: 20px;
-  color: #36495E;
+  color: #36495e;
   border-radius: 20px;
   padding: 11px 16px 11px;
   box-sizing: border-box;
@@ -29,19 +29,19 @@
 }
 
 .form-container input::placeholder {
-  color: rgba(54, 73, 94, 0.70);
+  color: rgba(54, 73, 94, 0.7);
 }
 
 .form-submit-btn {
   font-size: 20px;
   font-weight: 700;
-  color: #29384A;
+  color: #29384a;
   border-radius: 10px;
   border: 0;
   margin-top: 25px;
   padding: 14px;
   background-color: white;
-  box-shadow: 0 2px 10px 0 #D4D4D480;
+  box-shadow: 0 2px 10px 0 #d4d4d480;
   transition: 0.1s;
 }
 

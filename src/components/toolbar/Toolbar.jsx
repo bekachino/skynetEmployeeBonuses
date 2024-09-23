@@ -1,7 +1,7 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import './toolbar.css';
 
-const Toolbar = ({open, onClick, children}) => {
+const Toolbar = ({ open, onClick, children }) => {
   const [toolbarInnerHeight, setToolbarInnerHeight] = useState(`0px`);
 
   useEffect(() => {
@@ -20,17 +20,18 @@ const Toolbar = ({open, onClick, children}) => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-
   return (
     <div className="toolbar">
-      <div className={`toolbar-inner ${open ? 'toolbar-inner-open' : ''}`} style={{height: toolbarInnerHeight}}>
+      <div
+        className={`toolbar-inner ${open ? 'toolbar-inner-open' : ''}`}
+        style={{ height: toolbarInnerHeight }}
+      >
         {children}
       </div>
-      <div
-        className="toolbar-inner-toggler"
-        onClick={onClick}
-      >
-        <span/><span/><span/>
+      <div className="toolbar-inner-toggler" onClick={onClick}>
+        <span />
+        <span />
+        <span />
       </div>
     </div>
   );

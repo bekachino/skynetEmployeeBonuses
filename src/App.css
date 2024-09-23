@@ -3,7 +3,10 @@ html {
   margin: 0 auto;
 }
 
-html, body, #root, .App {
+html,
+body,
+#root,
+.App {
   height: 100%;
 }
 
@@ -24,7 +27,7 @@ html, body, #root, .App {
 }
 
 input::placeholder {
-  color: rgba(54, 73, 94, 0.70);
+  color: rgba(54, 73, 94, 0.7);
 }
 
 @media (max-width: 768px) {

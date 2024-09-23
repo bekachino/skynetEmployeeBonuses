@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import excelLogo from "../../assets/excel.png";
-import { setLastViewedActiveLs, setNonActive } from "../../features/usersSlice";
-import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import * as XLSX from "xlsx";
-import { useLocation, useNavigate } from "react-router-dom";
-import axiosApi from "../../axiosApi";
-import moment from "moment";
+import excelLogo from '../../assets/excel.png';
+import { setLastViewedActiveLs, setNonActive } from '../../features/usersSlice';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import * as XLSX from 'xlsx';
+import { useLocation, useNavigate } from 'react-router-dom';
+import axiosApi from '../../axiosApi';
+import moment from 'moment';
 
 const inputStyles = {
   fontSize: '20px',
@@ -17,21 +17,24 @@ const inputStyles = {
   outline: 'none',
   width: 'auto',
   minWidth: '1px',
-  marginRight: 'auto'
-}
+  marginRight: 'auto',
+};
 
 const NonActivesList = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const user = useAppSelector(state => state.userState.user);
-  const lastViewedActiveLs = useAppSelector(state => state.userState.lastViewedActiveLs);
+  const user = useAppSelector((state) => state.userState.user);
+  const lastViewedActiveLs = useAppSelector(
+    (state) => state.userState.lastViewedActiveLs
+  );
   const [state, setState] = useState({
     district: {
       id: new URLSearchParams(location.search).get('id') || -1,
-      squares: new URLSearchParams(location.search).get('district_name') || ''
-    }, date: new Date(new URLSearchParams(location.search).get('date')),
-  })
+      squares: new URLSearchParams(location.search).get('district_name') || '',
+    },
+    date: new Date(new URLSearchParams(location.search).get('date')),
+  });
   const [data, setData] = useState({
     aab: -1,
     nab: -1,
@@ -48,90 +51,105 @@ const NonActivesList = () => {
     user_list: [],
   });
   const [nonActives, setNonActives] = useState([]);
-  const locations = useAppSelector(state => state.userState.locations);
+  const locations = useAppSelector((state) => state.userState.locations);
   const [nonActivesLoading, setNonActivesLoading] = useState(false);
-  
+
   const formatDate = () => {
     return moment().subtract(1, 'days').format('YYYY-MM-DD');
-  }
-  
+  };
+
   useEffect(() => {
     void fetchNonActives();
-    if (!/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) && !/iPad|Android|tablet|touch/i.test(navigator.userAgent)) {
+    if (
+      !/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent
+      ) &&
+      !/iPad|Android|tablet|touch/i.test(navigator.userAgent)
+    ) {
       navigate('/bonuses');
     }
-  }, []);
-  
-  const handleChange = e => setState(prevState => (
-    { ...prevState, [e.target.name]: e.target.value }
-  ));
-  
+  });
+
+  const handleChange = (e) =>
+    setState((prevState) => ({
+      ...prevState,
+      [e.target.name]: e.target.value,
+    }));
+
   const nonActivesBySearchWord = useCallback(() => {
-    return nonActives.filter(nonActive => nonActive?.ls_abon?.includes(state.searchWord?.toLowerCase() || '') || nonActive?.address?.toLowerCase()?.includes(state.searchWord?.toLowerCase() || ''))
+    return nonActives.filter(
+      (nonActive) =>
+        nonActive?.ls_abon?.includes(state.searchWord?.toLowerCase() || '') ||
+        nonActive?.address
+          ?.toLowerCase()
+          ?.includes(state.searchWord?.toLowerCase() || '')
+    );
   }, [nonActives, state.searchWord]);
-  
+
   const fetchNonActives = async () => {
     try {
       setNonActivesLoading(true);
       const formData = new FormData();
-      
+
       formData.append('date_filter', formatDate(new Date()));
       formData.append('squares_id', state.district.id);
-      
+
       const req = await axiosApi.post('noactive_squares/', formData);
       const req2 = await axiosApi.post('filtered_squares/', formData);
       const res = await req.data;
       const res2 = await req2.data;
       setNonActives(res.data);
       setNonActivesLoading(false);
-      setData(prevState => (
-        {
-          ...prevState,
-          aab: res2.count?.['Актив'] || -1,
-          nab: res2.count?.['Неактив'] || -1,
-          oab: (
-            res2.count?.['Неактив'] || -1
-          ) + (
-            res.count?.['Актив'] || -1
-          ),
-          locations: res2.locations,
-          user_list: res2.user_list,
-        }
-      ));
+      setData((prevState) => ({
+        ...prevState,
+        aab: res2.count?.['Актив'] || -1,
+        nab: res2.count?.['Неактив'] || -1,
+        oab: (res2.count?.['Неактив'] || -1) + (res.count?.['Актив'] || -1),
+        locations: res2.locations,
+        user_list: res2.user_list,
+      }));
       setTimeout(() => {
-        const lastViewedActiveItem = document.querySelector('.last-viewed-active');
+        const lastViewedActiveItem = document.querySelector(
+          '.last-viewed-active'
+        );
         if (lastViewedActiveItem) {
           lastViewedActiveItem.scrollIntoView({
-            behavior: 'smooth', block: 'center'
+            behavior: 'smooth',
+            block: 'center',
           });
         }
       }, 500);
     } catch (e) {
       console.log(e);
     }
-  }
-  
+  };
+
   const handleExcelFileExport = () => {
     const workbook = XLSX.utils.book_new();
-    const worksheet = XLSX.utils.json_to_sheet(nonActives.map(nonActive => {
-      return {
-        ls_abon: nonActive.ls_abon,
-        address: nonActive.address,
-        balance: nonActive.balance,
-        name_abon: nonActive.name_abon,
-        type_abon: nonActive.type_abon,
-        phone_abon: nonActive.phone_abon,
-        last_pay: nonActive.last_pay,
-      }
-    }));
+    const worksheet = XLSX.utils.json_to_sheet(
+      nonActives.map((nonActive) => {
+        return {
+          ls_abon: nonActive.ls_abon,
+          address: nonActive.address,
+          balance: nonActive.balance,
+          name_abon: nonActive.name_abon,
+          type_abon: nonActive.type_abon,
+          phone_abon: nonActive.phone_abon,
+          last_pay: nonActive.last_pay,
+        };
+      })
+    );
     XLSX.utils.book_append_sheet(workbook, worksheet, state.district.squares);
-    
-    XLSX.writeFile(workbook, `${state.district.squares} - ${formatDate()}.xlsx`);
+
+    XLSX.writeFile(
+      workbook,
+      `${state.district.squares} - ${formatDate()}.xlsx`
+    );
   };
-  
+
   return (
     <div
-      className='bonuses-paper non-actives-list'
+      className="bonuses-paper non-actives-list"
       style={{
         display: 'flex',
         flexDirection: 'column',
@@ -143,70 +161,100 @@ const NonActivesList = () => {
       }}
       onClick={(e) => e.stopPropagation()}
     >
-      {nonActivesLoading ? <span className='non-actives-list-loader'
-        style={{ marginTop: '20px' }}/> : nonActives.length ? <>
-        <div style={{
-          padding: '5px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          marginBottom: '5px'
-        }}>
+      {nonActivesLoading ? (
+        <span
+          className="non-actives-list-loader"
+          style={{ marginTop: '20px' }}
+        />
+      ) : nonActives.length ? (
+        <>
           <div
-            className='close-actives-modal'
-            onClick={(e) => {
-              e.stopPropagation();
-              window.history.back();
+            style={{
+              padding: '5px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              marginBottom: '5px',
             }}
-          />
-          <input
-            name='searchWord'
-            value={state?.searchWord}
-            placeholder='Поиск...'
-            onChange={handleChange}
-            required
-            style={inputStyles}
-          />
-          {user === 'meerim' && <div className='export-to-excel'
-            onClick={handleExcelFileExport}>
-            <img src={excelLogo}
-              alt='excel logo'
-              width='30px'
-              height='30px'/>
-            <span style={{
-              color: 'black', fontWeight: '700'
-            }}>экспорт</span>
-          </div>}
-        </div>
-        <div className='non-actives-list-inner'>
-          {nonActivesLoading ?
-            <span className='non-actives-list-loader'/> : nonActives.length && nonActivesBySearchWord()?.map((nonActive, i) => (
+          >
             <div
-              className={`bonuses-paper non-actives-list-item ${nonActive.ls_abon === lastViewedActiveLs ? 'last-viewed-active' : ''}${nonActive?.status && nonActive.status === 'Оплатил' ? 'non-actives-list-item-paid' : nonActive?.status && nonActive.status !== 'Оплатил' ? 'non-actives-list-item-has-status' : ''}`}
-              key={i}
-              onClick={() => {
-                dispatch(setLastViewedActiveLs(nonActive.ls_abon));
-                dispatch(setNonActive({
-                  ...nonActive,
-                  squares_id: locations.filter(location => `${location.id}` === state.district.id)[0]?.squares,
-                  user_listt: data.user_list,
-                }));
-                navigate(`/bonuses/non-active`);
+              className="close-actives-modal"
+              onClick={(e) => {
+                e.stopPropagation();
+                window.history.back();
               }}
-            >
-              <div className='non-actives-list-item-ls-abon'
-                style={{ width: '70px' }}>
-                <span style={{ fontWeight: '700' }}>Лицевой счёт:</span>
-                <span>{nonActive.ls_abon}</span>
+            />
+            <input
+              name="searchWord"
+              value={state?.searchWord}
+              placeholder="Поиск..."
+              onChange={handleChange}
+              required
+              style={inputStyles}
+            />
+            {user === 'meerim' && (
+              <div className="export-to-excel" onClick={handleExcelFileExport}>
+                <img
+                  src={excelLogo}
+                  alt="excel logo"
+                  width="30px"
+                  height="30px"
+                />
+                <span
+                  style={{
+                    color: 'black',
+                    fontWeight: '700',
+                  }}
+                >
+                  экспорт
+                </span>
               </div>
-              <div className='non-actives-list-item-address'
-                style={{ flexGrow: 1 }}>
-                <span style={{ fontWeight: '700' }}>Адрес:</span>
-                <span>{nonActive.address}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </> : <h3 className='bonuses-paper'>Нет данных</h3>}
+            )}
+          </div>
+          <div className="non-actives-list-inner">
+            {nonActivesLoading ? (
+              <span className="non-actives-list-loader" />
+            ) : (
+              nonActives.length &&
+              nonActivesBySearchWord()?.map((nonActive, i) => (
+                <div
+                  className={`bonuses-paper non-actives-list-item ${nonActive.ls_abon === lastViewedActiveLs ? 'last-viewed-active' : ''}${nonActive?.status && nonActive.status === 'Оплатил' ? 'non-actives-list-item-paid' : nonActive?.status && nonActive.status !== 'Оплатил' ? 'non-actives-list-item-has-status' : ''}`}
+                  key={i}
+                  onClick={() => {
+                    dispatch(setLastViewedActiveLs(nonActive.ls_abon));
+                    dispatch(
+                      setNonActive({
+                        ...nonActive,
+                        squares_id: locations.filter(
+                          (location) => `${location.id}` === state.district.id
+                        )[0]?.squares,
+                        user_listt: data.user_list,
+                      })
+                    );
+                    navigate(`/bonuses/non-active`);
+                  }}
+                >
+                  <div
+                    className="non-actives-list-item-ls-abon"
+                    style={{ width: '70px' }}
+                  >
+                    <span style={{ fontWeight: '700' }}>Лицевой счёт:</span>
+                    <span>{nonActive.ls_abon}</span>
+                  </div>
+                  <div
+                    className="non-actives-list-item-address"
+                    style={{ flexGrow: 1 }}
+                  >
+                    <span style={{ fontWeight: '700' }}>Адрес:</span>
+                    <span>{nonActive.address}</span>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </>
+      ) : (
+        <h3 className="bonuses-paper">Нет данных</h3>
+      )}
     </div>
   );
 };

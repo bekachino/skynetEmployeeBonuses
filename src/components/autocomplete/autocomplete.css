@@ -19,7 +19,7 @@
   height: 100%;
   border-top-left-radius: 10px;
   border-bottom-left-radius: 10px;
-  color: #1B1B1B;
+  color: #1b1b1b;
   background-color: white;
   box-sizing: border-box;
   font-size: 16px;
@@ -49,7 +49,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: url("../../assets/autocomplete-arrow.svg");
+  background-image: url('../../assets/autocomplete-arrow.svg');
   background-size: 16px;
   background-position: center;
   background-repeat: no-repeat;
@@ -87,7 +87,7 @@
 }
 
 .autocomplete-panel-open ~ .autocomplete-icon {
-  background-color: #E7F0FA;
+  background-color: #e7f0fa;
 }
 
 .autocomplete-panel-open ~ .autocomplete-icon::before {
@@ -118,7 +118,7 @@
   border-radius: 5px;
   font-weight: 500;
   text-align: left;
-  color: #1B1B1B;
+  color: #1b1b1b;
   padding: 3px 10px;
 }
 
@@ -127,7 +127,7 @@
 }
 
 .autocomplete-option:hover {
-  background-color: #29384A;
+  background-color: #29384a;
   color: white;
 }
 

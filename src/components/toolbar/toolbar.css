@@ -5,7 +5,7 @@
   flex-wrap: wrap;
   padding: 30px 40px;
   border-radius: 20px;
-  background-color: #A2B0C0;
+  background-color: #a2b0c0;
   box-sizing: border-box;
   width: 100%;
   z-index: 3;
@@ -17,7 +17,7 @@
   height: 42px;
   border-radius: 10px;
   box-shadow: 0 2px 5px 0 #61616166;
-  background-color: #FFFFFF;
+  background-color: #ffffff;
   transition: 0.1s;
 }
 
@@ -27,7 +27,7 @@
   width: 21px;
   height: 3px;
   border-radius: 2px;
-  background-color: #29384A;
+  background-color: #29384a;
   transition: 0.2s;
 }
 

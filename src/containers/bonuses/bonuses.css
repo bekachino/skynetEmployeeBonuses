@@ -1,4 +1,5 @@
-h1, h2 {
+h1,
+h2 {
   margin: 0;
 }
 
@@ -29,7 +30,7 @@ h1, h2 {
 
 .bonuses-paper {
   padding: 15px 30px 20px;
-  background-color: #FFFFFF;
+  background-color: #ffffff;
   border-radius: 10px;
   box-sizing: border-box;
 }
@@ -39,7 +40,7 @@ h1, h2 {
   justify-content: center;
   align-items: center;
   font-size: 24px;
-  color: #29384A;
+  color: #29384a;
   font-weight: 700;
   margin: 0 0 15px;
 }
@@ -65,21 +66,21 @@ h1, h2 {
 .table-col-title,
 .bonuses-table-title-row span {
   width: 50%;
-  background-color: #29384A;
+  background-color: #29384a;
   padding: 7px 0;
   font-size: 20px;
   font-weight: 700;
-  color: #FFFFFF;
+  color: #ffffff;
 }
 
 .table-col-value,
 .bonuses-table-value-row span {
   width: 50%;
-  background-color: #E7F0FA;
+  background-color: #e7f0fa;
   padding: 7px 0;
   font-size: 20px;
   font-weight: 600;
-  color: #29384A;
+  color: #29384a;
 }
 
 .bonuses-table-1,
@@ -119,33 +120,33 @@ h1, h2 {
 
 .table-col-value-red {
   align-items: center;
-  background-color: #D1585B;
-  color: #FFFFFF;
+  background-color: #d1585b;
+  color: #ffffff;
   font-size: 24px;
 }
 
 .table-col-value-yellow {
   align-items: center;
-  background-color: #FBDF35;
-  color: #29384A;
+  background-color: #fbdf35;
+  color: #29384a;
 }
 
 .border-red {
-  border: 3px solid #D1585B;
-  color: #29384A;
+  border: 3px solid #d1585b;
+  color: #29384a;
   border-radius: 6px;
 }
 
 .border-yellow {
   align-items: center;
   background-color: transparent;
-  color: #FFFFFF;
-  border: 3px solid #FBDF35;
+  color: #ffffff;
+  border: 3px solid #fbdf35;
   border-radius: 10px;
 }
 
 .table-col-value-minus {
-  color: #D1585B;
+  color: #d1585b;
 }
 
 .table-col-value-plus {
@@ -166,7 +167,7 @@ h1, h2 {
 
 .currentPercentage-decrease:hover,
 .currentPercentage-increase:hover {
-  background-color: #E7F0FA;
+  background-color: #e7f0fa;
   user-select: none;
 }
 
@@ -286,8 +287,8 @@ h1, h2 {
   transform: translate(-50%, -50%) rotate(90deg);
   width: 120px;
   height: 120px;
-  background-color: rgba(0, 0, 0, 0.30);
-  background-image: url("../../assets/arrow-white.svg");
+  background-color: rgba(0, 0, 0, 0.3);
+  background-image: url('../../assets/arrow-white.svg');
   background-repeat: no-repeat;
   background-position: center 25px;
   background-size: 30px;
@@ -303,8 +304,8 @@ h1, h2 {
   transform: translate(50%, -50%) rotate(-90deg);
   width: 120px;
   height: 120px;
-  background-color: rgba(0, 0, 0, 0.30);
-  background-image: url("../../assets/arrow-white.svg");
+  background-color: rgba(0, 0, 0, 0.3);
+  background-image: url('../../assets/arrow-white.svg');
   background-repeat: no-repeat;
   background-position: center 25px;
   background-size: 30px;
@@ -398,7 +399,7 @@ h1, h2 {
     justify-content: center;
     gap: 14px 30px;
     align-items: center;
-    background-color: #29384A;
+    background-color: #29384a;
     box-sizing: border-box;
     overflow: hidden;
     transition: 0.2s;
@@ -416,7 +417,8 @@ h1, h2 {
     gap: 30px;
   }
 
-  .autocomplete, .date-picker {
+  .autocomplete,
+  .date-picker {
     width: 50%;
   }
 
@@ -466,7 +468,7 @@ h1, h2 {
   }
 
   .location-block span {
-    font-size: 14px!important;
+    font-size: 14px !important;
   }
 
   .bonuses-paper-title {
@@ -523,7 +525,8 @@ h1, h2 {
 }
 
 @media (max-width: 476px) {
-  .autocomplete, .date-picker {
+  .autocomplete,
+  .date-picker {
     width: 95%;
   }
 

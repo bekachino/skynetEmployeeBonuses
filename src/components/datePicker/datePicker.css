@@ -28,7 +28,7 @@
 .date-picker-icon {
   width: 40px;
   height: 40px;
-  background-image: url("../../assets/date-picker-icon.svg");
+  background-image: url('../../assets/date-picker-icon.svg');
   background-size: 16px;
   background-position: center;
   background-repeat: no-repeat;
@@ -76,7 +76,7 @@
 }
 
 .date-picker-panel-open ~ .date-picker-icon {
-  background-color: #E7F0FA;
+  background-color: #e7f0fa;
 }
 
 .date-picker-current-position {
@@ -89,7 +89,8 @@
   margin-top: 10px;
 }
 
-.arrow-back, .arrow-forward {
+.arrow-back,
+.arrow-forward {
   width: 18px;
   height: 18px;
   background-repeat: no-repeat;
@@ -100,16 +101,17 @@
   cursor: pointer;
 }
 
-.arrow-back:hover, .arrow-forward:hover {
+.arrow-back:hover,
+.arrow-forward:hover {
   border: 1px dashed #cbcbcb;
 }
 
 .arrow-back {
-  background-image: url("../../assets/day-picker-arrow-back.svg");
+  background-image: url('../../assets/day-picker-arrow-back.svg');
 }
 
 .arrow-forward {
-  background-image: url("../../assets/day-picker-arrow-forward.svg");
+  background-image: url('../../assets/day-picker-arrow-forward.svg');
 }
 
 .date-picker-current-month {
@@ -128,8 +130,8 @@
   min-height: 18px;
   font-size: 12px;
   border-radius: 2px;
-  color: #CCCCCC;
-  background-color: #F0F0F0;
+  color: #cccccc;
+  background-color: #f0f0f0;
   margin-top: 5px;
 }
 
@@ -148,17 +150,17 @@
   width: 29px;
   height: 29px;
   text-align: center;
-  color: #29384A;
+  color: #29384a;
   cursor: pointer;
   font-weight: 500;
   margin: 0 auto;
   border: 1px dashed transparent;
   border-radius: 5px;
-  transition: .1s;
+  transition: 0.1s;
 }
 
 .date-picker-month-day:hover {
-  border: 1px dashed #29384A;
+  border: 1px dashed #29384a;
 }
 
 .date-picker-month-day:before {
@@ -171,11 +173,11 @@
 }
 
 .date-picker-not-current-month {
-  color: #CCCCCC;
+  color: #cccccc;
 }
 
 .day-picker-day-weekend {
-  color: #D1585B;
+  color: #d1585b;
 }
 
 .date-picker-day-in-future {
@@ -184,7 +186,7 @@
 
 .date-picker-current-day {
   border-radius: 5px;
-  background-color: #29384A;
+  background-color: #29384a;
   color: white;
 }
 

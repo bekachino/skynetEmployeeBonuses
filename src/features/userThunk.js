@@ -1,21 +1,23 @@
-import {createAsyncThunk} from "@reduxjs/toolkit";
-import {isAxiosError} from "axios";
-import axiosApi from "../axiosApi";
+import { createAsyncThunk } from '@reduxjs/toolkit';
+import { isAxiosError } from 'axios';
+import axiosApi from '../axiosApi';
 
-export const signUp = createAsyncThunk("user/signUp", async (userData, {rejectWithValue}) => {
-  try {
-    const response = await axiosApi.post("register/", userData);
-    return response.data;
-  }
-  catch (e) {
-    if (isAxiosError(e) && e.response && e.response.status === 400) {
-      return rejectWithValue(e.response.data);
+export const signUp = createAsyncThunk(
+  'user/signUp',
+  async (userData, { rejectWithValue }) => {
+    try {
+      const response = await axiosApi.post('register/', userData);
+      return response.data;
+    } catch (e) {
+      if (isAxiosError(e) && e.response && e.response.status === 400) {
+        return rejectWithValue(e.response.data);
+      }
+      throw e;
     }
-    throw e;
   }
-});
+);
 
-export const signIn = createAsyncThunk("user/signIn", async (userData) => {
+export const signIn = createAsyncThunk('user/signIn', async (userData) => {
   if (
     (userData.login === 'admin' && userData.password === 'skynet') ||
     (userData.login === 'osh' && userData.password === 'oshskynet02') ||
@@ -40,15 +42,17 @@ export const signIn = createAsyncThunk("user/signIn", async (userData) => {
   // }
 });
 
-export const fetchLocations = createAsyncThunk("user/fetchLocations", async (formData, {rejectWithValue}) => {
-  try {
-    const response = await axiosApi("all_squares/", formData);
-    return response.data;
-  }
-  catch (e) {
-    if (isAxiosError(e) && e.response && e.response.status === 400) {
-      return rejectWithValue(e.response.data);
+export const fetchLocations = createAsyncThunk(
+  'user/fetchLocations',
+  async (formData, { rejectWithValue }) => {
+    try {
+      const response = await axiosApi('all_squares/', formData);
+      return response.data;
+    } catch (e) {
+      if (isAxiosError(e) && e.response && e.response.status === 400) {
+        return rejectWithValue(e.response.data);
+      }
+      throw e;
     }
-    throw e;
   }
-});
+);

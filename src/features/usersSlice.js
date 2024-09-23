@@ -1,20 +1,20 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { fetchLocations, signIn, signUp } from "./userThunk";
+import { createSlice } from '@reduxjs/toolkit';
+import { fetchLocations, signIn, signUp } from './userThunk';
 
 const initialState = {
-  user: "",
+  user: '',
   signInLoading: false,
   signUpLoading: false,
-  authorizationError: "",
-  authorizationMessage: "",
-  popupId: "",
+  authorizationError: '',
+  authorizationMessage: '',
+  popupId: '',
   locations: [],
   nonActive: null,
   lastViewedActiveLs: '',
 };
 
 const UsersSlice = createSlice({
-  name: "user",
+  name: 'user',
   initialState,
   reducers: {
     logout: (state) => {
@@ -47,9 +47,10 @@ const UsersSlice = createSlice({
     });
     builder.addCase(signUp.rejected, (state, { payload: error }) => {
       state.signUpLoading = false;
-      state.authorizationError = error?.error || 'Произошла ошибка. Попробуйте позже';
+      state.authorizationError =
+        error?.error || 'Произошла ошибка. Попробуйте позже';
     });
-    
+
     builder.addCase(signIn.pending, (state) => {
       state.user = '';
       state.authorizationError = '';
@@ -63,9 +64,10 @@ const UsersSlice = createSlice({
     });
     builder.addCase(signIn.rejected, (state, { payload: error }) => {
       state.signInLoading = false;
-      state.authorizationError = error?.error || 'Произошла ошибка. Попробуйте позже';
+      state.authorizationError =
+        error?.error || 'Произошла ошибка. Попробуйте позже';
     });
-    
+
     builder.addCase(fetchLocations.pending, (state) => {
       state.locations = [];
     });
@@ -84,5 +86,5 @@ export const {
   setPopupId,
   setLocations,
   setNonActive,
-  setLastViewedActiveLs
+  setLastViewedActiveLs,
 } = UsersSlice.actions;

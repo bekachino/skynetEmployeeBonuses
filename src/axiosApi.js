@@ -1,11 +1,11 @@
 import axios from 'axios';
-import {apiUrl} from "./constants";
+import { apiUrl } from './constants';
 
 export const addInterceptors = (store) => {
   axiosApi.interceptors.request.use((config) => {
     const { url } = config;
-    const isSignUp = url?.includes("/register");
-    const isSignIn = url?.includes("/login");
+    const isSignUp = url?.includes('/register');
+    const isSignIn = url?.includes('/login');
     if (!isSignUp && !isSignIn) {
       const token = store.getState().userState.user;
       const headers = config.headers;
