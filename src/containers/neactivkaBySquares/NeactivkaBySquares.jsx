@@ -93,6 +93,9 @@ const NeactivkaBySquares = () => {
         formData.append('squares_id', location.id);
         const req = await axiosApi.post('filtered_squares/', formData);
         const res = await req.data;
+
+        if (locations.filter((loc) => loc.id === location.id)[0]?.squares === 'Партнерка') return;
+        
         listBySquares.push({
           squares: locations.filter((loc) => loc.id === location.id)[0],
           aab: res.count['Актив'] || 0,
