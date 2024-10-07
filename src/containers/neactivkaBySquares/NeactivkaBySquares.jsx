@@ -110,60 +110,58 @@ const NeactivkaBySquares = () => {
         const req = await axiosApi.post('filtered_squares/', formData);
         const res = await req.data;
         
-        if (!['Партнерка'].includes(locations.filter((loc) => loc.id === location.id)[0]?.squares)) {
-          listBySquares.push({
-            squares: locations.filter(loc => loc.id === location.id)[0],
-            aab: res.count['Актив'] || 0,
-            nab: res.count['Неактив'] || 0,
-            oab: (
-              res.count['Неактив'] || 0
-            ) + (
+        listBySquares.push({
+          squares: locations.filter(loc => loc.id === location.id)[0],
+          aab: res.count['Актив'] || 0,
+          nab: res.count['Неактив'] || 0,
+          oab: (
+            res.count['Неактив'] || 0
+          ) + (
+            res.count['Актив'] || 0
+          ),
+          aabPercentage: (
+            (
               res.count['Актив'] || 0
-            ),
-            aabPercentage: (
+            ) / (
+              res.count['Актив'] + res.count['Неактив'] || 0
+            ) * 100
+          ).toFixed(2) || 0,
+          otkl_percentage: Number((
+            (
+              res.count['Актив'] || 0
+            ) / (
+              res.count['Актив'] + res.count['Неактив'] || 0
+            ) * 100
+          ) - 90).toFixed(2) || 0,
+          otkl_kolvo: Number((
+            (
+              (
+                res.count['Актив'] + res.count['Неактив'] || 0
+              ) / 100 * 90
+            ) / 100 * Number((
               (
                 res.count['Актив'] || 0
               ) / (
                 res.count['Актив'] + res.count['Неактив'] || 0
               ) * 100
-            ).toFixed(2) || 0,
-            otkl_percentage: Number((
-              (
-                res.count['Актив'] || 0
-              ) / (
-                res.count['Актив'] + res.count['Неактив'] || 0
-              ) * 100
-            ) - 90).toFixed(2) || 0,
-            otkl_kolvo: Number((
-              (
-                (
-                  res.count['Актив'] + res.count['Неактив'] || 0
-                ) / 100 * 90
-              ) / 100 * Number((
-                (
-                  res.count['Актив'] || 0
-                ) / (
-                  res.count['Актив'] + res.count['Неактив'] || 0
-                ) * 100
-              ) - 90)
-            ).toFixed()) || 0,
-            locations: res.locations.join(', '),
-            percentage: 90,
-          });
-        }
+            ) - 90)
+          ).toFixed()) || 0,
+          locations: res.locations.join(', '),
+          percentage: 90,
+        });
       }
       
       setList(listBySquares);
       setOab(listBySquares.reduce((accumulator, currentValue) => {
-        accumulator += currentValue?.oab;
+        if (!['Партнерка'].includes(accumulator?.squares)) accumulator += currentValue?.oab;
         return accumulator;
       }, 0));
       setAab(listBySquares.reduce((accumulator, currentValue) => {
-        accumulator += currentValue?.aab;
+        if (!['Партнерка'].includes(accumulator?.squares)) accumulator += currentValue?.aab;
         return accumulator;
       }, 0));
       setNab(listBySquares.reduce((accumulator, currentValue) => {
-        accumulator += currentValue?.nab;
+        if (!['Партнерка'].includes(accumulator?.squares)) accumulator += currentValue?.nab;
         return accumulator;
       }, 0));
       
