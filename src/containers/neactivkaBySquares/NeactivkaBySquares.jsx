@@ -154,21 +154,18 @@ const NeactivkaBySquares = () => {
       setList(listBySquares);
       setOab(listBySquares.reduce((accumulator, currentValue) => {
         if (!['Партнерка'].includes(currentValue?.squares.squares)) {
-          console.log('OAB', currentValue.squares.squares, !['Партнерка'].includes(currentValue?.squares.squares))
           accumulator += currentValue?.oab;
         }
         return accumulator;
       }, 0));
       setAab(listBySquares.reduce((accumulator, currentValue) => {
         if (!['Партнерка'].includes(currentValue?.squares.squares)) {
-          console.log('AAB', currentValue.squares.squares, !['Партнерка'].includes(currentValue?.squares.squares))
           accumulator += currentValue?.aab;
         }
         return accumulator;
       }, 0));
       setNab(listBySquares.reduce((accumulator, currentValue) => {
         if (!['Партнерка'].includes(currentValue?.squares.squares)) {
-          console.log('NAB', currentValue.squares.squares, !['Партнерка'].includes(currentValue?.squares.squares))
           accumulator += currentValue?.nab;
         }
         return accumulator;
