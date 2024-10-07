@@ -209,7 +209,10 @@ const Bonuses = () => {
   const handleScroll = () => {
     const pos = kolZayContainerRef.current?.getBoundingClientRect();
     if (pos) {
-      setKolZayContainerPosition({ x: pos.left, y: pos.top });
+      setKolZayContainerPosition({
+        x: pos.left,
+        y: pos.top,
+      });
     }
   };
 
@@ -295,7 +298,8 @@ const Bonuses = () => {
 
   useEffect(() => {
     if (state.date) void onSubmit();
-  });
+    // no state dependency needed
+  }, []);
 
   useEffect(() => {
     window.addEventListener('click', () => {
@@ -310,12 +314,17 @@ const Bonuses = () => {
     if (e) {
       e.preventDefault();
       navigate(
-        `?date=${formatDate(new Date(state.date))}&id=${state.district.id}`
+        `?date=${formatDate(new Date(state.date))}&id=${state.district.id}`,
+        { replace: true }
       );
     }
-    setFormLoading(true);
     try {
-      if (!state.date || state.district.id < 0) return;
+      if (!state.date || state.district.id < 0) {
+        return;
+      }
+
+      setFormLoading(true);
+
       void fetchActives();
       void fetchNonActives();
       void fetchConnectedAbonents();
@@ -398,7 +407,10 @@ const Bonuses = () => {
                 onClick={() =>
                   setState((prevState) => ({
                     ...prevState,
-                    district: { id: -1, squares: '' },
+                    district: {
+                      id: -1,
+                      squares: '',
+                    },
                   }))
                 }
                 label="Выберите квадрат"
@@ -431,13 +443,22 @@ const Bonuses = () => {
         {data.aab < 0 ? (
           <h3
             className="bonuses-paper"
-            style={{ padding: '20px 0', margin: '0' }}
+            style={{
+              padding: '20px 0',
+              margin: '0',
+            }}
           >
             Нет данных
           </h3>
         ) : (
           <>
-            <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+            <div
+              style={{
+                display: 'flex',
+                gap: '20px',
+                flexWrap: 'wrap',
+              }}
+            >
               <div className="bonuses-paper service-group-block">
                 <h1 className="bonuses-paper-title">Сервисная группа</h1>
                 <div className="bonuses-table" style={{ gap: '4px' }}>
@@ -472,7 +493,12 @@ const Bonuses = () => {
               </div>
               <div className="bonuses-paper location-block">
                 <h1 className="bonuses-paper-title">Локация</h1>
-                <span style={{ fontSize: '18px', fontWeight: '600' }}>
+                <span
+                  style={{
+                    fontSize: '18px',
+                    fontWeight: '600',
+                  }}
+                >
                   {data.locations.length ? data.locations.join(', ') : '-'}
                 </span>
               </div>
@@ -522,7 +548,10 @@ const Bonuses = () => {
                 <div className="table-col">
                   <span
                     className="table-col-title"
-                    style={{ cursor: 'pointer', position: 'relative' }}
+                    style={{
+                      cursor: 'pointer',
+                      position: 'relative',
+                    }}
                     onClick={(e) => {
                       if (data.nab < 0) return;
                       if (
@@ -545,7 +574,10 @@ const Bonuses = () => {
                     {showActives && (
                       <div
                         className="bonuses-paper non-actives-list"
-                        style={{ display: 'flex', flexDirection: 'column' }}
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                        }}
                         onClick={(e) => e.stopPropagation()}
                       >
                         <div
@@ -618,7 +650,10 @@ const Bonuses = () => {
                 <div className="table-col">
                   <span
                     className="table-col-title"
-                    style={{ cursor: 'pointer', position: 'relative' }}
+                    style={{
+                      cursor: 'pointer',
+                      position: 'relative',
+                    }}
                     onClick={(e) => {
                       if (data.nab < 0) return;
                       if (
@@ -641,7 +676,10 @@ const Bonuses = () => {
                     {showNonActives && (
                       <div
                         className="bonuses-paper non-actives-list"
-                        style={{ display: 'flex', flexDirection: 'column' }}
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                        }}
                         onClick={(e) => e.stopPropagation()}
                       >
                         <div
@@ -675,15 +713,7 @@ const Bonuses = () => {
                               <div
                                 className={
                                   'bonuses-paper non-actives-list-item ' +
-                                  `${
-                                    nonActive?.status &&
-                                    nonActive.status === 'Оплатил'
-                                      ? 'non-actives-list-item-paid'
-                                      : nonActive?.status &&
-                                          nonActive.status !== 'Оплатил'
-                                        ? 'non-actives-list-item-has-status'
-                                        : ''
-                                  }`
+                                  `${nonActive?.status && nonActive.status === 'Оплатил' ? 'non-actives-list-item-paid' : nonActive?.status && nonActive.status !== 'Оплатил' ? 'non-actives-list-item-has-status' : ''}`
                                 }
                                 key={i}
                                 onClick={() => {
@@ -797,7 +827,10 @@ const Bonuses = () => {
               >
                 <div
                   className="table-col"
-                  style={{ maxWidth: 'unset', position: 'relative' }}
+                  style={{
+                    maxWidth: 'unset',
+                    position: 'relative',
+                  }}
                 >
                   <span
                     className="table-col-title"
@@ -833,13 +866,21 @@ const Bonuses = () => {
                             <div
                               className="bonuses-paper non-actives-list-item"
                               key={i}
-                              style={{ minWidth: '120px', width: 'unset' }}
+                              style={{
+                                minWidth: '120px',
+                                width: 'unset',
+                              }}
                             >
                               <div
                                 className="non-actives-list-item-ls-abon"
                                 style={{ width: '100%' }}
                               >
-                                <div style={{ display: 'flex', gap: '5px' }}>
+                                <div
+                                  style={{
+                                    display: 'flex',
+                                    gap: '5px',
+                                  }}
+                                >
                                   <span>{item.name}:</span>
                                   <span>{item.count}</span>
                                 </div>
@@ -952,7 +993,10 @@ const Bonuses = () => {
             <div className="bonuses-paper" style={{ width: '100%' }}>
               <div
                 className="border-yellow total-bonuses"
-                style={{ width: '450px', marginLeft: 'auto' }}
+                style={{
+                  width: '450px',
+                  marginLeft: 'auto',
+                }}
               >
                 <h2
                   className="table-col-value-yellow"
@@ -961,7 +1005,11 @@ const Bonuses = () => {
                   ИТОГО ПРЕМИЯ за текущий месяц на бригаду
                 </h2>
                 <h1
-                  style={{ color: '#29384A', padding: '9px', fontWeight: 800 }}
+                  style={{
+                    color: '#29384A',
+                    padding: '9px',
+                    fontWeight: 800,
+                  }}
                 >
                   {blockOneBonus +
                     blockTwoBonus +
@@ -998,7 +1046,12 @@ const Bonuses = () => {
                   >
                     Для этого надо вернуть всего абонентов из неактивки:
                   </span>
-                  <h2 style={{ marginTop: 'auto', color: '#D1585B' }}>
+                  <h2
+                    style={{
+                      marginTop: 'auto',
+                      color: '#D1585B',
+                    }}
+                  >
                     {(
                       ((Math.abs(otkloneniePercentage) +
                         (10 - data.additionalEarningPercentage)) *
