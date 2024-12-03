@@ -25,10 +25,10 @@ jobs:
             cd /var/www/
 
             # Remove the old directory if it exists
-            echo "DASHBOARD_SERVER_PASSWORD" | sudo -S rm -rf skynetEmployeeBonuses
+            echo "$DASHBOARD_SERVER_PASSWORD" | sudo -S rm -rf skynetEmployeeBonuses
 
             # Clone the repository
-            echo "DASHBOARD_SERVER_PASSWORD" | sudo -S git clone https://github.com/bekachino/skynetEmployeeBonuses.git
+            echo "$DASHBOARD_SERVER_PASSWORD" | sudo -S git clone https://github.com/bekachino/skynetEmployeeBonuses.git
 
             # Check if the repo was cloned successfully
             if [ ! -d "/var/www/skynetEmployeeBonuses" ]; then
@@ -44,8 +44,8 @@ jobs:
             fi
 
             # Install dependencies and build
-            echo "DASHBOARD_SERVER_PASSWORD" | sudo -S npm install
-            echo "DASHBOARD_SERVER_PASSWORD" | sudo -S npm run build
+            echo "$DASHBOARD_SERVER_PASSWORD" | sudo -S npm install
+            echo "$DASHBOARD_SERVER_PASSWORD" | sudo -S npm run build
 
       - name: Restart nginx
         uses: appleboy/ssh-action@v0.1.7
@@ -55,4 +55,4 @@ jobs:
           key: ${{ secrets.DASHBOARD_SERVER_KEY }}
           port: 22
           script: |
-            echo "DASHBOARD_SERVER_PASSWORD" | sudo -S service nginx restart
+            echo "$DASHBOARD_SERVER_PASSWORD" | sudo -S service nginx restart
