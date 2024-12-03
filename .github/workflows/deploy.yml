@@ -27,9 +27,10 @@ jobs:
       - name: Deploy via scp
         uses: appleboy/scp-action@v0.1.7
         with:
+          debug: true
           host: 185.39.79.89
           username: beka
-          key: ${{ vars.DASHBOARD_SERVER_KEY }}
+          key: ${{ secrets.DASHBOARD_SERVER_KEY }}
           port: 22
           source: ./build/*
           target: /var/www/bonuses
@@ -37,8 +38,9 @@ jobs:
       - name: Restart nginx
         uses: appleboy/scp-action@v0.1.7
         with:
+          debug: true
           host: 185.39.79.89
           username: beka
-          key: ${{ vars.DASHBOARD_SERVER_KEY }}
+          key: ${{ secrets.DASHBOARD_SERVER_KEY }}
           port: 22
           script: sudo service nginx restart
