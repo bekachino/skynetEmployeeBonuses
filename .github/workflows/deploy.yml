@@ -30,7 +30,7 @@ jobs:
           debug: true
           host: 185.39.79.89
           username: beka
-          passphrase: ${{ vars.DASHBOARD_SERVER_KEY }}
+          key: ${{ vars.DASHBOARD_SERVER_KEY }}
           port: 22
           source: ./build/*
           target: /var/www/bonuses
