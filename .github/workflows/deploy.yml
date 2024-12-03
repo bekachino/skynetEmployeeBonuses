@@ -30,7 +30,7 @@ jobs:
           debug: true
           host: 185.39.79.89
           username: beka
-          key: ${{ secrets.DASHBOARD_SERVER_KEY }}
+          key: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDRJJ8DLKhdy9SXl61PUNd0xTl21ah+TqFE+dBOiIbZauJx1qz6T3fUg8QXPsvvjVAxYuMDh3T2LQfFRlzM+r/04+y8EeiWbNNqAPkgBInmR/29brrgfETSYMnHdtW2sdT/D+/6wV9IHXevKZaQ/3K4FZAbhjqdYAkNDRX74IVTWRVw8a0T1kxEvejEd59JTo2AqYGCpYPd1idMOiLVuNYAHTH6elGxQvx0aExRPHRj2ASmG1gbwIYlPc3OYJ0CIxSgqoWyskl08kb6x0ivbHJ0BGXAMs3fBNSyg+MxHdjJCghKnDtkID7ip4VuwNGJUVCmrQFbMIz2GMRuNAwuPDEZhXh+NWuCiclr77bE0pV7lBgcxm6miIuaW3p6pNSHSNx/bTBEIbVHIO5U2JrmC2J1CVcqSv/7FsK0ngO4eTtHvbfeYEPgzLYFPM8YUUHR5wngZjeyGnHMQrrbABOB7Upb0csYQuHj+2M1Lach44uHUjBea0wnfvwAXyum9tApVJbuc2jAaTebIMrMi+4kYWTArxIT1Yru3SmMZ98dvpDE695cAM8ZfiEKIzf7Jl17MKub0LAzSlAGqLgvYoaeTQT0Bj3SPXrzDziHkaF/5wnFyitPqUB4pSp4v9ZitxwberomsDtj3kceaqqVibACbe1bZWhYGpKQls+e8yv1dcH37w== brzzkv@gmail.com'
           port: 22
           source: ./build/*
           target: /var/www/bonuses
@@ -41,6 +41,6 @@ jobs:
           debug: true
           host: 185.39.79.89
           username: beka
-          key: ${{ secrets.DASHBOARD_SERVER_KEY }}
+          key: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDRJJ8DLKhdy9SXl61PUNd0xTl21ah+TqFE+dBOiIbZauJx1qz6T3fUg8QXPsvvjVAxYuMDh3T2LQfFRlzM+r/04+y8EeiWbNNqAPkgBInmR/29brrgfETSYMnHdtW2sdT/D+/6wV9IHXevKZaQ/3K4FZAbhjqdYAkNDRX74IVTWRVw8a0T1kxEvejEd59JTo2AqYGCpYPd1idMOiLVuNYAHTH6elGxQvx0aExRPHRj2ASmG1gbwIYlPc3OYJ0CIxSgqoWyskl08kb6x0ivbHJ0BGXAMs3fBNSyg+MxHdjJCghKnDtkID7ip4VuwNGJUVCmrQFbMIz2GMRuNAwuPDEZhXh+NWuCiclr77bE0pV7lBgcxm6miIuaW3p6pNSHSNx/bTBEIbVHIO5U2JrmC2J1CVcqSv/7FsK0ngO4eTtHvbfeYEPgzLYFPM8YUUHR5wngZjeyGnHMQrrbABOB7Upb0csYQuHj+2M1Lach44uHUjBea0wnfvwAXyum9tApVJbuc2jAaTebIMrMi+4kYWTArxIT1Yru3SmMZ98dvpDE695cAM8ZfiEKIzf7Jl17MKub0LAzSlAGqLgvYoaeTQT0Bj3SPXrzDziHkaF/5wnFyitPqUB4pSp4v9ZitxwberomsDtj3kceaqqVibACbe1bZWhYGpKQls+e8yv1dcH37w== brzzkv@gmail.com'
           port: 22
           script: sudo service nginx restart
