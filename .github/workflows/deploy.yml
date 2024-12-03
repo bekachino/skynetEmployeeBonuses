@@ -25,7 +25,7 @@ jobs:
         run: npm run build
 
       - name: Deploy via scp
-        uses: appleboy/scp-action@v0.2.2
+        uses: appleboy/scp-action@v0.1.7
         with:
           host: 10.1.4.9
           username: beka
@@ -35,7 +35,7 @@ jobs:
           target: /var/www/bonuses
 
       - name: Restart nginx
-        uses: appleboy/ssh-action@v0.1.5
+        uses: appleboy/scp-action@v0.1.7
         with:
           host: 10.1.4.9
           username: beka
