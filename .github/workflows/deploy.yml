@@ -31,7 +31,7 @@ jobs:
           username: beka
           key: ${{ secrets.DASHBOARD_SERVER_KEY }}
           port: 22
-          source: ./build/*
+          source: ./build/
           target: /var/www/bonuses/
 
       - name: Restart nginx
