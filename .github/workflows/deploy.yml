@@ -29,6 +29,7 @@ jobs:
         with:
           debug: true
           host: 185.39.79.89
+          username: beka
           key: ${{ secrets.DASHBOARD_SERVER_KEY }}
           port: 22
           source: ./build/*
