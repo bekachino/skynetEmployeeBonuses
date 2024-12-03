@@ -25,17 +25,10 @@ jobs:
         run: npm run build
 
       - name: Deploy via scp
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          debug: true
-          host: 185.39.79.89
-          username: beka
-          key: ${{ secrets.DASHBOARD_SERVER_KEY }}
-          port: 22
-          run: |
-            echo "${{ secrets.DASHBOARD_SERVER_KEY }}" > private-key
-            chmod 600 private-key
-            scp -i private-key -P 22 -r ./build/* beka@185.39.79.89:/var/www/bonuses
+        run: |
+          echo "${{ secrets.DASHBOARD_SERVER_KEY }}" > private-key
+          chmod 600 private-key
+          scp -i private-key -P 22 -r ./build/* beka@185.39.79.89:/var/www/bonuses
 
       - name: Restart nginx
         uses: appleboy/scp-action@v0.1.7
