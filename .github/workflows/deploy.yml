@@ -25,17 +25,17 @@ jobs:
             cd /var/www/
 
             # Remove the old directory if it exists
-            rm -rf skynetEmployeeBonuses
+            sudo rm -rf skynetEmployeeBonuses
 
             # Clone the repository
-            git clone https://github.com/bekachino/skynetEmployeeBonuses.git
+            sudo git clone https://github.com/bekachino/skynetEmployeeBonuses.git
 
             # Navigate into the repo
             cd skynetEmployeeBonuses
 
             # Install dependencies and build
-            npm install
-            npm run build
+            sudo npm install
+            sudo npm run build
 
       - name: Restart nginx
         uses: appleboy/ssh-action@v0.1.7
