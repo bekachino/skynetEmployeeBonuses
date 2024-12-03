@@ -13,21 +13,36 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Update repo
-        uses: appleboy/scp-action@v0.1.7
+      - name: Update repo on server
+        uses: appleboy/ssh-action@v0.1.7
         with:
-          debug: true
           host: 185.39.79.89
           username: beka
           key: ${{ secrets.DASHBOARD_SERVER_KEY }}
           port: 22
-          script: cd /var/www/ && git clone https://github.com/bekachino/skynetEmployeeBonuses.git && cd skynetEmployeeBonuses && npm i && npm run build
+          script: |
+            # Navigate to the directory where the repo is to be cloned
+            cd /var/www/
+
+            # Remove the old directory if it exists
+            rm -rf skynetEmployeeBonuses
+
+            # Clone the repository
+            git clone https://github.com/bekachino/skynetEmployeeBonuses.git
+
+            # Navigate into the repo
+            cd skynetEmployeeBonuses
+
+            # Install dependencies and build
+            npm install
+            npm run build
 
       - name: Restart nginx
-        uses: appleboy/scp-action@v0.1.7
+        uses: appleboy/ssh-action@v0.1.7
         with:
           host: 185.39.79.89
           username: beka
           key: ${{ secrets.DASHBOARD_SERVER_KEY }}
           port: 22
-          script: sudo service nginx restart
+          script: |
+            sudo service nginx restart
