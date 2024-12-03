@@ -18,7 +18,6 @@ jobs:
         with:
           host: 185.39.79.89
           username: beka
-          password: ${{ secrets.DASHBOARD_SERVER_PASSWORD }}
           key: ${{ secrets.DASHBOARD_SERVER_KEY }}
           port: 22
           script: |
@@ -26,10 +25,10 @@ jobs:
             cd /var/www/
 
             # Remove the old directory if it exists
-            sudo rm -rf skynetEmployeeBonuses
+            rm -rf skynetEmployeeBonuses
 
             # Clone the repository
-            sudo git clone https://github.com/bekachino/skynetEmployeeBonuses.git
+            git clone https://github.com/bekachino/skynetEmployeeBonuses.git
 
             # Navigate into the repo
             cd skynetEmployeeBonuses
