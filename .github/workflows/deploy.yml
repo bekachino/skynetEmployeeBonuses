@@ -34,14 +34,15 @@ jobs:
             cd skynetEmployeeBonuses
 
             # Install dependencies and build
-            sudo npm install
-            sudo npm run build
+            npm install
+            npm run build
 
       - name: Restart nginx
         uses: appleboy/ssh-action@v0.1.7
         with:
           host: 185.39.79.89
           username: beka
+          password: ${{ secrets.DASHBOARD_SERVER_PASSWORD }}
           key: ${{ secrets.DASHBOARD_SERVER_KEY }}
           port: 22
           script: |
