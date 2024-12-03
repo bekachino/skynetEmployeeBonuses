@@ -30,7 +30,7 @@ jobs:
           debug: true
           host: 185.39.79.89
           username: beka
-          key: ${{ secrets.DASHBOARD_SERVER_KEY }}
+          key: echo "${{ secrets.DASHBOARD_SERVER_KEY }}" | base64 --decode > private-key
           port: 22
           source: ./build/*
           target: /var/www/bonuses
