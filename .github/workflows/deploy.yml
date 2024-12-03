@@ -30,7 +30,7 @@ jobs:
           host: 185.39.79.89
           username: beka
           key: ${{ secrets.DASHBOARD_SERVER_KEY }}
-          source: ./build/*
+          source: /build/*
           target: /var/www/bonuses/
 
       - name: Restart nginx
