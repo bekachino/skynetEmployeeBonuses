@@ -29,9 +29,6 @@ jobs:
         with:
           debug: true
           host: 185.39.79.89
-          username: beka
-          password: ${{ secrets.DASHBOARD_SERVER_PASSWORD }}
-          key: ${{ secrets.DASHBOARD_SERVER_KEY }}
           port: 22
           source: ./build/*
           target: /var/www/bonuses
@@ -42,7 +39,6 @@ jobs:
           debug: true
           host: 185.39.79.89
           username: beka
-          password: ${{ secrets.DASHBOARD_SERVER_PASSWORD }}
           key: ${{ secrets.DASHBOARD_SERVER_KEY }}
           port: 22
           script: sudo service nginx restart
