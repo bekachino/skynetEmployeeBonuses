@@ -18,6 +18,7 @@ jobs:
         with:
           host: 185.39.79.89
           username: beka
+          password: ${{ secrets.DASHBOARD_SERVER_PASSWORD }}
           key: ${{ secrets.DASHBOARD_SERVER_KEY }}
           port: 22
           script: |
@@ -42,7 +43,6 @@ jobs:
         with:
           host: 185.39.79.89
           username: beka
-          password: ${{ secrets.DASHBOARD_SERVER_PASSWORD }}
           key: ${{ secrets.DASHBOARD_SERVER_KEY }}
           port: 22
           script: |
