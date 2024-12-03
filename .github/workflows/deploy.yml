@@ -1,0 +1,44 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project
+        run: npm run build
+
+      - name: Deploy via scp
+        uses: appleboy/scp-action@v0.2.2
+        with:
+          host: 10.1.4.9
+          username: beka
+          password: ${{ secrets.DASHBOARD_SERVER_PASSWORD }}
+          port: 22
+          source: ./build/*
+          target: /var/www/bonuses
+
+      - name: Restart nginx
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+          host: 10.1.4.9
+          username: beka
+          password: ${{ secrets.DASHBOARD_SERVER_PASSWORD }}
+          port: 22
+          script: sudo service nginx restart
