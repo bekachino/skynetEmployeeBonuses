@@ -28,7 +28,7 @@ jobs:
             rm -rf skynetEmployeeBonuses
 
             # Clone the repository
-            git clone https://github.com/bekachino/skynetEmployeeBonuses.git
+            sudo git clone https://github.com/bekachino/skynetEmployeeBonuses.git
 
             # Navigate into the repo
             cd skynetEmployeeBonuses
