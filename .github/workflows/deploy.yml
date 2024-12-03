@@ -30,8 +30,8 @@ jobs:
           host: 185.39.79.89
           username: beka
           key: ${{ secrets.DASHBOARD_SERVER_KEY }}
-          port: 22
-          script: scp -r ./build/* beka@10.1.4.9:/var/www/bonuses
+          source: ./build/*
+          target: /var/www/bonuses/
 
       - name: Restart nginx
         uses: appleboy/scp-action@v0.1.7
