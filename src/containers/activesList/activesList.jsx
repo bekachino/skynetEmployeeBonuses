@@ -9,7 +9,7 @@ const ActivesList = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const user = useAppSelector((state) => state.userState.user);
-  const [state, setState] = useState({
+  const [state] = useState({
     district: {
       id: new URLSearchParams(location.search).get('id') || -1,
       squares: new URLSearchParams(location.search).get('district_name') || '',

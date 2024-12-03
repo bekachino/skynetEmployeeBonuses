@@ -47,6 +47,7 @@ const NonActive = () => {
       setFormLoading(true);
       const formData = new FormData();
 
+      //eslint-disable-next-line array-callback-return
       Object.keys(nonActive).map((key) => {
         if (key !== 'user_listt') {
           return formData.append(key, nonActive[key]);

@@ -293,12 +293,12 @@ const Bonuses = () => {
     } else {
       document.body.style.overflow = 'unset';
     }
-    // no state dependency needed
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, navigate, toobarOpen, user]);
 
   useEffect(() => {
     if (state.date) void onSubmit();
-    // no state dependency needed
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

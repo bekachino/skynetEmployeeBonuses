@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import mainLogo from '../../assets/skynet-logo.png';
-import './signUp.css';
 import { useNavigate } from 'react-router-dom';
-import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import { useAppSelector } from '../../app/hooks';
+import './signUp.css';
 
 const SignUp = () => {
   const [state, setState] = useState({

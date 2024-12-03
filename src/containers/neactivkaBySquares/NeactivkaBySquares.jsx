@@ -58,11 +58,12 @@ const NeactivkaBySquares = () => {
     } else {
       document.body.style.overflow = 'unset';
     }
-    // no dependencies needed
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     void fetchList();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [locations]);
 
   const formatDate = (date) => {
