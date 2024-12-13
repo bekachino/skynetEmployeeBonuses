@@ -69,7 +69,7 @@ const Bonuses = () => {
     (
       ((((data.oab || 0) / 100) * data.planActiveAbsBonusPercentage) / 100) *
       otkloneniePercentage
-    ).toFixed()
+    ).toFixed(2)
   );
   const blockOneBonus = Number(
     (otklonenieKolvo > 0
