@@ -68,7 +68,8 @@ const NonActivesList = () => {
     ) {
       navigate('/bonuses');
     }
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [navigate]);
 
   const handleChange = (e) =>
     setState((prevState) => ({
