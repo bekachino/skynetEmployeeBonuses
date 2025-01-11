@@ -95,8 +95,8 @@ const NonActivesList = () => {
       formData.append('date_filter', formatDate(new Date()));
       formData.append('squares_id', state.district.id);
 
-      const req = await axiosApi.post('noactive_squares/', formData);
-      const req2 = await axiosApi.post('filtered_squares/', formData);
+      const req = await axiosApi.post('squares-noactive/', formData);
+      const req2 = await axiosApi.post('squares-filter/', formData);
       const res = await req.data;
       const res2 = await req2.data;
       setNonActives(res.data);
