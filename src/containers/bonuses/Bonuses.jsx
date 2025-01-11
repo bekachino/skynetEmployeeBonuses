@@ -34,8 +34,7 @@ const Bonuses = () => {
   const [toobarOpen, setToolbarOpen] = useState(false);
   const [nonActivesLoading, setNonActivesLoading] = useState(false);
   const [activesLoading, setActivesLoading] = useState(false);
-  const [connectedAbonentsListLoading, setConnectedAbonentsListLoading] =
-    useState(false);
+  
   const [state, setState] = useState({
     date: new URLSearchParams(location.search).get('date') || '',
     district: {
@@ -223,29 +222,6 @@ const Bonuses = () => {
     }
   };
   
-  const fetchConnectedAbonents = async () => {
-    try {
-      setConnectedAbonentsListLoading(true);
-      const formData = new FormData();
-      
-      formData.append('date_filter', formatDate(new Date(state.date)));
-      formData.append('squares_id', state.district.id);
-      const req = await axiosApi.post('count_podkl/', formData);
-      const res = await req.data;
-      setConnectedSalesData(
-        res.data.map((tariff) => {
-          return {
-            ...tariff,
-            price: 100,
-          };
-        })
-      );
-      setConnectedAbonentsListLoading(false);
-    } catch (e) {
-      console.log(e);
-    }
-  };
-  
   const handleScroll = () => {
     const pos = kolZayContainerRef.current?.getBoundingClientRect();
     if (pos) {
@@ -390,7 +366,6 @@ const Bonuses = () => {
       
       void fetchActives();
       void fetchNonActives();
-      void fetchConnectedAbonents();
       const formData = new FormData();
       
       formData.append('date_filter', formatDate(new Date(state.date)));
@@ -942,75 +917,6 @@ const Bonuses = () => {
                     ref={kolZayContainerRef}
                   >
                     Кол-во заявок
-                    {showConnectedAbonents && !!connectedSalesData.length && (
-                      <div
-                        className='bonuses-paper non-actives-list'
-                        style={{
-                          position: 'fixed',
-                          top: '0',
-                          left: '0',
-                          display: 'grid',
-                          gridTemplateColumns:
-                            'repeat(auto-fit, minmax(120px, 1fr))',
-                          gridGap: '5px',
-                          minWidth: '310px',
-                          transform: `translate(${kolZayContainerPosition.x}px, ${kolZayContainerPosition.y}px)`,
-                          height: 'unset',
-                        }}
-                      >
-                        {connectedAbonentsListLoading ? (
-                          <span className='non-actives-list-loader'/>
-                        ) : (
-                          connectedSalesData.map((item, i) => (
-                            <div
-                              className='bonuses-paper non-actives-list-item'
-                              key={i}
-                              style={{
-                                minWidth: '120px',
-                                width: 'unset',
-                              }}
-                            >
-                              <div
-                                className='non-actives-list-item-ls-abon'
-                                style={{ width: '100%' }}
-                              >
-                                <div
-                                  style={{
-                                    display: 'flex',
-                                    gap: '5px',
-                                  }}
-                                >
-                                  <span>{item.name}:</span>
-                                  <span>{item.count}</span>
-                                </div>
-                                <div>
-                                  <input
-                                    className='editable-input'
-                                    type='text'
-                                    name='bonusPerConnectedReq'
-                                    value={item.price || 0}
-                                    onChange={(e) => {
-                                      const connectedSalesDataCopy = [
-                                        ...connectedSalesData,
-                                      ];
-                                      connectedSalesData[i].price =
-                                        e.target.value.replace(/[^0-9]/g, '');
-                                      setConnectedSalesData(
-                                        connectedSalesDataCopy
-                                      );
-                                    }}
-                                    style={{ marginLeft: '0' }}
-                                  />
-                                  <span style={{ textDecoration: 'underline' }}>
-                                    c
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                          ))
-                        )}
-                      </div>
-                    )}
                   </span>
                   <span className='table-col-value'>
                     {connectedSalesData.reduce(
