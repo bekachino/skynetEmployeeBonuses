@@ -196,7 +196,7 @@ const Bonuses = () => {
       formData.append('date_filter', formatDate(new Date(state.date)));
       formData.append('squares_id', state.district.id);
       
-      const req = await axiosApi.post('squares-noactive/', formData);
+      const req = await axiosApi.post('v2/squares-noactive/', formData);
       const res = await req.data;
       setNonActives(res.data);
       setNonActivesLoading(false);
@@ -213,7 +213,7 @@ const Bonuses = () => {
       formData.append('date_filter', formatDate(new Date(state.date)));
       formData.append('squares_id', state.district.id);
       
-      const req = await axiosApi.post('squares-active/', formData);
+      const req = await axiosApi.post('v2/squares-active/', formData);
       const res = await req.data;
       setActives(res.data);
       setActivesLoading(false);
@@ -371,7 +371,7 @@ const Bonuses = () => {
       formData.append('date_filter', formatDate(new Date(state.date)));
       formData.append('squares_id', state.district.id);
       
-      const req = await axiosApi.post('squares-filter/', formData);
+      const req = await axiosApi.post('v2/squares-filter/', formData);
       const res = await req.data;
       setData((prevState) => (
         {

@@ -24,7 +24,7 @@ const App = () => {
       document.documentElement.style.width = '1440px';
     }
   }, [location.pathname]);
-
+  
   return (
     <div className="App">
       <Routes>

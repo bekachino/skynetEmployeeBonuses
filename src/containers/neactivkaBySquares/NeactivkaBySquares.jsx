@@ -93,7 +93,7 @@ const NeactivkaBySquares = () => {
         const formData = new FormData();
         formData.append('date_filter', formatDate(new Date(state.date)));
         formData.append('squares_id', location.id);
-        const req = await axiosApi.post('squares-filter/', formData);
+        const req = await axiosApi.post('v2/squares-filter/', formData);
         const res = await req.data;
 
         listBySquares.push({

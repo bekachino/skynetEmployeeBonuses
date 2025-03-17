@@ -49,7 +49,7 @@ const ActivesList = () => {
       formData.append('date_filter', formatDate(new Date()));
       formData.append('squares_id', state.district.id);
 
-      const req = await axiosApi.post('squares-active/', formData);
+      const req = await axiosApi.post('v2/squares-active/', formData);
       const res = await req.data;
       setActives(res.data);
       setNonActivesLoading(false);

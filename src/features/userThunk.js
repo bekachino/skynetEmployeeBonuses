@@ -46,7 +46,7 @@ export const fetchLocations = createAsyncThunk(
   'user/fetchLocations',
   async (formData, { rejectWithValue }) => {
     try {
-      const response = await axiosApi('all_squares/', formData);
+      const response = await axiosApi('/all_squares/', formData);
       return response.data;
     } catch (e) {
       if (isAxiosError(e) && e.response && e.response.status === 400) {
