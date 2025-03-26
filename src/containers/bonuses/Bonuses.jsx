@@ -29,6 +29,7 @@ const Bonuses = () => {
   const [connectedSalesData, setConnectedSalesData] = useState([]);
   const [showNonActives, setShowNonActives] = useState(false);
   const [showActives, setShowActives] = useState(false);
+  const [showOab, setShowOab] = useState(false);
   const [showConnectedAbonents, setShowConnectedAbonents] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
   const [toobarOpen, setToolbarOpen] = useState(false);
@@ -58,101 +59,73 @@ const Bonuses = () => {
     user_list: [],
   });
   
-  const aabPercentage = Number(
-    (
-      (
-        (
-          data.aab || 0
-        ) / (
-          data.oab || 0
-        )
-      ) * 100
-    ).toFixed(2)
-  );
-  const otkloneniePercentage = Number(
-    (
-      aabPercentage - data.planActiveAbsBonusPercentage
-    ).toFixed(2)
-  );
-  const otklonenieKolvo = Number(
-    (
-      (
-        (
-          (
-            (
-              data.oab || 0
-            ) / 100
-          ) * data.planActiveAbsBonusPercentage
-        ) / 100
-      ) *
-      otkloneniePercentage
-    ).toFixed(2)
-  );
-  const blockOneBonus = Number(
-    (
-      otklonenieKolvo > 0
-        ? otklonenieKolvo * data.bonusPerPlanActiveAbonent
-        : 0
-    ).toFixed()
-  );
-  const blockTwoBonus = connectedSalesData.reduce(
-    (accumulator, currentValue) => {
-      return accumulator + currentValue.count * currentValue.price;
-    },
-    0
-  );
-  const blockThreeBonus = Number(
-    (
-      data.connectedAbonentsAmount * data.bonusPerConnectedAbonent
-    ).toFixed()
-  );
-  const blockFourBonus = Number(
+  const aabPercentage = Number((
     (
       (
         data.aab || 0
-      ) * data.bonusPerActiveAbonent2
-    ).toFixed()
-  );
-  const additionalBonus = Number(
+      ) / (
+        data.oab || 0
+      )
+    ) * 100
+  ).toFixed(2));
+  const otkloneniePercentage = Number((
+    aabPercentage - data.planActiveAbsBonusPercentage
+  ).toFixed(2));
+  const otklonenieKolvo = Number((
     (
       (
         (
           (
-            100 -
-            data.planActiveAbsBonusPercentage -
-            data.additionalEarningPercentage
-          ) *
-          (
             data.oab || 0
-          )
-        ) /
-        100
-      ) *
-      150
-    ).toFixed()
-  );
+          ) / 100
+        ) * data.planActiveAbsBonusPercentage
+      ) / 100
+    ) * otkloneniePercentage
+  ).toFixed(2));
+  const blockOneBonus = Number((
+    otklonenieKolvo > 0 ? otklonenieKolvo * data.bonusPerPlanActiveAbonent : 0
+  ).toFixed());
+  const blockTwoBonus = connectedSalesData.reduce((accumulator, currentValue) => {
+    return accumulator + currentValue.count * currentValue.price;
+  }, 0);
+  const blockThreeBonus = Number((
+    data.connectedAbonentsAmount * data.bonusPerConnectedAbonent
+  ).toFixed());
+  const blockFourBonus = Number((
+    (
+      data.aab || 0
+    ) * data.bonusPerActiveAbonent2
+  ).toFixed());
+  const additionalBonus = Number((
+    (
+      (
+        (
+          100 - data.planActiveAbsBonusPercentage - data.additionalEarningPercentage
+        ) * (
+          data.oab || 0
+        )
+      ) / 100
+    ) * 150
+  ).toFixed());
   
   const changeHandler = (e) => {
     const {
       name,
       value
     } = e.target;
-    if (
-      [
-        'bonusPerPlanActiveAbonent',
-        'planActiveAbsBonusPercentage',
-        'additionalEarningPercentage',
-        'bonusPerConnectedReq',
-        'bonusPerConnectedAbonent',
-        'bonusPerActiveAbonent2',
-        'bonusPerReturnedAbonent2',
-      ].includes(name)
-    ) {
+    if ([
+      'bonusPerPlanActiveAbonent',
+      'planActiveAbsBonusPercentage',
+      'additionalEarningPercentage',
+      'bonusPerConnectedReq',
+      'bonusPerConnectedAbonent',
+      'bonusPerActiveAbonent2',
+      'bonusPerReturnedAbonent2',
+    ].includes(name)) {
       setData((prevState) => (
         {
           ...prevState,
-          [name]:
-            typeof value === 'number' ? value : value.replace(/[^0-9]/g, ''),
+          [name]: typeof value === 'number' ? value : value.replace(/[^0-9]/g, ''),
         }
       ));
     } else {
@@ -233,16 +206,9 @@ const Bonuses = () => {
   };
   
   useEffect(() => {
-    if (
-      !user &&
-      (
-        !/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-          navigator.userAgent
-        ) ||
-        !/iPad|Android|tablet|touch/i.test(navigator.userAgent)
-      )
-    )
-      navigate('/sign-in');
+    if (!user && (
+      !/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || !/iPad|Android|tablet|touch/i.test(navigator.userAgent)
+    )) navigate('/sign-in');
     dispatch(fetchLocations())
     .then((res) => {
       if (state.district.id > 0 && !state.district.squares) {
@@ -251,74 +217,42 @@ const Bonuses = () => {
             ...prevState,
             district: {
               id: state.district.id,
-              squares: res.payload?.data.filter(
-                (location) => location.id === Number(state.district.id)
-              )[0]?.squares,
+              squares: res.payload?.data.filter((location) => location.id === Number(state.district.id))[0]?.squares,
             },
           }
         ));
       }
       if (user === 'naryn') {
-        dispatch(
-          setLocations(
-            res.payload.data.filter((location) =>
-              [
-                'Ат-Башы',
-                'Кочкор',
-                'Нарын'
-              ].includes(location.squares)
-            )
-          )
-        );
+        dispatch(setLocations(res.payload.data.filter((location) => [
+          'Ат-Башы',
+          'Кочкор',
+          'Нарын'
+        ].includes(location.squares))));
       } else if (user === 'ik') {
-        dispatch(
-          setLocations(
-            res.payload.data.filter((location) =>
-              [
-                'Кызыл-Суу',
-                'Ананьева',
-                'Чолпон-Ата',
-                'Балыкчы',
-                'Боконбаево',
-                'Барскоон',
-              ].includes(location.squares)
-            )
-          )
-        );
+        dispatch(setLocations(res.payload.data.filter((location) => [
+          'Кызыл-Суу',
+          'Ананьева',
+          'Чолпон-Ата',
+          'Балыкчы',
+          'Боконбаево',
+          'Барскоон',
+        ].includes(location.squares))));
       } else if (user === 'talas') {
-        dispatch(
-          setLocations(
-            res.payload.data.filter((location) =>
-              [
-                'Талас',
-                'Талас1'
-              ].includes(location.squares)
-            )
-          )
-        );
+        dispatch(setLocations(res.payload.data.filter((location) => [
+          'Талас',
+          'Талас1'
+        ].includes(location.squares))));
       } else if (user === 'djalalabad') {
-        dispatch(
-          setLocations(
-            res.payload.data.filter((location) =>
-              [
-                'Базар-Коргон',
-                'Джалал-Абад'
-              ].includes(location.squares)
-            )
-          )
-        );
+        dispatch(setLocations(res.payload.data.filter((location) => [
+          'Базар-Коргон',
+          'Джалал-Абад'
+        ].includes(location.squares))));
       } else if (user === 'osh') {
-        dispatch(
-          setLocations(
-            res.payload.data.filter((location) =>
-              [
-                'Ош',
-                'Араван',
-                'Кара-Суу'
-              ].includes(location.squares)
-            )
-          )
-        );
+        dispatch(setLocations(res.payload.data.filter((location) => [
+          'Ош',
+          'Араван',
+          'Кара-Суу'
+        ].includes(location.squares))));
       }
     })
     .catch((e) => console.log(e));
@@ -344,6 +278,7 @@ const Bonuses = () => {
     window.addEventListener('click', () => {
       setShowNonActives(false);
       setShowActives(false);
+      setShowOab(false);
     });
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
@@ -352,10 +287,7 @@ const Bonuses = () => {
   const onSubmit = async (e) => {
     if (e) {
       e.preventDefault();
-      navigate(
-        `?date=${formatDate(new Date(state.date))}&id=${state.district.id}`,
-        { replace: true }
-      );
+      navigate(`?date=${formatDate(new Date(state.date))}&id=${state.district.id}`, { replace: true });
     }
     try {
       if (!state.date || state.district.id < 0) {
@@ -396,37 +328,35 @@ const Bonuses = () => {
   
   const handleExcelFileExport = (tab) => {
     const workbook = XLSX.utils.book_new();
-    const worksheet = XLSX.utils.json_to_sheet(
-      (
-        tab === 'aab' ? actives || [] : nonActives || []
-      ).map((nonActive) => {
-        if (tab === 'aab') {
-          return {
-            ls_abon: nonActive.ls_abon,
-            address: nonActive.address,
-            balance: nonActive.balance,
-            ip_address: nonActive.ip_address,
-          };
-        } else {
-          return {
-            ls_abon: nonActive.ls_abon,
-            address: nonActive.address,
-            balance: nonActive.balance,
-            ip_address: nonActive.ip_address,
-            name_abon: nonActive.name_abon,
-            type_abon: nonActive.type_abon,
-            phone_abon: nonActive.phone_abon,
-            last_pay: nonActive.last_pay,
-          };
-        }
-      })
-    );
+    const worksheet = XLSX.utils.json_to_sheet((
+      tab === 'aab' ? actives || [] : tab === 'nab' ? nonActives || [] : [
+        ...actives,
+        ...nonActives
+      ] || []
+    ).map((nonActive) => {
+      if (tab === 'aab') {
+        return {
+          ls_abon: nonActive.ls_abon,
+          address: nonActive.address,
+          balance: nonActive.balance,
+          ip_address: nonActive.ip_address,
+        };
+      } else {
+        return {
+          ls_abon: nonActive.ls_abon,
+          address: nonActive.address,
+          balance: nonActive.balance,
+          ip_address: nonActive.ip_address,
+          name_abon: nonActive?.name_abon,
+          type_abon: nonActive?.type_abon,
+          phone_abon: nonActive?.phone_abon,
+          last_pay: nonActive?.last_pay,
+        };
+      }
+    }));
     XLSX.utils.book_append_sheet(workbook, worksheet, state.district.squares);
     
-    XLSX.writeFile(
-      workbook,
-      `${state.district.squares} - ${formatDate(new Date(state.date))}.xlsx`
-    );
+    XLSX.writeFile(workbook, `${state.district.squares} - ${formatDate(new Date(state.date))}.xlsx`);
   };
   
   return (
@@ -435,10 +365,8 @@ const Bonuses = () => {
         open={toobarOpen}
         onClick={() => setToolbarOpen(!toobarOpen)}
       >
-        {!/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-            navigator.userAgent
-          ) &&
-          !/iPad|Android|tablet|touch/i.test(navigator.userAgent) && <Logout/>}
+        {!/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) && !/iPad|Android|tablet|touch/i.test(navigator.userAgent) &&
+          <Logout/>}
         <form
           className='toolbar-form'
           onSubmit={onSubmit}
@@ -448,46 +376,34 @@ const Bonuses = () => {
             changeHandler={changeHandler}
             i={''}
           />
-          {!/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-              navigator.userAgent
-            ) &&
-            !/iPad|Android|tablet|touch/i.test(navigator.userAgent) && (
-              <Autocomplete
-                name='district'
-                value={state.district.squares}
-                changeHandler={changeHandler}
-                options={[
-                  ...(
-                    locations?.map((district) => district.squares) || []
-                  ),
-                ]}
-                i={''}
-                onClick={() =>
-                  setState((prevState) => (
-                    {
-                      ...prevState,
-                      district: {
-                        id: -1,
-                        squares: '',
-                      },
-                    }
-                  ))
+          {!/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) && !/iPad|Android|tablet|touch/i.test(navigator.userAgent) && (
+            <Autocomplete
+              name='district'
+              value={state.district.squares}
+              changeHandler={changeHandler}
+              options={[
+                ...(
+                  locations?.map((district) => district.squares) || []
+                ),
+              ]}
+              i={''}
+              onClick={() => setState((prevState) => (
+                {
+                  ...prevState,
+                  district: {
+                    id: -1,
+                    squares: '',
+                  },
                 }
-                label='Выберите квадрат'
-              />
-            )}
+              ))}
+              label='Выберите квадрат'
+            />
+          )}
           <Button
             type='submit'
-            disabled={
-              !state.date ||
-              (
-                !/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-                  navigator.userAgent
-                ) &&
-                !/iPad|Android|tablet|touch/i.test(navigator.userAgent) &&
-                !state.district.squares
-              )
-            }
+            disabled={!state.date || (
+              !/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) && !/iPad|Android|tablet|touch/i.test(navigator.userAgent) && !state.district.squares
+            )}
             loading={formLoading}
             label='Поиск'
           />
@@ -586,29 +502,23 @@ const Bonuses = () => {
                 >
                   <span
                     className='currentPercentage-increase'
-                    onClick={() =>
-                      data.planActiveAbsBonusPercentage < 100 &&
-                      changeHandler({
-                        target: {
-                          name: 'planActiveAbsBonusPercentage',
-                          value: data.planActiveAbsBonusPercentage + 1,
-                        },
-                      })
-                    }
+                    onClick={() => data.planActiveAbsBonusPercentage < 100 && changeHandler({
+                      target: {
+                        name: 'planActiveAbsBonusPercentage',
+                        value: data.planActiveAbsBonusPercentage + 1,
+                      },
+                    })}
                   >
                     &#x25B2;
                   </span>
                   <span
                     className='currentPercentage-decrease'
-                    onClick={() =>
-                      data.planActiveAbsBonusPercentage > 0 &&
-                      changeHandler({
-                        target: {
-                          name: 'planActiveAbsBonusPercentage',
-                          value: data.planActiveAbsBonusPercentage - 1,
-                        },
-                      })
-                    }
+                    onClick={() => data.planActiveAbsBonusPercentage > 0 && changeHandler({
+                      target: {
+                        name: 'planActiveAbsBonusPercentage',
+                        value: data.planActiveAbsBonusPercentage - 1,
+                      },
+                    })}
                   >
                     &#x25BC;
                   </span>
@@ -625,19 +535,13 @@ const Bonuses = () => {
                     }}
                     onClick={(e) => {
                       if (data.nab < 0) return;
-                      if (
-                        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-                          navigator.userAgent
-                        ) &&
-                        /iPad|Android|tablet|touch/i.test(navigator.userAgent)
-                      ) {
-                        navigate(
-                          `/bonuses/actives-list?id=${state.district.id}&district_name=${state.district.squares}`
-                        );
+                      if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) && /iPad|Android|tablet|touch/i.test(navigator.userAgent)) {
+                        navigate(`/bonuses/actives-list?id=${state.district.id}&district_name=${state.district.squares}`);
                       } else {
                         e.stopPropagation();
                         setShowActives(true);
                         setShowNonActives(false);
+                        setShowOab(false);
                       }
                     }}
                   >
@@ -727,19 +631,13 @@ const Bonuses = () => {
                     }}
                     onClick={(e) => {
                       if (data.nab < 0) return;
-                      if (
-                        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-                          navigator.userAgent
-                        ) &&
-                        /iPad|Android|tablet|touch/i.test(navigator.userAgent)
-                      ) {
-                        navigate(
-                          `/bonuses/non-actives-list?id=${state.district.id}&district_name=${state.district.squares}`
-                        );
+                      if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) && /iPad|Android|tablet|touch/i.test(navigator.userAgent)) {
+                        navigate(`/bonuses/non-actives-list?id=${state.district.id}&district_name=${state.district.squares}`);
                       } else {
                         e.stopPropagation();
                         setShowNonActives(true);
                         setShowActives(false);
+                        setShowOab(false);
                       }
                     }}
                   >
@@ -782,31 +680,15 @@ const Bonuses = () => {
                           ) : nonActives.length ? (
                             nonActives.map((nonActive, i) => (
                               <div
-                                className={
-                                  'bonuses-paper non-actives-list-item ' +
-                                  `${nonActive?.status && nonActive.status === 'Оплатил' ? 'non-actives-list-item-paid' : nonActive?.status && nonActive.status !== 'Оплатил' ? 'non-actives-list-item-has-status' : ''}`
-                                }
+                                className={'bonuses-paper non-actives-list-item ' + `${nonActive?.status && nonActive.status === 'Оплатил' ? 'non-actives-list-item-paid' : nonActive?.status && nonActive.status !== 'Оплатил' ? 'non-actives-list-item-has-status' : ''}`}
                                 key={i}
                                 onClick={() => {
-                                  if (
-                                    !/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-                                      navigator.userAgent
-                                    ) &&
-                                    !/iPad|Android|tablet|touch/i.test(
-                                      navigator.userAgent
-                                    )
-                                  ) {
-                                    dispatch(
-                                      setNonActive({
-                                        ...nonActive,
-                                        squares_id: locations.filter(
-                                          (location) =>
-                                            `${location.id}` ===
-                                            state.district.id
-                                        )[0]?.squares,
-                                        user_listt: data.user_list,
-                                      })
-                                    );
+                                  if (!/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) && !/iPad|Android|tablet|touch/i.test(navigator.userAgent)) {
+                                    dispatch(setNonActive({
+                                      ...nonActive,
+                                      squares_id: locations.filter((location) => `${location.id}` === state.district.id)[0]?.squares,
+                                      user_listt: data.user_list,
+                                    }));
                                     navigate(`/bonuses/non-active`);
                                   }
                                 }}
@@ -847,7 +729,99 @@ const Bonuses = () => {
                   </span>
                 </div>
                 <div className='table-col'>
-                  <span className='table-col-title'>ОАБ</span>
+                  <span
+                    className='table-col-title'
+                    style={{
+                      cursor: 'pointer',
+                      position: 'relative',
+                    }}
+                    onClick={(e) => {
+                      if (data.oab < 0) return;
+                      e.stopPropagation();
+                      setShowOab(true);
+                      setShowActives(false);
+                      setShowNonActives(false);
+                    }}
+                  >
+                    ОАБ
+                    {showOab && (
+                      <div
+                        className='bonuses-paper non-actives-list'
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <div
+                          style={{
+                            padding: '5px',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            marginBottom: '5px',
+                          }}
+                        >
+                          {user === 'meerim' && (
+                            <div
+                              className='export-to-excel'
+                              onClick={() => handleExcelFileExport('oab')}
+                            >
+                              <img
+                                src={excelLogo}
+                                alt='excel logo'
+                                width='30px'
+                                height='30px'
+                              />
+                              <span style={{ color: 'black' }}>экспорт</span>
+                            </div>
+                          )}
+                        </div>
+                        <div className='non-actives-list-inner'>
+                          {nonActivesLoading ? (
+                            <span className='non-actives-list-loader'/>
+                          ) : [
+                            ...actives,
+                            ...nonActives
+                          ].length ? (
+                            [
+                              ...actives,
+                              ...nonActives
+                            ].map((oabAbon, i) => (
+                              <div
+                                className={'bonuses-paper non-actives-list-item ' + `${oabAbon?.status && oabAbon.status === 'Оплатил' ? 'non-actives-list-item-paid' : oabAbon?.status && oabAbon.status !== 'Оплатил' ? 'non-actives-list-item-has-status' : ''}`}
+                                key={i}
+                              >
+                                <div
+                                  className='non-actives-list-item-ls-abon'
+                                  style={{
+                                    minWidth: '120px',
+                                    maxWidth: '120px',
+                                  }}
+                                >
+                                  <span>Лицевой счёт:</span>
+                                  <span>{oabAbon.ls_abon}</span>
+                                </div>
+                                <div
+                                  className='non-actives-list-item-address'
+                                  style={{ flexGrow: 1 }}
+                                >
+                                  <span>Адрес:</span>
+                                  <span>{oabAbon.address}</span>
+                                </div>
+                              </div>
+                            ))
+                          ) : (
+                            <h3
+                              className='bonuses-paper'
+                              style={{ color: 'black' }}
+                            >
+                              Нет данных
+                            </h3>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </span>
                   <span className='table-col-value'>
                     {data.oab > 0 ? data.oab : '-'}
                   </span>
@@ -919,10 +893,7 @@ const Bonuses = () => {
                     Кол-во заявок
                   </span>
                   <span className='table-col-value'>
-                    {connectedSalesData.reduce(
-                      (acc, currentValue) => acc + currentValue.count,
-                      0
-                    )}
+                    {connectedSalesData.reduce((acc, currentValue) => acc + currentValue.count, 0)}
                   </span>
                 </div>
                 <div
@@ -1034,10 +1005,7 @@ const Bonuses = () => {
                     fontWeight: 800,
                   }}
                 >
-                  {blockOneBonus +
-                    blockTwoBonus +
-                    blockThreeBonus +
-                    blockFourBonus}{' '}
+                  {blockOneBonus + blockTwoBonus + blockThreeBonus + blockFourBonus}{' '}
                   сом
                 </h1>
               </div>
@@ -1078,14 +1046,11 @@ const Bonuses = () => {
                     {(
                       (
                         (
-                          Math.abs(otkloneniePercentage) +
-                          (
+                          Math.abs(otkloneniePercentage) + (
                             10 - data.additionalEarningPercentage
                           )
-                        ) *
-                        data.oab
-                      ) /
-                      100
+                        ) * data.oab
+                      ) / 100
                     ).toFixed()}
                   </h2>
                 </div>
@@ -1110,29 +1075,23 @@ const Bonuses = () => {
                     >
                       <span
                         className='additionalEarningPercentage-increase'
-                        onClick={() =>
-                          data.additionalEarningPercentage < 100 &&
-                          changeHandler({
-                            target: {
-                              name: 'additionalEarningPercentage',
-                              value: data.additionalEarningPercentage + 1,
-                            },
-                          })
-                        }
+                        onClick={() => data.additionalEarningPercentage < 100 && changeHandler({
+                          target: {
+                            name: 'additionalEarningPercentage',
+                            value: data.additionalEarningPercentage + 1,
+                          },
+                        })}
                       >
                         &#x25B2;
                       </span>
                       <span
                         className='additionalEarningPercentage-decrease'
-                        onClick={() =>
-                          data.additionalEarningPercentage > 0 &&
-                          changeHandler({
-                            target: {
-                              name: 'additionalEarningPercentage',
-                              value: data.additionalEarningPercentage - 1,
-                            },
-                          })
-                        }
+                        onClick={() => data.additionalEarningPercentage > 0 && changeHandler({
+                          target: {
+                            name: 'additionalEarningPercentage',
+                            value: data.additionalEarningPercentage - 1,
+                          },
+                        })}
                       >
                         &#x25BC;
                       </span>
