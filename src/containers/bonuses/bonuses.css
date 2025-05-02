@@ -381,6 +381,41 @@ h2 {
   border-bottom-left-radius: 0;
 }
 
+.new-bonuses-table-wrapper {
+  max-height: 400px;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.new-bonuses-table {
+  width: 100%;
+  border-spacing: 7px;
+}
+
+.new-bonuses-table thead {
+  position: sticky;
+  top: 0;
+  background-color: #FFFFFF;
+}
+
+.new-bonuses-table tr th,
+.new-bonuses-table tr td {
+  text-align: left;
+  border-radius: 10px;
+  padding: 7px 15px;
+}
+
+.new-bonuses-table tr th {
+  color: #FFFFFF;
+  background-color: #29384a;
+  font-size: 20px;
+  text-wrap: nowrap;
+}
+
+.new-bonuses-table tr td {
+  background-color: #e7f0fa;
+}
+
 @media (max-width: 910px) {
   .toolbar-form {
     gap: 78px;
@@ -404,11 +439,11 @@ h2 {
     overflow: hidden;
     transition: 0.2s;
   }
-
+  
   .toolbar-inner-open {
     width: 100%;
   }
-
+  
   .toolbar-form {
     flex-direction: column;
     align-items: center;
@@ -416,65 +451,65 @@ h2 {
     width: 100%;
     gap: 30px;
   }
-
+  
   .autocomplete,
   .date-picker {
     width: 50%;
   }
-
+  
   .toolbar-form #button {
     width: 50% !important;
     max-width: unset;
   }
-
+  
   .logout-btn {
     margin: auto 0 50px;
   }
-
+  
   .bonuses-paper {
     padding: 8px 10px 12px;
   }
-
+  
   .non-actives-list-item {
     font-size: 12px;
     gap: 8px;
     padding: 5px;
   }
-
+  
   .non-actives-list-item-ip-address {
     min-width: unset;
   }
-
+  
   .non-actives-list-item-balance {
     min-width: 70px;
   }
-
+  
   .bonuses-table-title-row span,
   .bonuses-table-value-row span,
   .table-col-title,
   .table-col-value {
     font-size: 14px;
   }
-
+  
   .table-col-title,
   .table-col-value {
     display: flex;
     align-items: center;
   }
-
+  
   .location-block,
   .service-group-block {
     width: 100%;
   }
-
+  
   .location-block span {
     font-size: 14px !important;
   }
-
+  
   .bonuses-paper-title {
     font-size: 20px;
   }
-
+  
   .bonuses-table-1,
   .bonuses-table-2,
   .bonuses-table-3,
@@ -482,45 +517,53 @@ h2 {
     flex-direction: column;
     gap: 4px;
   }
-
+  
   .table-col {
     flex-direction: row;
     width: 100% !important;
     gap: 4px;
   }
-
+  
   .table-col-title {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
   }
-
+  
   .table-col-value {
     width: 30%;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
   }
-
+  
   .can-earn-more-block {
     flex-direction: column-reverse;
     width: unset;
   }
-
+  
   .total-bonuses {
     width: 100% !important;
   }
-
+  
   .can-earn-more-block h2 {
     font-size: 16px !important;
   }
-
+  
   .can-earn-more-block h1,
   .total-bonuses h1,
   .total-bonuses h2 {
     font-size: 18px;
   }
-
+  
   .editable-input {
     font-size: 14px;
+  }
+  
+  .new-bonuses-table tr th {
+    font-size: 16px;
+  }
+  
+  .new-bonuses-table tr td {
+    font-size: 12px;
   }
 }
 
@@ -529,7 +572,7 @@ h2 {
   .date-picker {
     width: 95%;
   }
-
+  
   .date-picker-panel,
   .date-picker-panel-open {
     left: 50%;

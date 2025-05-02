@@ -12,6 +12,7 @@ import { setLocations, setNonActive } from '../../features/usersSlice';
 import * as XLSX from 'xlsx';
 import excelLogo from '../../assets/excel.png';
 import './bonuses.css';
+import { useFetchLastPays } from "./hooks";
 
 const Bonuses = () => {
   const location = useLocation();
@@ -35,6 +36,11 @@ const Bonuses = () => {
   const [toobarOpen, setToolbarOpen] = useState(false);
   const [nonActivesLoading, setNonActivesLoading] = useState(false);
   const [activesLoading, setActivesLoading] = useState(false);
+  const {
+    lastPays,
+    lastPaysLoading,
+    fetchLastPays
+  } = useFetchLastPays();
   
   const [state, setState] = useState({
     date: new URLSearchParams(location.search).get('date') || '',
@@ -298,6 +304,7 @@ const Bonuses = () => {
       
       void fetchActives();
       void fetchNonActives();
+      void fetchLastPays(state.district.id);
       const formData = new FormData();
       
       formData.append('date_filter', formatDate(new Date(state.date)));
@@ -867,7 +874,42 @@ const Bonuses = () => {
               style={{ width: '100%' }}
             >
               <h1 className='bonuses-paper-title'>
-                2. Премия за подключенные заявки (продажи)
+                2. Последние платежи
+              </h1>
+              <div className='new-bonuses-table-wrapper'>
+                {
+                  !lastPaysLoading ?
+                    <table
+                      className='new-bonuses-table'
+                    >
+                      <thead>
+                      <tr>
+                        <th>Лицевой счёт</th>
+                        <th style={{ minWidth: '240px' }}>Номер телефона</th>
+                        <th style={{ minWidth: '300px' }}>Адрес</th>
+                        <th style={{ fontWeight: '700' }}>Баланс</th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                      {lastPays.map(lastPay => (
+                        <tr>
+                          <td>{lastPay.ls_abon}</td>
+                          <td>{lastPay.phone_abon}</td>
+                          <td>{lastPay.address}</td>
+                          <td style={{ fontWeight: '700' }}>{lastPay.balance}</td>
+                        </tr>
+                      ))}
+                      </tbody>
+                    </table> : <h3 style={{margin: 0}}>Загрузка...</h3>
+                }
+              </div>
+            </div>
+            <div
+              className='bonuses-paper'
+              style={{ width: '100%' }}
+            >
+              <h1 className='bonuses-paper-title'>
+                3. Премия за подключенные заявки (продажи)
               </h1>
               <div
                 className='bonuses-table bonuses-table-2'
@@ -914,7 +956,7 @@ const Bonuses = () => {
               style={{ width: '100%' }}
             >
               <h1 className='bonuses-paper-title'>
-                3. Премия за подключение абонента
+                4. Премия за подключение абонента
               </h1>
               <div className='bonuses-table bonuses-table-3'>
                 <div
@@ -951,7 +993,7 @@ const Bonuses = () => {
               style={{ width: '100%' }}
             >
               <h1 className='bonuses-paper-title'>
-                4. Премия за Активных абонентов
+                5. Премия за Активных абонентов
               </h1>
               <div className='bonuses-table bonuses-table-4'>
                 <div
