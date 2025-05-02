@@ -887,6 +887,7 @@ const Bonuses = () => {
                         <th>Лицевой счёт</th>
                         <th style={{ minWidth: '240px' }}>Номер телефона</th>
                         <th style={{ minWidth: '300px' }}>Адрес</th>
+                        <th>Дата</th>
                         <th style={{ fontWeight: '700' }}>Баланс</th>
                       </tr>
                       </thead>
@@ -896,6 +897,7 @@ const Bonuses = () => {
                           <td>{lastPay.ls_abon}</td>
                           <td>{lastPay.phone_abon}</td>
                           <td>{lastPay.address}</td>
+                          <td>{lastPay.last_pay}</td>
                           <td style={{ fontWeight: '700' }}>{lastPay.balance}</td>
                         </tr>
                       ))}
