@@ -834,7 +834,7 @@ const Bonuses = () => {
                   </span>
                 </div>
                 <div className='table-col'>
-                  <span className='table-col-title'>6 и более %</span>
+                  <span className='table-col-title'>6 и более</span>
                   <span className='table-col-value'>{(
                     lastPays || []
                   ).length}</span>
