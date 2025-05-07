@@ -84,12 +84,18 @@
 }
 
 .neactivka-all-main-item:nth-child(4)::before {
+  background-image: url('../../assets/last-pays-icon.svg');
+  background-color: #f6edde;
+  background-position: 11px center;
+}
+
+.neactivka-all-main-item:nth-child(5)::before {
   background-image: url('../../assets/otkl-icon.svg');
   background-color: #d9d1ff;
   background-position: center 19px;
 }
 
-.neactivka-all-main-item:nth-child(5)::before {
+.neactivka-all-main-item:nth-child(6)::before {
   background-image: url('../../assets/otkl-icon.svg');
   background-color: #d9d1ff;
   background-position: center 19px;

@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import './neactivkaBySquares.css';
-import axiosApi from '../../axiosApi';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import Logout from '../../components/logout/Logout';
@@ -9,6 +7,8 @@ import Button from '../../components/button/Button';
 import Toolbar from '../../components/toolbar/Toolbar';
 import { fetchLocations } from '../../features/userThunk';
 import { setLocations } from '../../features/usersSlice';
+import { useFetchDataByAllSquares } from "../bonuses/hooks";
+import './neactivkaBySquares.css';
 
 const NeactivkaBySquares = () => {
   const navigate = useNavigate();
@@ -19,40 +19,68 @@ const NeactivkaBySquares = () => {
   const [state, setState] = useState({
     date: '',
   });
-  const [list, setList] = useState([]);
-  const [listLoading, setListLoading] = useState(false);
   const [oab, setOab] = useState(0);
   const [aab, setAab] = useState(0);
   const [nab, setNab] = useState(0);
-  const otkloneniePercentage = Number(
-    (Number((((aab || 0) / (oab || 0)) * 100).toFixed(2)) - 90).toFixed(2)
-  );
-  const otklonenieKolvo = Number(
-    (((((oab || 0) / 100) * 90) / 100) * otkloneniePercentage).toFixed()
-  );
-
+  const [lastPaysCount, setLastPaysCount] = useState(0);
+  const {
+    dataBySquares,
+    dataBySquaresLoading,
+    fetchDataBySquares,
+    percentageChange
+  } = useFetchDataByAllSquares();
+  const otkloneniePercentage = Number((
+    Number((
+      (
+        (
+          aab || 0
+        ) / (
+          oab || 0
+        )
+      ) * 100
+    ).toFixed(2)) - 90
+  ).toFixed(2));
+  const otklonenieKolvo = Number((
+    (
+      (
+        (
+          (
+            oab || 0
+          ) / 100
+        ) * 90
+      ) / 100
+    ) * otkloneniePercentage
+  ).toFixed());
+  
   const changeHandler = (e) => {
-    const { name, value } = e.target;
-    setState((prevState) => ({
-      ...prevState,
-      [name]: value || '',
-    }));
+    const {
+      name,
+      value
+    } = e.target;
+    setState((prevState) => (
+      {
+        ...prevState,
+        [name]: value || '',
+      }
+    ));
   };
-
+  
   useEffect(() => {
-    if (!user || !['ruslan', 'meerim'].includes(user)) navigate('/sign-in');
-  }, [navigate, user]);
-
+    if (!user || ![
+      'ruslan',
+      'meerim'
+    ].includes(user)) navigate('/sign-in');
+  }, [
+    navigate,
+    user
+  ]);
+  
   useEffect(() => {
     dispatch(fetchLocations())
-      .then((res) => {
-        dispatch(
-          setLocations(
-            res.payload.data.filter((location) => ![36].includes(location.id))
-          )
-        );
-      })
-      .catch((e) => console.log(e));
+    .then((res) => {
+      dispatch(setLocations(res.payload.data.filter((location) => ![36].includes(location.id))));
+    })
+    .catch((e) => console.log(e));
     if (toobarOpen) {
       document.body.style.overflow = 'hidden';
     } else {
@@ -60,126 +88,59 @@ const NeactivkaBySquares = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
+  
   useEffect(() => {
     void fetchList();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [locations]);
-
-  const formatDate = (date) => {
-    const pad = (num, size) => num.toString().padStart(size, '0');
-
-    const year = date.getFullYear();
-    const month = pad(date.getMonth() + 1, 2);
-    const day = pad(date.getDate(), 2);
-
-    return `${year}-${month}-${day}`;
-  };
-
-  const percentageChange = (i, value) => {
-    const listCopy = [...list];
-    list[i].percentage = value || 90;
-    setList(listCopy);
-  };
-
+  
+  useEffect(() => {
+    setOab(dataBySquares.reduce((accumulator, currentValue) => {
+      accumulator += currentValue?.oab;
+      return accumulator;
+    }, 0));
+    setAab(dataBySquares.reduce((accumulator, currentValue) => {
+      accumulator += currentValue?.aab;
+      return accumulator;
+    }, 0));
+    setNab(dataBySquares.reduce((accumulator, currentValue) => {
+      accumulator += currentValue?.nab;
+      return accumulator;
+    }, 0));
+    setLastPaysCount(dataBySquares.reduce((accumulator, currentValue) => {
+      accumulator += currentValue?.lastPaysCount;
+      return accumulator;
+    }, 0));
+  }, [dataBySquares]);
+  
   const fetchList = async (e) => {
     e?.preventDefault();
-    try {
-      if (!state.date) return;
-      const listBySquares = [];
-      setListLoading(true);
-
-      for (const location of locations) {
-        const formData = new FormData();
-        formData.append('date_filter', formatDate(new Date(state.date)));
-        formData.append('squares_id', location.id);
-        const req = await axiosApi.post('v2/squares-filter/', formData);
-        const res = await req.data;
-
-        listBySquares.push({
-          squares: locations.filter((loc) => loc.id === location.id)[0],
-          aab: res.count['Актив'] || 0,
-          nab: res.count['Неактив'] || 0,
-          oab: (res.count['Неактив'] || 0) + (res.count['Актив'] || 0),
-          aabPercentage:
-            (
-              ((res.count['Актив'] || 0) /
-                (res.count['Актив'] + res.count['Неактив'] || 0)) *
-              100
-            ).toFixed(2) || 0,
-          otkl_percentage:
-            Number(
-              ((res.count['Актив'] || 0) /
-                (res.count['Актив'] + res.count['Неактив'] || 0)) *
-                100 -
-                90
-            ).toFixed(2) || 0,
-          otkl_kolvo:
-            Number(
-              (
-                ((((res.count['Актив'] + res.count['Неактив'] || 0) / 100) *
-                  90) /
-                  100) *
-                Number(
-                  ((res.count['Актив'] || 0) /
-                    (res.count['Актив'] + res.count['Неактив'] || 0)) *
-                    100 -
-                    90
-                )
-              ).toFixed()
-            ) || 0,
-          locations: res.locations.join(', '),
-          percentage: 90,
-        });
-      }
-
-      setList(listBySquares);
-      setOab(
-        listBySquares.reduce((accumulator, currentValue) => {
-          if (!['Партнерка'].includes(currentValue?.squares.squares)) {
-            accumulator += currentValue?.oab;
-          }
-          return accumulator;
-        }, 0)
-      );
-      setAab(
-        listBySquares.reduce((accumulator, currentValue) => {
-          if (!['Партнерка'].includes(currentValue?.squares.squares)) {
-            accumulator += currentValue?.aab;
-          }
-          return accumulator;
-        }, 0)
-      );
-      setNab(
-        listBySquares.reduce((accumulator, currentValue) => {
-          if (!['Партнерка'].includes(currentValue?.squares.squares)) {
-            accumulator += currentValue?.nab;
-          }
-          return accumulator;
-        }, 0)
-      );
-
-      setListLoading(false);
-    } catch (e) {
-      setListLoading(false);
-      console.log(e);
-    }
+    if (!state.date) return;
+    void fetchDataBySquares(locations.filter(square => !square.squares.includes('партнерка')), state.date);
   };
-
+  
   return (
     <>
-      <Toolbar open={toobarOpen} onClick={() => setToolbarOpen(!toobarOpen)}>
-        {!/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-          navigator.userAgent
-        ) &&
-          !/iPad|Android|tablet|touch/i.test(navigator.userAgent) && <Logout />}
-        <form className="toolbar-form" onSubmit={fetchList}>
-          <DatePicker value={state.date} changeHandler={changeHandler} i={''} />
+      <Toolbar
+        open={toobarOpen}
+        onClick={() => setToolbarOpen(!toobarOpen)}
+      >
+        {!/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) && !/iPad|Android|tablet|touch/i.test(navigator.userAgent) &&
+          <Logout/>}
+        <form
+          className='toolbar-form'
+          onSubmit={fetchList}
+        >
+          <DatePicker
+            value={state.date}
+            changeHandler={changeHandler}
+            i={''}
+          />
           <Button
-            type="submit"
+            type='submit'
             disabled={!state.date}
-            loading={listLoading}
-            label="Поиск"
+            loading={dataBySquaresLoading}
+            label='Поиск'
           />
         </form>
       </Toolbar>
@@ -191,15 +152,15 @@ const NeactivkaBySquares = () => {
         }}
       >
         <Button
-          type="button"
+          type='button'
           onClick={() => navigate('/bonuses')}
-          label="Одиночный просмотр"
+          label='Одиночный просмотр'
           style={{ margin: '0 5px 0 auto' }}
         />
       </div>
-      {!list.length && (
+      {!dataBySquares.length && (
         <div
-          className="bonuses-paper"
+          className='bonuses-paper'
           style={{
             marginTop: '20px',
             color: '#29384A',
@@ -208,31 +169,35 @@ const NeactivkaBySquares = () => {
           <h2>Выберите дату</h2>
         </div>
       )}
-      {!!list.length && (
-        <div className="neactivka-all">
-          <div className="neactivka-all-main br-10">
-            <span className="neactivka-all-main-title">Все квадраты</span>
-            <span className="neactivka-all-main-desc">Общая статистика</span>
-            <div className="neactivka-all-main-items">
-              <div className="neactivka-all-main-item">
+      {!!dataBySquares.length && (
+        <div className='neactivka-all'>
+          <div className='neactivka-all-main br-10'>
+            <span className='neactivka-all-main-title'>Все квадраты</span>
+            <span className='neactivka-all-main-desc'>Общая статистика</span>
+            <div className='neactivka-all-main-items'>
+              <div className='neactivka-all-main-item'>
                 <span>ОАБ</span>
                 <span>{oab}</span>
               </div>
-              <div className="neactivka-all-main-item">
+              <div className='neactivka-all-main-item'>
                 <span>ААБ</span>
                 <span>{aab}</span>
               </div>
-              <div className="neactivka-all-main-item">
+              <div className='neactivka-all-main-item'>
                 <span>НАБ</span>
                 <span>{nab}</span>
               </div>
-              <div className="neactivka-all-main-item">
+              <div className='neactivka-all-main-item'>
+                <span>6 и более</span>
+                <span>{lastPaysCount}</span>
+              </div>
+              <div className='neactivka-all-main-item'>
                 <span>
                   {otklonenieKolvo >= 0 ? 'Соответствие' : 'Отклонение'}
                 </span>
                 <span>{otklonenieKolvo || 0}</span>
               </div>
-              <div className="neactivka-all-main-item">
+              <div className='neactivka-all-main-item'>
                 <span>
                   {otkloneniePercentage >= 0 ? 'Соответствие' : 'Отклонение'} %
                 </span>
@@ -240,9 +205,12 @@ const NeactivkaBySquares = () => {
               </div>
             </div>
           </div>
-          {list.map((item, i) => (
-            <div className="neactivka-all-square br-10" key={i}>
-              <span className="neactivka-all-square-title">
+          {dataBySquares.map((item, i) => (
+            <div
+              className='neactivka-all-square br-10'
+              key={i}
+            >
+              <span className='neactivka-all-square-title'>
                 {item.squares.squares}
                 <span
                   style={{
@@ -267,17 +235,21 @@ const NeactivkaBySquares = () => {
                     }}
                   >
                     <span
-                      className="currentPercentage-increase"
+                      className='currentPercentage-increase'
                       onClick={() => {
-                        percentageChange(i, (item.percentage || 90) + 1);
+                        percentageChange(i, (
+                          item.percentage || 90
+                        ) + 1);
                       }}
                     >
                       &#x25B2;
                     </span>
                     <span
-                      className="currentPercentage-decrease"
+                      className='currentPercentage-decrease'
                       onClick={() => {
-                        percentageChange(i, (item.percentage || 90) - 1);
+                        percentageChange(i, (
+                          item.percentage || 90
+                        ) - 1);
                       }}
                     >
                       &#x25BC;
@@ -286,90 +258,118 @@ const NeactivkaBySquares = () => {
                   {' ' + item.percentage}%
                 </div>
               </span>
-              <div className="neactivka-all-square-items">
-                <div className="neactivka-all-square-item br-10">
-                  <span className="neactivka-all-square-item-title br-10">
+              <div className='neactivka-all-square-items'>
+                <div className='neactivka-all-square-item br-10'>
+                  <span className='neactivka-all-square-item-title br-10'>
                     ААБ
                   </span>
-                  <span className="neactivka-all-square-item-value br-10">
+                  <span className='neactivka-all-square-item-value br-10'>
                     {item.aab}
                   </span>
                 </div>
-                <div className="neactivka-all-square-item br-10">
-                  <span className="neactivka-all-square-item-title br-10">
+                <div className='neactivka-all-square-item br-10'>
+                  <span className='neactivka-all-square-item-title br-10'>
                     НАБ
                   </span>
-                  <span className="neactivka-all-square-item-value br-10">
+                  <span className='neactivka-all-square-item-value br-10'>
                     {item.nab}
                   </span>
                 </div>
-                <div className="neactivka-all-square-item br-10">
-                  <span className="neactivka-all-square-item-title br-10">
+                <div className='neactivka-all-square-item br-10'>
+                  <span className='neactivka-all-square-item-title br-10'>
                     ОАБ
                   </span>
-                  <span className="neactivka-all-square-item-value br-10">
+                  <span className='neactivka-all-square-item-value br-10'>
                     {item.oab}
                   </span>
                 </div>
-                <div className="neactivka-all-square-item br-10">
-                  <span className="neactivka-all-square-item-title br-10">
+                <div className='neactivka-all-square-item br-10'>
+                  <span className='neactivka-all-square-item-title br-10'>
+                    6 и более
+                  </span>
+                  <span className='neactivka-all-square-item-value br-10'>
+                    {item.lastPaysCount}
+                  </span>
+                </div>
+                <div className='neactivka-all-square-item br-10'>
+                  <span className='neactivka-all-square-item-title br-10'>
                     ААБ/ОАБ%
                   </span>
-                  <span className="neactivka-all-square-item-value br-10">
+                  <span className='neactivka-all-square-item-value br-10'>
                     {Number(item.aabPercentage) || 0}%
                   </span>
                 </div>
-                <div className="neactivka-all-square-item br-10">
-                  <span className="neactivka-all-square-item-title br-10">
-                    {Number(
-                      ((item.aab || 0) / ((item.aab || 0) + (item.nab || 0))) *
-                        100 -
-                        item.percentage || 0
-                    ).toFixed(2) || 0
-                      ? 'Соответствие'
-                      : 'Отклонение'}{' '}
+                <div className='neactivka-all-square-item br-10'>
+                  <span className='neactivka-all-square-item-title br-10'>
+                    {Number((
+                      (
+                        item.aab || 0
+                      ) / (
+                        (
+                          item.aab || 0
+                        ) + (
+                          item.nab || 0
+                        )
+                      )
+                    ) * 100 - item.percentage || 0).toFixed(2) || 0 ? 'Соответствие' : 'Отклонение'}{' '}
                     %
                   </span>
-                  <span className="neactivka-all-square-item-value br-10">
-                    {Number(
-                      ((item.aab || 0) / ((item.aab || 0) + (item.nab || 0))) *
-                        100 -
-                        item.percentage || 0
-                    ).toFixed(2) ||
-                      0 ||
-                      0}
+                  <span className='neactivka-all-square-item-value br-10'>
+                    {Number((
+                      (
+                        item.aab || 0
+                      ) / (
+                        (
+                          item.aab || 0
+                        ) + (
+                          item.nab || 0
+                        )
+                      )
+                    ) * 100 - item.percentage || 0).toFixed(2) || 0 || 0}
                     %
                   </span>
                 </div>
-                <div className="neactivka-all-square-item br-10">
-                  <span className="neactivka-all-square-item-title br-10">
-                    {(Number(
-                      (
-                        ((((item.aab + item.nab || 0) / 100) *
-                          item.percentage) /
-                          100) *
-                        Number(
-                          ((item.aab || 0) / (item.aab + item.nab || 0)) * 100 -
-                            item.percentage
-                        )
-                      ).toFixed()
-                    ) || 0) >= 0
-                      ? 'Соответствие'
-                      : 'Отклонение'}
+                <div className='neactivka-all-square-item br-10'>
+                  <span className='neactivka-all-square-item-title br-10'>
+                    {(
+                      Number((
+                        (
+                          (
+                            (
+                              (
+                                item.aab + item.nab || 0
+                              ) / 100
+                            ) * item.percentage
+                          ) / 100
+                        ) * Number((
+                          (
+                            item.aab || 0
+                          ) / (
+                            item.aab + item.nab || 0
+                          )
+                        ) * 100 - item.percentage)
+                      ).toFixed()) || 0
+                    ) >= 0 ? 'Соответствие' : 'Отклонение'}
                     , кол-во
                   </span>
-                  <span className="neactivka-all-square-item-value br-10">
-                    {Number(
+                  <span className='neactivka-all-square-item-value br-10'>
+                    {Number((
                       (
-                        ((((item.aab + item.nab || 0) / 100) *
-                          item.percentage) /
-                          100) *
-                        Number(
-                          ((item.aab || 0) / (item.aab + item.nab || 0)) * 100 -
-                            item.percentage
+                        (
+                          (
+                            (
+                              item.aab + item.nab || 0
+                            ) / 100
+                          ) * item.percentage
+                        ) / 100
+                      ) * Number((
+                        (
+                          item.aab || 0
+                        ) / (
+                          item.aab + item.nab || 0
                         )
-                      ).toFixed()
-                    ) || 0}
+                      ) * 100 - item.percentage)
+                    ).toFixed()) || 0}
                   </span>
                 </div>
               </div>

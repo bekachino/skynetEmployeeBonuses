@@ -341,56 +341,60 @@ const Bonuses = () => {
     XLSX.writeFile(workbook, `${state.district.squares} - ${formatDate(new Date(state.date))}.xlsx`);
   };
   
+  const ToolbarLayout = () => (
+    <Toolbar
+      open={toobarOpen}
+      onClick={() => setToolbarOpen(!toobarOpen)}
+    >
+      {!/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) && !/iPad|Android|tablet|touch/i.test(navigator.userAgent) &&
+        <Logout/>}
+      <form
+        className='toolbar-form'
+        onSubmit={onSubmit}
+      >
+        <DatePicker
+          value={state.date}
+          changeHandler={changeHandler}
+          i={''}
+        />
+        {!/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) && !/iPad|Android|tablet|touch/i.test(navigator.userAgent) && (
+          <Autocomplete
+            name='district'
+            value={state.district.squares}
+            changeHandler={changeHandler}
+            options={[
+              ...(
+                locations?.map((district) => district.squares) || []
+              ),
+            ]}
+            i={''}
+            onClick={() => setState((prevState) => (
+              {
+                ...prevState,
+                district: {
+                  id: -1,
+                  squares: '',
+                },
+              }
+            ))}
+            label='Выберите квадрат'
+          />
+        )}
+        <Button
+          type='submit'
+          disabled={!state.date || (
+            !/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) && !/iPad|Android|tablet|touch/i.test(navigator.userAgent) && !state.district.squares
+          )}
+          loading={formLoading}
+          label='Поиск'
+        />
+      </form>
+    </Toolbar>
+  );
+  
   return (
     <>
-      <Toolbar
-        open={toobarOpen}
-        onClick={() => setToolbarOpen(!toobarOpen)}
-      >
-        {!/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) && !/iPad|Android|tablet|touch/i.test(navigator.userAgent) &&
-          <Logout/>}
-        <form
-          className='toolbar-form'
-          onSubmit={onSubmit}
-        >
-          <DatePicker
-            value={state.date}
-            changeHandler={changeHandler}
-            i={''}
-          />
-          {!/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) && !/iPad|Android|tablet|touch/i.test(navigator.userAgent) && (
-            <Autocomplete
-              name='district'
-              value={state.district.squares}
-              changeHandler={changeHandler}
-              options={[
-                ...(
-                  locations?.map((district) => district.squares) || []
-                ),
-              ]}
-              i={''}
-              onClick={() => setState((prevState) => (
-                {
-                  ...prevState,
-                  district: {
-                    id: -1,
-                    squares: '',
-                  },
-                }
-              ))}
-              label='Выберите квадрат'
-            />
-          )}
-          <Button
-            type='submit'
-            disabled={!state.date || (
-              !/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) && !/iPad|Android|tablet|touch/i.test(navigator.userAgent) && !state.district.squares
-            )}
-            loading={formLoading}
-            label='Поиск'
-          />
-        </form>
-      </Toolbar>
+      <ToolbarLayout/>
       <div className='bonuses-container'>
         {[
           'ruslan',
