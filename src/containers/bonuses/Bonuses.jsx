@@ -12,6 +12,7 @@ import { setLocations, setNonActive } from '../../features/usersSlice';
 import * as XLSX from 'xlsx';
 import excelLogo from '../../assets/excel.png';
 import { useFetchLastPays } from "./hooks";
+import { formatDate, uploadLastPays } from "../../utils";
 import './bonuses.css';
 
 const Bonuses = () => {
@@ -19,10 +20,6 @@ const Bonuses = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const kolZayContainerRef = useRef();
-  const [kolZayContainerPosition, setKolZayContainerPosition] = useState({
-    x: 0,
-    y: 0,
-  });
   const user = useAppSelector((state) => state.userState.user);
   const locations = useAppSelector((state) => state.userState.locations);
   const [nonActives, setNonActives] = useState([]);
@@ -153,16 +150,6 @@ const Bonuses = () => {
     );
   };
   
-  const formatDate = (date) => {
-    const pad = (num, size) => num.toString().padStart(size, '0');
-    
-    const year = date.getFullYear();
-    const month = pad(date.getMonth() + 1, 2);
-    const day = pad(date.getDate(), 2);
-    
-    return `${year}-${month}-${day}`;
-  };
-  
   const formatNumber = (number) => {
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
   };
@@ -198,16 +185,6 @@ const Bonuses = () => {
       setActivesLoading(false);
     } catch (e) {
       console.log(e);
-    }
-  };
-  
-  const handleScroll = () => {
-    const pos = kolZayContainerRef.current?.getBoundingClientRect();
-    if (pos) {
-      setKolZayContainerPosition({
-        x: pos.left,
-        y: pos.top,
-      });
     }
   };
   
@@ -286,8 +263,6 @@ const Bonuses = () => {
       setShowActives(false);
       setShowOab(false);
     });
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
   
   const onSubmit = async (e) => {
@@ -877,36 +852,59 @@ const Bonuses = () => {
             </div>
             <div
               className='bonuses-paper'
-              style={{ width: '100%' }}
+              style={{
+                width: '100%',
+                position: 'relative'
+              }}
             >
               <h1 className='bonuses-paper-title'>
                 2. Абоненты 6 и более
+                <div
+                  className='export-to-excel'
+                  onClick={() => {
+                    if (lastPaysLoading || !lastPays) return;
+                    uploadLastPays(lastPays, state.district.squares, state.date)
+                  }}
+                  style={{
+                    position: 'absolute',
+                    right: '30px',
+                  }}
+                >
+                  <img
+                    src={excelLogo}
+                    alt='excel logo'
+                    width='30px'
+                    height='30px'
+                  />
+                  <span style={{ color: 'black' }}>экспорт</span>
+                </div>
               </h1>
               <div className='new-bonuses-table-wrapper'>
-                {!lastPaysLoading ? <table
-                  className='new-bonuses-table'
-                >
-                  <thead>
-                  <tr>
-                    <th>Лицевой счёт</th>
-                    <th style={{ minWidth: '240px' }}>Номер телефона</th>
-                    <th style={{ minWidth: '300px' }}>Адрес</th>
-                    <th>Дата</th>
-                    <th style={{ fontWeight: '700' }}>Баланс</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  {lastPays.map(lastPay => (
+                {!lastPaysLoading ? !!lastPays.length ? <table
+                    className='new-bonuses-table'
+                  >
+                    <thead>
                     <tr>
-                      <td>{lastPay.ls_abon}</td>
-                      <td>{lastPay.phone_abon}</td>
-                      <td>{lastPay.address}</td>
-                      <td>{lastPay.last_pay}</td>
-                      <td style={{ fontWeight: '700' }}>{lastPay.balance}</td>
+                      <th>Лицевой счёт</th>
+                      <th style={{ minWidth: '240px' }}>Номер телефона</th>
+                      <th style={{ minWidth: '300px' }}>Адрес</th>
+                      <th>Дата</th>
+                      <th style={{ fontWeight: '700' }}>Баланс</th>
                     </tr>
-                  ))}
-                  </tbody>
-                </table> : <h3 style={{ margin: 0 }}>Загрузка...</h3>}
+                    </thead>
+                    <tbody>
+                    {lastPays.map(lastPay => (
+                      <tr>
+                        <td>{lastPay.ls_abon}</td>
+                        <td>{lastPay.phone_abon}</td>
+                        <td>{lastPay.address}</td>
+                        <td>{lastPay.last_pay}</td>
+                        <td style={{ fontWeight: '700' }}>{lastPay.balance}</td>
+                      </tr>
+                    ))}
+                    </tbody>
+                  </table> : <h3 style={{ margin: 0 }}>Нет данных</h3> :
+                  <h3 style={{ margin: 0 }}>Загрузка...</h3>}
               </div>
             </div>
             <div
@@ -930,7 +928,6 @@ const Bonuses = () => {
                   <span
                     className='table-col-title'
                     onMouseEnter={() => {
-                      handleScroll();
                       setShowConnectedAbonents(true);
                     }}
                     onMouseLeave={() => setShowConnectedAbonents(false)}
